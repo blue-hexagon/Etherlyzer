@@ -1,0 +1,141 @@
+[project]
+name = "etherlyzer"
+version = "0.3.0"
+description = "Fast offline lookup and classification of Ethernet-related identifiers."
+readme = "README.md"
+requires-python = ">=3.14"
+license = { text = "MIT" }
+
+authors = [
+    { name = "Tobias Andersen" }
+]
+
+keywords = [
+    "ethernet",
+    "mac-address",
+    "oui",
+    "ieee",
+    "ethertype",
+    "networking",
+    "cybersecurity",
+    "asset-discovery",
+    "network-automation",
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: System :: Networking",
+    "Topic :: Security",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "requests (>=2.34.2,<3.0.0)",
+    "python-dotenv>=1.2.2,<2.0.0",
+    "platformdirs (>=4.10.0,<5.0.0)",
+    "pandas (>=3.0.5,<4.0.0)",
+]
+
+[project.urls]
+Homepage = "https://github.com/blue-hexagon/EtherLyzer"
+Repository = "https://github.com/blue-hexagon/EtherLyzer"
+Issues = "https://github.com/blue-hexagon/EtherLyzer/issues"
+
+[project.scripts]
+etherlyzer = "etherlyzer.cli:main"
+
+
+[tool.poetry]
+packages = [
+    { include = "etherlyzer", from = "src" }
+]
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.1.1"
+pytest-cov = "^7.1.0"
+mypy = "^2.2.0"
+ruff = "^0.15.21"
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+]
+
+
+[tool.coverage.run]
+branch = true
+source = ["etherlyzer"]
+
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+files = ["src", "tests"]
+
+warn_unused_configs = true
+warn_unreachable = true
+show_error_codes = true
+pretty = true
+
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+src = ["src", "tests"]
+
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "W",
+    "I",
+    "UP",
+    "B",
+    "SIM",
+    "C4",
+    "RUF",
+]
+
+ignore = [
+    "E501",
+]
+
+
+[tool.ruff.lint.isort]
+known-first-party = ["etherlyzer"]
+
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
