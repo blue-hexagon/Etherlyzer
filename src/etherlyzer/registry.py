@@ -6,9 +6,9 @@ from pathlib import Path
 import requests
 from requests import ConnectTimeout
 
-from etherlyzer.conf import config
+from etherlyzer.configuration import config
 from etherlyzer.importer import CSVImporter
-from etherlyzer.pathman import DATA_ROOT
+from etherlyzer.dirs import DATA_ROOT
 
 
 class RegistryCategory(StrEnum):
@@ -68,7 +68,7 @@ class IEEERegistry:
     legacy: bool = False
 
     update_interval: datetime.timedelta = datetime.timedelta(days=1)
-    last_retrieved: datetime.datetime = None
+    last_retrieved: datetime.datetime = None  # noqa; set in post-init
 
     def __post_init__(self):
         # Check that filepath exists
@@ -111,6 +111,8 @@ class IEEERegistry:
         }
 
     def load(self):
+        if not self.filepath.exists():
+            self.save()
         return CSVImporter.load(self.filepath, self.model)
 
     def need_updates(self):
@@ -132,19 +134,24 @@ class IEEERegistry:
         times = 1
         max = 3
         res = None
-        while loop := True and times <= max:
+        loop = True
+        while loop and times <= max:
             try:
-                res = requests.get(headers=self.req_headers(), url=self.url, timeout=2)
+                if config.show_sync_messages:
+                    print(f"Saving Registry: {self.name}")
+                res = requests.get(headers=self.req_headers(), url=self.url, timeout=20)
                 res.raise_for_status()
                 loop = False
             except ConnectTimeout:
-                print(f"Request timed out. Attempt {times} of {max}.")
+                if config.show_sync_messages:
+                    print(f"Request timed out on {times}. attempt out of {max} attempts.")
                 times += 1
                 if times == max + 1:
-                    print("Unable to retrieve the registry. Maximum retry attempts exceeded.")
+                    print(f"Unable to retrieve the registry '{self.name}' from {self.url}. Maximum attempts exceeded.")
                     return False
         with open(self.filepath, "w", encoding="utf-8", newline="") as f:
             f.write(res.content.decode("utf-8"))
+        return None
 
 
 class Registry:
@@ -286,8 +293,7 @@ class Registry:
     def get_registries(self, update=True) -> list[IEEERegistry]:
         for registry in self.IEEE_REGISTRIES.values():
             if update and registry.need_updates():
-                if config.show_sync_messages:
-                    print(f"Saving Registry: {registry.name}")
+
                 status = registry.save()
                 if status is False:
                     break

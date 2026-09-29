@@ -23,12 +23,12 @@ Typical use cases include:
 * Identify the manufacturer of a MAC address.
 * Distinguish between MA-L, MA-M, and MA-S allocations.
 * Look up EtherTypes (e.g. IPv4, IPv6, ARP, LLDP).
-* Identify industrial, AV, IoT, and network infrastructure vendors.
-* Bulk-process thousands of MAC addresses from text files.
+* Identify industrial, AV, IoT, network infrastructure vendors and a bunch more.
+* Bulk-process thousands of MAC addresses from text files in seconds.
 * Build high-performance lookup indexes for repeated searches.
-* Automatically synchronize the local IEEE registry database.
+* Automatically synchronize the local IEEE registry database (update interval configurable).
 * Normalize MAC addresses from virtually any format.
-* Format MAC addresses using Cisco, Windows, Linux, or custom styles.
+* Format MAC addresses using Cisco, Windows, Linux, or custom formats.
 * Export lookup results as CSV or other delimited formats.
 * Integrate into automation scripts, inventory systems, NAC workflows, NOC/SOC tooling, and asset discovery solutions.
 
@@ -39,35 +39,90 @@ Typical use cases include:
 Clone the repository:
 
 ```bash
-git clone https://github.com/blue-hexagon/EtherLyzer.git
-cd EtherLyzer
+pip install etherlyzer
 ```
 
-Install the project using Poetry:
+## Running
 
 ```bash
-poetry install
-```
+etherlyzer normalize --bulk --linenumbers | Select-String "Invalid"
 
+>>>
+00:1A:2B:3C:4D:5E
+00-1A-2B-3C-4D-5E
+001A.2B3C.4D5E
+001A2B3C4D5E
+00 1A 2B 3C 4D 5E
+001A-2B3C-4D5E
+001A:2B3C:4D5E
+
+aa:bb:cc:dd:ee:ff
+AA-BB-CC-DD-EE-FF
+aabb.ccdd.eeff
+AABBCCDDEEFF
+
+00:00:00:00:00:00
+FF:FF:FF:FF:FF:FF
+02:00:00:00:00:01
+
+00:1A:2B:3C:4D
+00:1A:2B:3C:4D:5E:6F
+001A2B3C4D5
+001A2B3C4D5E00
+
+00:1A:2B:3C:4D:ZZ
+GG:1A:2B:3C:4D:5E
+00:1A:2B:3C:4D:5G
+
+00::1A:2B:3C:4D:5E
+00:1A::2B:3C:4D:5E
+00-1A:2B-3C:4D-5E
+00.1A.2B.3C.4D.5E
+
+ 00:1A:2B:3C:4D:5E
+00:1A:2B:3C:4D:5E 
+00:1A:2B:3C:4D:5E\t
+00 : 1A : 2B : 3C : 4D : 5E
+;;;
+
+15. Invalid MAC address: 001a2b3c4d?
+16. Invalid MAC address: 001a2b3c4d5e?6f
+
+```
 ---
 
 ## Configuration
 
-The included `.env` file provides sensible defaults and works out of the box.
+The included `etherlyzer.env` file provides sensible defaults and works out of the box.
 
 Example configuration:
 
 ```dotenv
+#---------------------------------------------------DATASET
+# Maximum age of the local IEEE database before synchronization, in hours
 DB_UPDATE_INTERVAL_HOURS=24
 
-FIELD_SEPARATOR=;
-MAC_SEPARATOR=.
-MAC_BLOCK_SIZE=4
-MAC_CASE=upper
+#---------------------------------------------------EXPORT
+# Field delimiter used for CSV and stdout output
+FIELD_SEPARATOR="\t"
+# MAC address formatting
+# Supported separators: :, -, ., or an empty value
+MAC_SEPARATOR=-
+# Number of hexadecimal characters per block
+# 2 -> 00:11:22:33:44:55
+# 4 -> 0011.2233.4455
+MAC_BLOCK_SIZE=2
+# Supported values: upper, lower
+MAC_CASE=lower
 
-SHOW_SYNC_MESSAGES=false
+#---------------------------------------------------DISPLAY
+# Print database synchronization messages
+SHOW_SYNC_MESSAGES=true
 
+#---------------------------------------------------INPUT (deprecated - will use stdin in future)
+# Read lookup values from a text file
 USE_FILE_ENABLED=true
+# Input filename relative to the configured input directory
 USE_FILE=in.txt
 ```
 
@@ -84,7 +139,7 @@ poetry run python main.py
 Or activate the virtual environment first:
 
 ```bash
-poetry shell
+poetry env activate
 python main.py
 ```
 

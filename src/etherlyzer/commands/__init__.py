@@ -1,6 +1,6 @@
 from . import (
     bulk,
-    formatmac,
+    format,
     info,
     lookup,
     normalize,

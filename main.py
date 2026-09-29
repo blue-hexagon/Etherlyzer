@@ -1,10 +1,9 @@
 from etherlyzer.database import RegistryIndex
 from etherlyzer.exporter import RegistryMatchExporter
 from etherlyzer.registry import Registry
-
+from etherlyzer import __version__
 if __name__ == '__main__':
     import time
-
     t0 = time.perf_counter()
 
     registry = Registry()
@@ -42,4 +41,3 @@ if __name__ == '__main__':
         retrieved_vendors
     )
     print(f"{len(retrieved_vendors)} vendors found")
-

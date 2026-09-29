@@ -3,8 +3,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypeVar
 
-import etherlyzer.pathman as pathman
-from etherlyzer.conf import config
+import etherlyzer.dirs as pathman
+from etherlyzer.configuration import config
 from etherlyzer.registry import EtherTypeEntry, IEEEEntry, IEEERegistry, RegistryCategory
 
 HEX_DIGITS = frozenset("0123456789ABCDEF")

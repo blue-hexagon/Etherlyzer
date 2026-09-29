@@ -1,17 +1,15 @@
 from __future__ import annotations
 
 from etherlyzer.registry import Registry
-
-__VERSION__ = "0.1.0"
+from etherlyzer import __version__
 
 
 def run(args):
-
     manager = Registry()
 
     print()
 
-    print(f"EtherLyzer {__VERSION__}")
+    print(f"EtherLyzer {__version__}")
     print()
 
     print("Registries")
@@ -37,7 +35,6 @@ def run(args):
 
 
 def register(subparsers):
-
     parser = subparsers.add_parser(
         "info",
         help="Show application information",

@@ -57,6 +57,10 @@ packages = [
     { include = "etherlyzer", from = "src" }
 ]
 
+include = [
+    { path = "src/etherlyzer/data/*.csv", format = ["sdist", "wheel"] }
+]
+
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.1.1"
@@ -138,4 +142,3 @@ line-ending = "auto"
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
-

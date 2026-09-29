@@ -4,7 +4,7 @@ import argparse
 
 from etherlyzer.commands import (
     # bulk,
-    formatmac,
+    format,
     info,
     # lookup,
     normalize,
@@ -34,7 +34,7 @@ def build_parser() -> argparse.ArgumentParser:
     # lookup.register(subparsers)
     # bulk.register(subparsers)
     normalize.register(subparsers)
-    formatmac.register(subparsers)
+    format.register(subparsers)
     update.register(subparsers)
     info.register(subparsers)
     identify.register(subparsers)

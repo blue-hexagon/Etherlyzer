@@ -1,5 +1,5 @@
-from conf import config
-from formatters import MACFormatter
+from etherlyzer.configuration import config
+from etherlyzer.formatters import MACFormatter
 
 from etherlyzer.registry import IEEEEntry
 

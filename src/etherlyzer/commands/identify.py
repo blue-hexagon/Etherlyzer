@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from etherlyzer.database import RegistryIndex
 from etherlyzer.registry import EtherTypeEntry, Registry, RegistryCategory
 
