@@ -2,15 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from etherlyzer.commands import (
-    # bulk,
-    format,
-    info,
-    # lookup,
-    normalize,
-    identify,
-    update,
-)
+from etherlyzer.terminal.commands import info, format, normalize, identify, update
 
 
 def build_parser() -> argparse.ArgumentParser:

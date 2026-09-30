@@ -1,7 +1,7 @@
 from enum import StrEnum
 from typing import Literal
 
-from etherlyzer.configuration import config
+from etherlyzer.misc.settings import config
 from string import punctuation
 
 

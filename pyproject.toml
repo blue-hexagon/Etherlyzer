@@ -49,7 +49,7 @@ Repository = "https://github.com/blue-hexagon/EtherLyzer"
 Issues = "https://github.com/blue-hexagon/EtherLyzer/issues"
 
 [project.scripts]
-etherlyzer = "etherlyzer.cli:main"
+etherlyzer = "etherlyzer.terminal.cli:main"
 
 
 [tool.poetry]

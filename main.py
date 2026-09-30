@@ -1,7 +1,7 @@
-from etherlyzer.database import RegistryIndex
+from etherlyzer.ieee.database import RegistryIndex
 from etherlyzer.exporter import RegistryMatchExporter
-from etherlyzer.registry import Registry
-from etherlyzer import __version__
+from etherlyzer.ieee.registry import Registry
+
 if __name__ == '__main__':
     import time
     t0 = time.perf_counter()

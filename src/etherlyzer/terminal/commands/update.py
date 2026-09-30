@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 
-from etherlyzer.registry import Registry
+from etherlyzer.ieee.registry import Registry
 
 
 def run(args):

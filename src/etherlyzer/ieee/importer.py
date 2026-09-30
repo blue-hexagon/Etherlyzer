@@ -8,7 +8,7 @@ from typing import Any, TypeVar
 T = TypeVar("T")
 
 
-class CSVImporter:
+class IEEERegistryReader:
 
     @staticmethod
     def normalize(name: str) -> str:

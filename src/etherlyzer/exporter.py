@@ -1,7 +1,7 @@
-from etherlyzer.configuration import config
+from etherlyzer.misc.settings import config
 from etherlyzer.formatters import MACFormatter
 
-from etherlyzer.registry import IEEEEntry
+from etherlyzer.ieee.registry import IEEEEntry
 
 
 class RegistryMatchExporter:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from etherlyzer.registry import Registry
+from etherlyzer.ieee.registry import Registry
 from etherlyzer import __version__
 
 

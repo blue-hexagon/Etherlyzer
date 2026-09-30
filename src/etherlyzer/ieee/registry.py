@@ -6,9 +6,9 @@ from pathlib import Path
 import requests
 from requests import ConnectTimeout
 
-from etherlyzer.configuration import config
-from etherlyzer.importer import CSVImporter
-from etherlyzer.dirs import DATA_ROOT
+from etherlyzer.misc.settings import config
+from etherlyzer.ieee.importer import IEEERegistryReader
+from etherlyzer.misc.dirs import DATA_ROOT
 
 
 class RegistryCategory(StrEnum):
@@ -113,7 +113,7 @@ class IEEERegistry:
     def load(self):
         if not self.filepath.exists():
             self.save()
-        return CSVImporter.load(self.filepath, self.model)
+        return IEEERegistryReader.load(self.filepath, self.model)
 
     def need_updates(self):
         expires = self.last_retrieved + self.update_interval

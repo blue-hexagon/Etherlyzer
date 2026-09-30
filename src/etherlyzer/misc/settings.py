@@ -14,7 +14,7 @@ class MACCase(StrEnum):
 
 
 @dataclass(slots=True, frozen=True)
-class Config:
+class Settings:
     db_update_interval_hours: int = 24
 
     field_separator: str = ";"
@@ -28,7 +28,7 @@ class Config:
     use_file: Path = Path("in.txt")
 
 
-def validate_config(conf: Config) -> None:
+def validate_config(conf: Settings) -> None:
     if conf.db_update_interval_hours <= 0:
         raise ValueError(
             "DB_UPDATE_INTERVAL_HOURS must be greater than zero."
@@ -55,7 +55,7 @@ def validate_config(conf: Config) -> None:
         )
 
 
-def load_config(cls: type[Config]) -> Config:
+def load_config(cls: type[Settings]) -> Settings:
     values = {}
 
     for field in fields(cls):
@@ -97,5 +97,5 @@ def load_config(cls: type[Config]) -> Config:
     return cls(**values)
 
 
-config = load_config(Config)
+config = load_config(Settings)
 validate_config(config)

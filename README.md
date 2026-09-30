@@ -45,50 +45,80 @@ pip install etherlyzer
 ## Running
 
 ```bash
-etherlyzer normalize --bulk --linenumbers | Select-String "Invalid"
+etherlyzer normalize --bulk --linenumbers
 
->>>
-00:1A:2B:3C:4D:5E
-00-1A-2B-3C-4D-5E
-001A.2B3C.4D5E
-001A2B3C4D5E
-00 1A 2B 3C 4D 5E
-001A-2B3C-4D5E
-001A:2B3C:4D5E
+Paste MAC addresses. Enter a triple semicolon ;;; when done:
+001a2b3c4d5e
+001a2b3c4d5
+001a2b3c4d5e6
+001a2b3c4d5?
+001a2b3c4d5O
+001a2b3c4d5I
+001a2b3c4d5L
+001a2b3c4d5S
+001a2b3c4d5eF
+001a2b3c4d5eO
+001a2b3c4d5eI
+001a2b3c4d5eL
+001a2b3c4d5eS
+001a2b3c4d5e?
+001a2b3c4d5eFF
+001a2b3c4d5eOO
+001a2b3c4d5eII
+001a2b3c4d5eSS
+00:1a:2b:3c:4d:5e
+00-1a-2b-3c-4d-5e
+001a.2b3c.4d5e
+0:0:1:a:2:b:3:c:4:d:5:e
+00 : 1a : 2b : 3c : 4d : 5e
+"00:1a:2b:3c:4d:5e"
+00::1a::2b::3c::4d::5e
+00:1a-2b.3c:4d-5e
 
-aa:bb:cc:dd:ee:ff
-AA-BB-CC-DD-EE-FF
-aabb.ccdd.eeff
-AABBCCDDEEFF
-
-00:00:00:00:00:00
-FF:FF:FF:FF:FF:FF
-02:00:00:00:00:01
-
-00:1A:2B:3C:4D
-00:1A:2B:3C:4D:5E:6F
-001A2B3C4D5
-001A2B3C4D5E00
-
-00:1A:2B:3C:4D:ZZ
-GG:1A:2B:3C:4D:5E
-00:1A:2B:3C:4D:5G
-
-00::1A:2B:3C:4D:5E
-00:1A::2B:3C:4D:5E
-00-1A:2B-3C:4D-5E
-00.1A.2B.3C.4D.5E
-
- 00:1A:2B:3C:4D:5E
-00:1A:2B:3C:4D:5E 
-00:1A:2B:3C:4D:5E\t
-00 : 1A : 2B : 3C : 4D : 5E
 ;;;
+OK  001a2b3c4d5e    << 001a2b3c4d5e
+ERR 001a2b3c4d5     >> vvvvvvvvvvvM
+ERR 001a2b3c4d5e6   >> vvvvvvvvvvvvV
+ERR 001a2b3c4d5     >> vvvvvvvvvvvM
+ERR 001a2b3c4d5O    >> vvvvvvvvvvvr
+ERR 001a2b3c4d5I    >> vvvvvvvvvvvl
+ERR 001a2b3c4d5L    >> vvvvvvvvvvvl
+ERR 001a2b3c4d5S    >> vvvvvvvvvvvl
+ERR 001a2b3c4d5ef   >> vvvvvvvvvvvvV
+ERR 001a2b3c4d5eO   >> vvvvvvvvvvvvR
+ERR 001a2b3c4d5eI   >> vvvvvvvvvvvvL
+ERR 001a2b3c4d5eL   >> vvvvvvvvvvvvL
+ERR 001a2b3c4d5eS   >> vvvvvvvvvvvvL
+OK  001a2b3c4d5e    << 001a2b3c4d5e?
+ERR 001a2b3c4d5eff  >> vvvvvvvvvvvvVV
+ERR 001a2b3c4d5eOO  >> vvvvvvvvvvvvRR
+ERR 001a2b3c4d5eII  >> vvvvvvvvvvvvLL
+ERR 001a2b3c4d5eSS  >> vvvvvvvvvvvvLL
+OK  001a2b3c4d5e    << 00:1a:2b:3c:4d:5e
+OK  001a2b3c4d5e    << 00-1a-2b-3c-4d-5e
+OK  001a2b3c4d5e    << 001a.2b3c.4d5e
+OK  001a2b3c4d5e    << 0:0:1:a:2:b:3:c:4:d:5:e
+OK  001a2b3c4d5e    << 00 : 1a : 2b : 3c : 4d : 5e
+OK  001a2b3c4d5e    << "00:1a:2b:3c:4d:5e"
+OK  001a2b3c4d5e    << 00::1a::2b::3c::4d::5e
+OK  001a2b3c4d5e    << 00:1a-2b.3c:4d-5e
 
-15. Invalid MAC address: 001a2b3c4d?
-16. Invalid MAC address: 001a2b3c4d5e?6f
-
+Normalized 10/26 MAC addresses. Invalid MAC addresses identified: 16/26
 ```
+
+### Understanding Masks
+
+The following masks are used when normalizing MAC adresses.
+
+```python
+v = valid hex digit
+M = missing digit
+V = excess valid hex digit
+I = invalid character
+r/R = relaxed typo candidate
+l/L = lenient typo candidate
+```
+
 ---
 
 ## Configuration

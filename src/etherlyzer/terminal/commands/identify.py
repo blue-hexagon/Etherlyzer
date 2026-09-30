@@ -1,5 +1,5 @@
-from etherlyzer.database import RegistryIndex
-from etherlyzer.registry import EtherTypeEntry, Registry, RegistryCategory
+from etherlyzer.ieee.database import RegistryIndex
+from etherlyzer.ieee.registry import EtherTypeEntry, Registry, RegistryCategory
 
 
 def run(args):
