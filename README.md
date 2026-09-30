@@ -34,18 +34,169 @@ Typical use cases include:
 
 ---
 
+## The Data Layer
+
+From the command-line: `etherlyzer info`:
+
+```text
+(etherlyzer-py3.14) PS C:\Users\T\Desktop\EtherTools> etherlyzer info
+
+EtherLyzer 0.3.0
+
+Registries
+IEEE Name: MA-L (MAC Address Block Large)
+Legacy Name: OUI
+Category: mac
+Description: Large IEEE MAC address allocation. Formerly known as the Organizationally Unique Identifier (OUI). Used by vendors requiring large address spaces.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\MA-L.csv
+URL: https://standards-oui.ieee.org/oui/oui.csv
+Prefix bits: 24
+Last retrieved: 2026-09-28 17:33:17.442158+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: MA-M (MAC Address Block Medium)
+Legacy Name: OUI-28
+Category: mac
+Description: Medium-sized IEEE MAC address allocation intended for organizations requiring fewer addresses than MA-L.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\MA-M.csv
+URL: https://standards-oui.ieee.org/oui28/mam.csv
+Prefix bits: 28
+Last retrieved: 2026-09-28 17:33:20.061122+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: MA-S (MAC Address Block Small)
+Legacy Name: OUI-36
+Category: mac
+Description: Small IEEE MAC address allocation for embedded devices, IoT, industrial equipment, and smaller manufacturers.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\MA-S.csv
+URL: https://standards-oui.ieee.org/oui36/oui36.csv
+Prefix bits: 36
+Last retrieved: 2026-09-28 17:33:22.278145+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: MANID (Manufacturer Identifier)
+Legacy Name: None
+Category: identifier
+Description: Manufacturer identifier registry maintained by the IEEE Registration Authority. Used to uniquely identify manufacturers rather than allocating MAC addresses.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\MANID.csv
+URL: https://standards-oui.ieee.org/manid/manid.csv
+Prefix bits: None
+Last retrieved: 2026-09-28 17:33:23.313482+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: OPID (OUI-based Protocol Identifier)
+Legacy Name: None
+Category: identifier
+Description: Registry of protocol identifiers based on IEEE-assigned organizational identifiers. Used by vendor-specific and IEEE protocols.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\OPID.csv
+URL: https://standards-oui.ieee.org/bopid/opid.csv
+Prefix bits: None
+Last retrieved: 2026-09-28 17:33:24.455807+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: CID (Company Identifier)
+Legacy Name: None
+Category: identifier
+Description: Unique company identifiers assigned by IEEE. Identifies organizations independently of MAC address allocations.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\CID.csv
+URL: https://standards-oui.ieee.org/cid/cid.csv
+Prefix bits: None
+Last retrieved: 2026-09-28 17:33:25.409803+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: IAB (Individual Address Block)
+Legacy Name: None
+Category: mac
+Description: Legacy IEEE MAC address allocation scheme superseded by MA-S. Retained for compatibility with older hardware.
+Is Legacy: True
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\IAB.csv
+URL: https://standards-oui.ieee.org/iab/iab.csv
+Prefix bits: 36
+Last retrieved: 2026-09-28 17:33:27.785458+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: EtherType (EtherType Registry)
+Legacy Name: None
+Category: protocol
+Description: Registry mapping EtherType values to Ethernet protocols, including IPv4, IPv6, ARP, VLAN tagging, LLDP, MPLS, 802.1X, and many vendor-specific protocols.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\EtherType.csv
+URL: https://standards-oui.ieee.org/ethertype/eth.csv
+Prefix bits: None
+Last retrieved: 2026-09-28 17:33:29.763446+00:00
+Update interval: 1 day, 0:00:00
+
+```
 ## Installation
 
 Clone the repository:
+
+*Not published to pypi yet(!).*
 
 ```bash
 pip install etherlyzer
 ```
 
-## Running
+## Commandline Interface
+```shell
+usage: etherlyzer [-h] [-v] {validize,format,update,info,identify} ...
+
+EtherLyzer - Ethernet lookup and analysis toolkit
+
+options:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+
+Commands:
+  {validize,format,update,info,identify}
+    validize            Validates and normalizes MAC addresses
+    format              Format MAC address
+    update              Synchronize IEEE registries
+    info                Show application information
+    identify            Search vendors, protocols or assignments
+```
+
+### Example: validize
+
+Validates and normalizes MAC adresses in bulk.
+
+Validation runs first after which candidates are normalized and optionally a masked output of the MACs failing validation are output.
+
+```text
+v = valid hex digit
+M = missing digit
+V = excess valid hex digit
+I = invalid character
+r/R = relaxed typo candidate
+l/L = lenient typo candidate
+```
+
+Options:
+```shell
+usage: etherlyzer validize [-h] [-b] [-l] [-s] [-o] [-n] [mac]
+
+positional arguments:
+  mac                   MAC address to normalize
+
+options:
+  -h, --help            show this help message and exit
+  -b, --bulk            Read multiple MAC addresses interactively
+  -l, --linenumbers     Show linenumbers corresponding to each MAC address (kind of only useful when validizing in bulk)
+  -s, --strict          Only return MAC's that can be normalized without errors.
+  -o, --show-originals  Displays the original MAC addresses after the normalized MAC address on each line.
+  -n, --no-info         Doesn't display an OK or ERR before each line depending on whether the outout succeeded normalization.
+```
+
+Example
 
 ```bash
-etherlyzer normalize --bulk --linenumbers
+etherlyzer validize --bulk --linenumbers
 
 Paste MAC addresses. Enter a triple semicolon ;;; when done:
 001a2b3c4d5e
@@ -74,8 +225,8 @@ Paste MAC addresses. Enter a triple semicolon ;;; when done:
 "00:1a:2b:3c:4d:5e"
 00::1a::2b::3c::4d::5e
 00:1a-2b.3c:4d-5e
-
 ;;;
+
 OK  001a2b3c4d5e    << 001a2b3c4d5e
 ERR 001a2b3c4d5     >> vvvvvvvvvvvM
 ERR 001a2b3c4d5e6   >> vvvvvvvvvvvvV
@@ -106,20 +257,6 @@ OK  001a2b3c4d5e    << 00:1a-2b.3c:4d-5e
 Normalized 10/26 MAC addresses. Invalid MAC addresses identified: 16/26
 ```
 
-### Understanding Masks
-
-The following masks are used when normalizing MAC adresses.
-
-```python
-v = valid hex digit
-M = missing digit
-V = excess valid hex digit
-I = invalid character
-r/R = relaxed typo candidate
-l/L = lenient typo candidate
-```
-
----
 
 ## Configuration
 
