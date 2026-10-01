@@ -4,7 +4,8 @@ from enum import StrEnum
 from pathlib import Path
 
 import requests
-from requests import ConnectTimeout
+from requests import ConnectTimeout, RequestException
+from tqdm import tqdm
 
 from etherlyzer.misc.settings import config
 from etherlyzer.ieee.importer import IEEERegistryReader
@@ -131,27 +132,55 @@ class IEEERegistry:
         return f_not_exists or expires <= now
 
     def save(self) -> bool | None:
-        times = 1
-        max = 3
-        res = None
-        loop = True
-        while loop and times <= max:
+        attempts = 1
+        max_attempts = 3
+
+        while attempts <= max_attempts:
             try:
                 if config.show_sync_messages:
                     print(f"Saving Registry: {self.name}")
-                res = requests.get(headers=self.req_headers(), url=self.url, timeout=20)
+
+                res = requests.get(
+                    headers=self.req_headers(),
+                    url=self.url,
+                    timeout=20,
+                    stream=True,
+                )
                 res.raise_for_status()
-                loop = False
-            except ConnectTimeout:
+
+                total_size = int(res.headers.get("content-length", 0)) or None
+
+                with open(self.filepath, "wb") as f:
+                    with tqdm(
+                            total=total_size or None,
+                            unit="B",
+                            unit_scale=True,
+                            unit_divisor=1024,
+                            desc=f"Saving {self.name}",
+                            disable=not config.show_sync_messages,
+                    ) as progress:
+                        for chunk in res.iter_content(chunk_size=8192):
+                            if chunk:
+                                f.write(chunk)
+                                progress.update(len(chunk))
+
+                return None
+
+            except RequestException as exc:
                 if config.show_sync_messages:
-                    print(f"Request timed out on {times}. attempt out of {max} attempts.")
-                times += 1
-                if times == max + 1:
-                    print(f"Unable to retrieve the registry '{self.name}' from {self.url}. Maximum attempts exceeded.")
-                    return False
-        with open(self.filepath, "w", encoding="utf-8", newline="") as f:
-            f.write(res.content.decode("utf-8"))
-        return None
+                    print(
+                        f"Request timed out on attempt "
+                        f"{attempts} of {max_attempts}."
+                    )
+
+                attempts += 1
+
+        print(
+            f"Unable to retrieve the registry '{self.name}' "
+            f"from {self.url}. Maximum attempts exceeded."
+        )
+
+        return False
 
 
 class Registry:
@@ -286,13 +315,22 @@ class Registry:
         ),
     }
 
+    @classmethod
+    def db_is_initialized(cls):
+        db_init_checks: list[bool] = []
+        for registry in cls.IEEE_REGISTRIES.values():
+            db_init_checks.append(registry.filepath.exists())
+        if not all([check for check in db_init_checks]):
+            return False
+        return True
+
     @staticmethod
     def get_registry(name: str) -> IEEERegistry | None:
         return Registry.IEEE_REGISTRIES.get(name, None)
 
     def get_registries(self, update=True) -> list[IEEERegistry]:
         for registry in self.IEEE_REGISTRIES.values():
-            if update and registry.need_updates():
+            if (update and registry.need_updates()) or not self.db_is_initialized():
 
                 status = registry.save()
                 if status is False:
