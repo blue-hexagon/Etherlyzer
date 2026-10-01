@@ -27,12 +27,37 @@ Typical use cases include:
 * Bulk-process thousands of MAC addresses from text files in seconds.
 * Build high-performance lookup indexes for repeated searches.
 * Automatically synchronize the local IEEE registry database (update interval configurable).
-* Normalize MAC addresses from virtually any format.
-* Format MAC addresses using Cisco, Windows, Linux, or custom formats.
+* Validate and normalize MAC addresses from virtually any format.
+* Format MAC addresses using Cisco, Windows, Linux or custom formats.
 * Export lookup results as CSV or other delimited formats.
-* Integrate into automation scripts, inventory systems, NAC workflows, NOC/SOC tooling, and asset discovery solutions.
+* Integrate into automation scripts, inventory systems, NAC workflows, NOC/SOC tooling and asset discovery solutions.
 
 ---
+
+## Brief Example
+
+```text
+etherlyzer identify --type mac 001a2b3c4d5e
+
+Organization
+  Name           : Ayecom Technology
+  Full Name      : Ayecom Technology Co., Ltd.
+  Address
+    No. 25
+    R&D Road 2
+    Science-Based Industrial Park Hsinchu
+    TW 300
+
+Registry
+  IEEE Type    : MA-L [MAC Address Block Large]
+  Assignment   : 00-1a-2b
+  Range        : 00-1a-2b-00-00-00 - 00-1a-2b-ff-ff-ff
+  Legacy       : False
+  Prefix Bits  : 24 bits
+  Address Bits : 24 bits
+  Addresses    : 16,777,216
+
+```
 
 ## The Data Layer
 

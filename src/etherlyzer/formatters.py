@@ -48,6 +48,11 @@ class MACFormatter:
         return getattr(mac, config.mac_case.value)()
 
     @classmethod
+    def format_stuff(cls, mac: str,stuffed_hex:str) -> str:
+        mac = (cls.normalize(mac) + 12 * stuffed_hex)[:12]
+        return cls.format_default(mac)
+
+    @classmethod
     def format(
             cls,
             mac: str,
