@@ -175,7 +175,7 @@ pip install etherlyzer
 ```
 
 ## Commandline Interface
-```shell
+```text
 usage: etherlyzer [-h] [-v] {validize,format,update,info,identify} ...
 
 EtherLyzer - Ethernet lookup and analysis toolkit
@@ -209,7 +209,7 @@ l/L = lenient typo candidate
 ```
 
 Options:
-```shell
+```text
 usage: etherlyzer validize [-h] [-b] [-l] [-s] [-o] [-n] [mac]
 
 positional arguments:
@@ -226,7 +226,7 @@ options:
 
 Example
 
-```bash
+```text
 etherlyzer validize --bulk --linenumbers
 
 Paste MAC addresses. Enter a triple semicolon ;;; when done:
