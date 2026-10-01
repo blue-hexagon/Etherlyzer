@@ -24,8 +24,6 @@ class Settings:
 
     show_sync_messages: bool = False
 
-    use_file_enabled: bool = True
-    use_file: Path = Path("in.txt")
 
 
 def validate_config(conf: Settings) -> None:
@@ -47,11 +45,6 @@ def validate_config(conf: Settings) -> None:
     if conf.mac_block_size not in {2, 4, 12}:
         raise ValueError(
             "MAC_BLOCK_SIZE must be 2, 4, or 12."
-        )
-
-    if conf.use_file_enabled and not conf.use_file.name:
-        raise ValueError(
-            "USE_FILE must be configured when USE_FILE_ENABLED is true."
         )
 
 

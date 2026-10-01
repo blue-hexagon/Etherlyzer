@@ -35,9 +35,9 @@ class MACIndex:
         mac = "".join(c for c in mac.upper() if c in HEX_DIGITS)
 
         return (
-            self.prefixes_36.get(mac[:9])
-            or self.prefixes_28.get(mac[:7])
-            or self.prefixes_24.get(mac[:6])
+                self.prefixes_36.get(mac[:9])
+                or self.prefixes_28.get(mac[:7])
+                or self.prefixes_24.get(mac[:6])
         )
 
 
@@ -46,9 +46,9 @@ class ProtocolIndex:
     ethertype: dict[str, EtherTypeEntry] = field(default_factory=dict)
 
     def insert(
-        self,
-        registry: IEEERegistry,
-        entries: Iterable[EtherTypeEntry],
+            self,
+            registry: IEEERegistry,
+            entries: Iterable[EtherTypeEntry],
     ) -> None:
         self.ethertype.update({entry.assignment.upper(): entry for entry in entries})
 
@@ -90,8 +90,8 @@ class RegistryIndex:
 
     @classmethod
     def from_registries(
-        cls,
-        registries: Iterable[IEEERegistry],
+            cls,
+            registries: Iterable[IEEERegistry],
     ) -> RegistryIndex:
 
         index = cls()
@@ -125,16 +125,17 @@ class RegistryIndex:
 
     @staticmethod
     def lookup_bulk_from_file(
-        indextype: MACIndex | IdentifierIndex | ProtocolIndex,
-        infile: Path | str = Path(pathman.USER_INPUT_ROOT / config.use_file),
+            indextype: MACIndex | IdentifierIndex | ProtocolIndex,
+            stream: Path | str | list[str],
     ) -> list[IEEEEntry]:
-        if config.use_file_enabled:
-            infile = Path(pathman.USER_INPUT_ROOT / config.use_file)
-
-        with open(infile) as f:
-            lines = f.readlines()
+        # Pass a list[str] from interactive or pass a Path|str`Path`
+        if not isinstance(stream, list):
+            with open(stream) as f:
+                macdata = f.readlines()
+        else:
+            macdata = stream
         entries: set[IEEEEntry] = set()
-        for line in lines:
+        for line in macdata:
             ieee_entry = indextype.lookup(line)
             if ieee_entry:
                 entries.add(ieee_entry)

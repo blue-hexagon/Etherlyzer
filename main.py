@@ -21,7 +21,7 @@ if __name__ == '__main__':
     index.mac_index.lookup("C8-95-CE-A0-3B-A6")
     macs = (RegistryIndex.lookup_bulk_from_file(
         indextype=index.mac_index,
-        infile='src/etherlyzer/in2.txt'
+        stream='src/etherlyzer/in2.txt'
     ))
     for mac in macs:
         print(f"[{mac.registry+']':<6}{mac.assignment+':':<12} {mac.organization_name}")

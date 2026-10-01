@@ -32,6 +32,12 @@ Typical use cases include:
 * Export lookup results as CSV or other delimited formats.
 * Integrate into automation scripts, inventory systems, NAC workflows, NOC/SOC tooling and asset discovery solutions.
 
+
+Etherlyzer automatically fetches the official IEEE registry listings once every 24 hours, ensuring that the local registry data remains up to date. IEEE states that its public listings are updated every 24 hours.
+
+The synchronization interval can be adjusted to your preference in the shipped `etherlyzer.env` file.
+
+
 ---
 
 ## Brief Example
