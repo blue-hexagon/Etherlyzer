@@ -22,25 +22,24 @@ def run(args):
                 print(f"{linenumber}.".ljust(padding, " "), end="")
 
         if not args.strict and not MACFormatter.mask_is_valid(validation_mask):
-            if args.no_info is False:
+            if args.show_info is True:
                 print("ERR".ljust(4, " "), end="")
             if len(validated_mac) > 14:
-                print(f"{validated_mac.ljust(14, ' ')[:14]}. >> {validation_mask}")
+                print(f"{validated_mac.ljust(14, ' ')[:14]}. => {validation_mask}")
             else:
-                print(f"{validated_mac.ljust(15, ' ')[:15]} >> {validation_mask}")
+                print(f"{validated_mac.ljust(15, ' ')[:15]} => {validation_mask}")
             invalid_count += 1
             continue
 
         if MACFormatter.mask_is_valid(validation_mask):
             normalized_mac = MACFormatter.normalize(mac)
-            if args.no_info is False:
+            if args.show_info is True:
                 print("OK".ljust(4, " "), end="")
             if args.show_originals:
-                print(f"{normalized_mac.ljust(15, ' ')} << {mac}")
+                print(f"{normalized_mac.ljust(15, ' ')} <~ {mac}")
             else:
                 print(f"{normalized_mac}")
             normalized_count += 1
-
 
     print()
     print(
@@ -51,7 +50,7 @@ def run(args):
 def register(subparsers):
     parser = subparsers.add_parser(
         "validize",
-        help="Validates and normalizes MAC addresses",
+        help="Validates and normalizes MAC addresses (this command does not perform any sort of typo-correction - use `format` for that purpose).",
     )
 
     parser.add_argument(
@@ -90,16 +89,16 @@ def register(subparsers):
         help="Displays the original MAC addresses after the normalized MAC address on each line.",
     )
     parser.add_argument(
-        "-n",
-        "--no-info",
-        dest="no_info",
+        "-i",
+        "--show-info",
+        dest="show_info",
         action="store_true",
-        help="Doesn't display an OK or ERR before each line depending on whether the outout succeeded normalization.",
+        help="Displays an OK or ERR before each line depending on whether the outout succeeded normalization.",
     )
 
     parser.set_defaults(
         func=run,
         strict=False,
-        no_info=True,
+        show_info=False,
         show_originals=False,
     )

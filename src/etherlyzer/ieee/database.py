@@ -3,9 +3,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypeVar
 
-import etherlyzer.util.dirs as pathman
-from etherlyzer.util.settings import config
-from etherlyzer.ieee.registry import RegistryCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
+from etherlyzer.ieee.registry import RegCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
 
 HEX_DIGITS = frozenset("0123456789ABCDEF")
 
@@ -101,13 +99,13 @@ class IEEEIndex:
             entries = registry.load()
 
             match registry.category:
-                case RegistryCategory.MAC:
+                case RegCategory.MAC:
                     index.mac_index.insert(registry, entries)
 
-                case RegistryCategory.PROTOCOL:
+                case RegCategory.PROTOCOL:
                     index.protocol_index.insert(registry, entries)
 
-                case RegistryCategory.IDENTIFIER:
+                case RegCategory.IDENTIFIER:
                     index.identifier_index.insert(registry, entries)
 
                 case _:

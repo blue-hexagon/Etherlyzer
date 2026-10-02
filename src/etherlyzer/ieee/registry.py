@@ -12,10 +12,10 @@ from etherlyzer.util.dirs import IEEE_DATA_PLATDIR
 from etherlyzer.util.settings import config
 
 
-class RegistryCategory(StrEnum):
-    MAC = "mac"
-    PROTOCOL = "protocol"
-    IDENTIFIER = "identifier"
+class RegCategory(StrEnum):
+    MAC = "mac"  # IAB, MA-L, MA-M, MA-S
+    PROTOCOL = "protocol"  # Ethertype
+    IDENTIFIER = "identifier"  # CID
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,9 +56,11 @@ class IEEERegistry:
     full_name: str
     url: str
 
-    description: str = ""
+    category: RegCategory
 
-    category: RegistryCategory = RegistryCategory.IDENTIFIER
+    legacy: bool
+
+    description: str = ""
 
     legacy_name: str | None = None
 
@@ -66,7 +68,6 @@ class IEEERegistry:
     address_bits: int | None = None
     address_count: int | None = None
 
-    legacy: bool = False
 
     update_interval: datetime.timedelta = datetime.timedelta(days=1)
     last_retrieved: datetime.datetime = None  # noqa; set in post-init
@@ -83,15 +84,15 @@ class IEEERegistry:
 
     @property
     def is_mac_registry(self) -> bool:
-        return self.category is RegistryCategory.MAC
+        return self.category is RegCategory.MAC
 
     @property
     def is_protocol_registry(self) -> bool:
-        return self.category is RegistryCategory.PROTOCOL
+        return self.category is RegCategory.PROTOCOL
 
     @property
     def is_identifier_registry(self) -> bool:
-        return self.category is RegistryCategory.IDENTIFIER
+        return self.category is RegCategory.IDENTIFIER
 
     @property
     def filepath(self) -> Path:

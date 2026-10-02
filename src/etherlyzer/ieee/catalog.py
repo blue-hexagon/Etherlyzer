@@ -1,4 +1,4 @@
-from etherlyzer.ieee.registry import RegistryCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
+from etherlyzer.ieee.registry import RegCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
 
 
 class Catalog:
@@ -9,7 +9,7 @@ class Catalog:
             model=IEEEEntry,
             full_name="MAC Address Block Large",
             legacy_name="OUI",
-            category=RegistryCategory.MAC,
+            category=RegCategory.MAC,
             prefix_bits=24,
             address_bits=24,
             address_count=16_777_216,
@@ -27,7 +27,7 @@ class Catalog:
             model=IEEEEntry,
             full_name="MAC Address Block Medium",
             legacy_name="OUI-28",
-            category=RegistryCategory.MAC,
+            category=RegCategory.MAC,
             prefix_bits=28,
             address_bits=20,
             address_count=1_048_576,
@@ -44,7 +44,7 @@ class Catalog:
             model=IEEEEntry,
             full_name="MAC Address Block Small",
             legacy_name="OUI-36",
-            category=RegistryCategory.MAC,
+            category=RegCategory.MAC,
             prefix_bits=36,
             address_bits=12,
             address_count=4_096,
@@ -55,43 +55,13 @@ class Catalog:
             ),
             url="https://standards-oui.ieee.org/oui36/oui36.csv",
         ),
-        "manid": IEEERegistry(
-            enabled=False,
-            name="MANID",
-            model=IEEEEntry,
-            full_name="Manufacturer Identifier",
-            legacy_name=None,
-            category=RegistryCategory.IDENTIFIER,
-            legacy=False,
-            description=(
-                "Manufacturer identifier registry maintained by the IEEE "
-                "Registration Authority. Used to uniquely identify "
-                "manufacturers rather than allocating MAC addresses."
-            ),
-            url="https://standards-oui.ieee.org/manid/manid.csv",
-        ),
-        "opid": IEEERegistry(
-            enabled=False,
-            name="OPID",
-            model=IEEEEntry,
-            full_name="OUI-based Protocol Identifier",
-            legacy_name=None,
-            category=RegistryCategory.IDENTIFIER,
-            legacy=False,
-            description=(
-                "Registry of protocol identifiers based on IEEE-assigned "
-                "organizational identifiers. Used by vendor-specific and "
-                "IEEE protocols."
-            ),
-            url="https://standards-oui.ieee.org/bopid/opid.csv",
-        ),
         "cid": IEEERegistry(
-            enabled=False,
+            enabled=True,
             name="CID",
             model=IEEEEntry,
             full_name="Company Identifier",
             legacy_name=None,
-            category=RegistryCategory.IDENTIFIER,
+            category=RegCategory.IDENTIFIER,
             legacy=False,
             description=(
                 "Unique company identifiers assigned by IEEE. Identifies "
@@ -100,12 +70,12 @@ class Catalog:
             url="https://standards-oui.ieee.org/cid/cid.csv",
         ),
         "iab": IEEERegistry(
-            enabled=False,
+            enabled=True,
             name="IAB",
             model=IEEEEntry,
             full_name="Individual Address Block",
             legacy_name=None,
-            category=RegistryCategory.MAC,
+            category=RegCategory.MAC,
             prefix_bits=36,
             address_bits=12,
             address_count=4_096,
@@ -122,7 +92,7 @@ class Catalog:
             model=EtherTypeEntry,
             full_name="EtherType Registry",
             legacy_name=None,
-            category=RegistryCategory.PROTOCOL,
+            category=RegCategory.PROTOCOL,
             legacy=False,
             description=(
                 "Registry mapping EtherType values to Ethernet protocols, "

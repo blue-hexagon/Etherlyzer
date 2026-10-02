@@ -24,17 +24,19 @@ def register(subparsers):
     )
 
     parser.add_argument("mac", nargs="?")
-    parser.add_argument("--separator", type=str, default=":", help="Separator for mac address")
-    parser.add_argument("--block-size", type=int, default=2, help="Block size for mac address")
+    parser.add_argument("-p", "--separator", type=str, default=":", help="Separator for mac address")
+    parser.add_argument("-b", "--block-size", type=int, default=2, help="Block size for mac address")
     parser.add_argument(
+        "-c",
         "--casing", type=str, default="lower", help="Use upper case (lower is default)"
     )
     parser.add_argument(
+        "-f",
         "--fix-typos",
         action="store_true",
         default=False,
         dest="fix_typos",
-        help="Fix typos like o/O/ø/Ø instead of 0, 1 instead of i/I et cetera",
+        help="Fix typo-candidates like o/O/ø/Ø instead of 0, 1 instead of i/I et cetera (see docs for specifics).",
     )
 
     parser.set_defaults(func=run)

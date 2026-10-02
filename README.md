@@ -4,13 +4,11 @@ EtherLyzer is a Python library and command-line utility for identifying, classif
 
 It provides fast, high-performance offline lookups:
 
-* IEEE MAC address registries (EtherType, MA-L/OUI-24, MA-M/OUI-28, MA-S/OUI-36, MANID, OPID, CID, IAB)
-* Protocol identifiers
-* Block sizes and vendor information
+* IEEE MAC address registries (OUI, MA-L/OUI-24, MA-M/OUI-28, MA-S/OUI-36, CID, IAB)
+* Protocol identifiers (Ethertypes)
+* Block sizes, vendor names, addresses and correlation
 
-Etherlyzer provides a CLI utilty supporting single and bulk-processing + a Python library/API.
-
-It builds high-performance indexes of fresh datasets that by default (althrough this can be adjusted) update once every 24 hours.
+Etherlyzer provides a CLI utilty supporting both single and bulk-processing, as well as a Python library and builds high-performance indexes of current up to date datasets.
 
 EtherLyzer is designed for network engineers, cybersecurity professionals, automation, and asset discovery.
 
@@ -26,7 +24,7 @@ Typical use cases include:
 * Distinguish between MA-L, MA-M, and MA-S allocations.
 * Look up EtherTypes (e.g. IPv4, IPv6, ARP, LLDP).
 * Identify vendor information.
-* Bulk-process thousands of MAC addresses from CLI/API in seconds.
+* Bulk-process vendor information, address allocations or validate and normalize thousands of MAC addresses from CLI/API in seconds.
 * Build high-performance lookup indexes for repeated searches.
 * Automatically synchronize the local IEEE registry database (update interval configurable).
 * Validate, normalize and format MAC addresses from and to, virtually any format.
@@ -38,32 +36,61 @@ Etherlyzer automatically fetches the official IEEE registry listings once every 
 
 The synchronization interval can be adjusted to your preference in the shipped `etherlyzer.env` file.
 
+## Roadmap
+
+* Implement a seperate vendor index and correlate assignment-blocks when identifying MAC addresses.
+
 ---
 
 ## Showcasing
 
 ### Identify HW Vendor
 
+Longest prefix match in action:
+IAB is legacy. It's still very much in use today, but no new entries are added to the index.
+This example shows Etherlyzer performing a longest-prefix match.
+
+IAB is registered in MA-L listing, but if we provide the first 9 hex-digits we can identify the IAB.
+
+
 ```text
-etherlyzer identify --type mac 001a2b3c4d5e
+etherlyzer identify --type mac 40-D8-55-11-A3-E1
 
 Organization
-  Name           : Ayecom Technology
-  Full Name      : Ayecom Technology Co., Ltd.
+  Name         : Sicon srl
+  Full Name    : Sicon srl
   Address
-    No. 25
-    R&D Road 2
-    Science-Based Industrial Park Hsinchu
-    TW 300
+    Via Sila 1/3 Isola Vicentina Vicenza IT 36033
+
+Registry
+  IEEE Type    : IAB [Individual Address Block]
+  Assignment   : 40-d8-55-11-a
+  Range        : 40-d8-55-11-a0-00 - 40-d8-55-11-af-ff
+  Legacy       : True
+  Legacy Name  : None
+  Prefix Bits  : 36 bits
+  Address Bits : 12 bits
+  Addresses    : 4,096
+
+
+etherlyzer identify  40-D8-55         
+
+Organization
+  Name         : IEEE Registration Authority
+  Full Name    : IEEE Registration Authority
+  Address
+    445 Hoes Lane Piscataway NJ US 08554
 
 Registry
   IEEE Type    : MA-L [MAC Address Block Large]
-  Assignment   : 00-1a-2b
-  Range        : 00-1a-2b-00-00-00 - 00-1a-2b-ff-ff-ff
+  Assignment   : 40-d8-55
+  Range        : 40-d8-55-00-00-00 - 40-d8-55-ff-ff-ff
   Legacy       : False
   Prefix Bits  : 24 bits
   Address Bits : 24 bits
   Addresses    : 16,777,216
+
+IEEE Registration Authority
 
 ```
 
