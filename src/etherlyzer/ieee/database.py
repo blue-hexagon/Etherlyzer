@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypeVar
 
-import etherlyzer.misc.dirs as pathman
-from etherlyzer.misc.settings import config
-from etherlyzer.ieee.registry import EtherTypeEntry, IEEEEntry, IEEERegistry, RegistryCategory
+import etherlyzer.util.dirs as pathman
+from etherlyzer.util.settings import config
+from etherlyzer.ieee.registry import RegistryCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
 
 HEX_DIGITS = frozenset("0123456789ABCDEF")
 
@@ -34,6 +34,7 @@ class MACIndex:
     def lookup(self, mac: str) -> IEEEEntry | None:
         mac = "".join(c for c in mac.upper() if c in HEX_DIGITS)
 
+        # Order is important - longest prefix match
         return (
                 self.prefixes_36.get(mac[:9])
                 or self.prefixes_28.get(mac[:7])
@@ -83,7 +84,7 @@ class IdentifierIndex:
 
 
 @dataclass(slots=True)
-class RegistryIndex:
+class IEEEIndex:
     mac_index: MACIndex = field(default_factory=MACIndex)
     protocol_index: ProtocolIndex = field(default_factory=ProtocolIndex)
     identifier_index: IdentifierIndex = field(default_factory=IdentifierIndex)
@@ -92,7 +93,7 @@ class RegistryIndex:
     def from_registries(
             cls,
             registries: Iterable[IEEERegistry],
-    ) -> RegistryIndex:
+    ) -> IEEEIndex:
 
         index = cls()
 
@@ -114,41 +115,41 @@ class RegistryIndex:
 
         return index
 
-    def lookup_mac(self, mac: str) -> IEEEEntry | None:
+    def get_from_mac_index(self, mac: str) -> IEEEEntry | None:
         return self.mac_index.lookup(mac)
 
-    def lookup_ethertype(self, ethertype: str) -> EtherTypeEntry | None:
+    def get_from_ethertype_index(self, ethertype: str) -> EtherTypeEntry | None:
         return self.protocol_index.lookup(ethertype)
 
-    def lookup_identifier(self, identifier: str) -> IEEEEntry | None:
+    def get_identifier(self, identifier: str) -> IEEEEntry | None:
         return self.identifier_index.lookup(identifier)
 
     @staticmethod
-    def lookup_bulk_from_file(
-            indextype: MACIndex | IdentifierIndex | ProtocolIndex,
-            stream: Path | str | list[str],
+    def get_bulk(
+            ieee_index: MACIndex | IdentifierIndex | ProtocolIndex,
+            path_or_text: Path | list[str],
     ) -> list[IEEEEntry]:
-        # Pass a list[str] from interactive or pass a Path|str`Path`
-        if not isinstance(stream, list):
-            with open(stream) as f:
-                macdata = f.readlines()
+        # Pass a list[str] from interactive or pass a Path
+        if isinstance(path_or_text, Path):
+            with open(path_or_text) as f:
+                text_data = f.readlines()
         else:
-            macdata = stream
-        entries: set[IEEEEntry] = set()
-        for line in macdata:
-            ieee_entry = indextype.lookup(line)
+            text_data = path_or_text
+        ieee_entries: set[IEEEEntry] = set()
+        for line in text_data:
+            ieee_entry = ieee_index.lookup(line)
             if ieee_entry:
-                entries.add(ieee_entry)
+                ieee_entries.add(ieee_entry)
 
-        entries: list[IEEEEntry] = list(entries)
+        ieee_entries: list[IEEEEntry] = list(ieee_entries)
         # Sort by name, and then by registry-name reversed
-        entries = sorted(entries, key=lambda e: e.organization_name)
-        entries = sorted(entries, key=lambda e: e.registry, reverse=True)
+        ieee_entries = sorted(ieee_entries, key=lambda e: e.organization_name)
+        ieee_entries = sorted(ieee_entries, key=lambda e: e.registry, reverse=True)
 
-        return entries
+        return ieee_entries
 
     @staticmethod
-    def lookup_single_from_console(indextype: MACIndex | IdentifierIndex | ProtocolIndex, mac: str):
+    def get_single(indextype: MACIndex | IdentifierIndex | ProtocolIndex, mac: str):
         ieee_entry = indextype.lookup(mac)
         if ieee_entry:
             return ieee_entry

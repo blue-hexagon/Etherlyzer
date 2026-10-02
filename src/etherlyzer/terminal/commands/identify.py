@@ -1,19 +1,20 @@
 import re
 
 from etherlyzer.formatters import MACFormatter
-from etherlyzer.ieee.database import RegistryIndex
-from etherlyzer.ieee.registry import EtherTypeEntry, Registry, RegistryCategory
+from etherlyzer.ieee.database import IEEEIndex
+from etherlyzer.ieee.catalog import Catalog
+from etherlyzer.ieee.registry import RegistryCategory, EtherTypeEntry
 
 
 def run(args):
-    registry = Registry()
-    index = RegistryIndex.from_registries(registry.get_registries(update=False))
+    registry = Catalog()
+    index = IEEEIndex.from_registries(registry.get_all_registries(check_for_updates=False))
     if args.type.lower() == RegistryCategory.MAC.value:
-        entry = index.lookup_single_from_console(index.mac_index, args.mac)
+        entry = index.get_single(index.mac_index, args.mac)
     elif args.type.lower() == RegistryCategory.PROTOCOL.value:
-        entry = index.lookup_single_from_console(index.protocol_index, args.mac)
+        entry = index.get_single(index.protocol_index, args.mac)
     elif args.type.lower() == RegistryCategory.IDENTIFIER.value:
-        entry = index.lookup_single_from_console(index.identifier_index, args.mac)
+        entry = index.get_single(index.identifier_index, args.mac)
     else:
         print("No valid type selected.")
         print(args.type)
@@ -36,11 +37,11 @@ def run(args):
                 print(f"    {line.strip()}")
 
     print()
-    reg = Registry.get_registry(str(entry.registry).lower().replace("-", ""))
+    reg = Catalog.get_registry(str(entry.registry).lower().replace("-", ""))
     print("Registry")
     print(f"  IEEE Type    : {entry.registry} [{reg.full_name}]")
     print(f"  Assignment   : {MACFormatter.format_default(entry.assignment)}")
-    print(f"  Range        : {MACFormatter.format_stuff(entry.assignment,"0")} - {MACFormatter.format_stuff(entry.assignment,"f")}")
+    print(f"  Range        : {MACFormatter.format_with_stuffed_hex(entry.assignment, "0")} - {MACFormatter.format_with_stuffed_hex(entry.assignment, "f")}")
     try:
         # @formatter:off
         print(f"  Legacy       : {reg.legacy}")

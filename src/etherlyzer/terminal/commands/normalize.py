@@ -1,4 +1,4 @@
-from etherlyzer.terminal.cliutil import read_multiline
+from etherlyzer.terminal.utility import read_multiline
 from etherlyzer.formatters import MACFormatter
 
 

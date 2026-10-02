@@ -4,9 +4,8 @@ from etherlyzer.formatters import MACFormatter
 
 
 def run(args) -> int:
-
     print(
-        MACFormatter.format(
+        MACFormatter.format_custom(
             mac=args.mac,
             separator=args.separator,
             block_size=args.block_size,
@@ -19,13 +18,12 @@ def run(args) -> int:
 
 
 def register(subparsers):
-
     parser = subparsers.add_parser(
         "format",
         help="Format MAC address",
     )
 
-    parser.add_argument("mac")
+    parser.add_argument("mac", nargs="?")
     parser.add_argument("--separator", type=str, default=":", help="Separator for mac address")
     parser.add_argument("--block-size", type=int, default=2, help="Block size for mac address")
     parser.add_argument(
@@ -36,7 +34,7 @@ def register(subparsers):
         action="store_true",
         default=False,
         dest="fix_typos",
-        help="Fix typos like O instead of 0",
+        help="Fix typos like o/O/ø/Ø instead of 0, 1 instead of i/I et cetera",
     )
 
     parser.set_defaults(func=run)

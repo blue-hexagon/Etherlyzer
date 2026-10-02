@@ -1,15 +1,15 @@
 import datetime
-from dataclasses import astuple, dataclass, fields
+from dataclasses import dataclass, fields, astuple
 from enum import StrEnum
 from pathlib import Path
 
 import requests
-from requests import ConnectTimeout, RequestException
+from requests import RequestException
 from tqdm import tqdm
 
-from etherlyzer.misc.settings import config
-from etherlyzer.ieee.importer import IEEERegistryReader
-from etherlyzer.misc.dirs import DATA_ROOT
+from etherlyzer.ieee.csv_parser import IEEERegistryReader
+from etherlyzer.util.dirs import IEEE_DATA_PLATDIR
+from etherlyzer.util.settings import config
 
 
 class RegistryCategory(StrEnum):
@@ -95,7 +95,7 @@ class IEEERegistry:
 
     @property
     def filepath(self) -> Path:
-        return DATA_ROOT / Path("".join([self.name, ".csv"]))
+        return IEEE_DATA_PLATDIR / Path("".join([self.name, ".csv"]))
 
     @property
     def assignment_length(self) -> int:
@@ -181,161 +181,3 @@ class IEEERegistry:
         )
 
         return False
-
-
-class Registry:
-    IEEE_REGISTRIES = {  # noqa
-        "mal": IEEERegistry(
-            enabled=True,
-            name="MA-L",
-            model=IEEEEntry,
-            full_name="MAC Address Block Large",
-            legacy_name="OUI",
-            category=RegistryCategory.MAC,
-            prefix_bits=24,
-            address_bits=24,
-            address_count=16_777_216,
-            legacy=False,
-            description=(
-                "Large IEEE MAC address allocation. Formerly known as the "
-                "Organizationally Unique Identifier (OUI). Used by vendors "
-                "requiring large address spaces."
-            ),
-            url="https://standards-oui.ieee.org/oui/oui.csv",
-        ),
-        "mam": IEEERegistry(
-            enabled=True,
-            name="MA-M",
-            model=IEEEEntry,
-            full_name="MAC Address Block Medium",
-            legacy_name="OUI-28",
-            category=RegistryCategory.MAC,
-            prefix_bits=28,
-            address_bits=20,
-            address_count=1_048_576,
-            legacy=False,
-            description=(
-                "Medium-sized IEEE MAC address allocation intended for "
-                "organizations requiring fewer addresses than MA-L."
-            ),
-            url="https://standards-oui.ieee.org/oui28/mam.csv",
-        ),
-        "mas": IEEERegistry(
-            enabled=True,
-            name="MA-S",
-            model=IEEEEntry,
-            full_name="MAC Address Block Small",
-            legacy_name="OUI-36",
-            category=RegistryCategory.MAC,
-            prefix_bits=36,
-            address_bits=12,
-            address_count=4_096,
-            legacy=False,
-            description=(
-                "Small IEEE MAC address allocation for embedded devices, "
-                "IoT, industrial equipment, and smaller manufacturers."
-            ),
-            url="https://standards-oui.ieee.org/oui36/oui36.csv",
-        ),
-        "manid": IEEERegistry(
-            enabled=False,
-            name="MANID",
-            model=IEEEEntry,
-            full_name="Manufacturer Identifier",
-            legacy_name=None,
-            category=RegistryCategory.IDENTIFIER,
-            legacy=False,
-            description=(
-                "Manufacturer identifier registry maintained by the IEEE "
-                "Registration Authority. Used to uniquely identify "
-                "manufacturers rather than allocating MAC addresses."
-            ),
-            url="https://standards-oui.ieee.org/manid/manid.csv",
-        ),
-        "opid": IEEERegistry(
-            enabled=False,
-            name="OPID",
-            model=IEEEEntry,
-            full_name="OUI-based Protocol Identifier",
-            legacy_name=None,
-            category=RegistryCategory.IDENTIFIER,
-            legacy=False,
-            description=(
-                "Registry of protocol identifiers based on IEEE-assigned "
-                "organizational identifiers. Used by vendor-specific and "
-                "IEEE protocols."
-            ),
-            url="https://standards-oui.ieee.org/bopid/opid.csv",
-        ),
-        "cid": IEEERegistry(
-            enabled=False,
-            name="CID",
-            model=IEEEEntry,
-            full_name="Company Identifier",
-            legacy_name=None,
-            category=RegistryCategory.IDENTIFIER,
-            legacy=False,
-            description=(
-                "Unique company identifiers assigned by IEEE. Identifies "
-                "organizations independently of MAC address allocations."
-            ),
-            url="https://standards-oui.ieee.org/cid/cid.csv",
-        ),
-        "iab": IEEERegistry(
-            enabled=False,
-            name="IAB",
-            model=IEEEEntry,
-            full_name="Individual Address Block",
-            legacy_name=None,
-            category=RegistryCategory.MAC,
-            prefix_bits=36,
-            address_bits=12,
-            address_count=4_096,
-            legacy=True,
-            description=(
-                "Legacy IEEE MAC address allocation scheme superseded by "
-                "MA-S. Retained for compatibility with older hardware."
-            ),
-            url="https://standards-oui.ieee.org/iab/iab.csv",
-        ),
-        "ethertype": IEEERegistry(
-            enabled=True,
-            name="EtherType",
-            model=EtherTypeEntry,
-            full_name="EtherType Registry",
-            legacy_name=None,
-            category=RegistryCategory.PROTOCOL,
-            legacy=False,
-            description=(
-                "Registry mapping EtherType values to Ethernet protocols, "
-                "including IPv4, IPv6, ARP, VLAN tagging, LLDP, MPLS, "
-                "802.1X, and many vendor-specific protocols."
-            ),
-            url="https://standards-oui.ieee.org/ethertype/eth.csv",
-        ),
-    }
-
-    @classmethod
-    def db_is_initialized(cls):
-        db_init_checks: list[bool] = []
-        for registry in cls.IEEE_REGISTRIES.values():
-            db_init_checks.append(registry.filepath.exists())
-        if not all([check for check in db_init_checks]):
-            return False
-        return True
-
-    @staticmethod
-    def get_registry(name: str) -> IEEERegistry | None:
-        return Registry.IEEE_REGISTRIES.get(name, None)
-
-    def get_registries(self, update=True) -> list[IEEERegistry]:
-        for registry in self.IEEE_REGISTRIES.values():
-            if (update and registry.need_updates()) or not self.db_is_initialized():
-
-                status = registry.save()
-                if status is False:
-                    break
-        return list(self.IEEE_REGISTRIES.values())
-
-    def __getitem__(self, key):
-        return self.IEEE_REGISTRIES[key]

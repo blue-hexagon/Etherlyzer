@@ -2,25 +2,25 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from etherlyzer.ieee.database import RegistryIndex
-from etherlyzer.ieee.registry import Registry
-from etherlyzer.terminal.cliutil import read_multiline
+from etherlyzer.ieee.database import IEEEIndex
+from etherlyzer.ieee.catalog import Catalog
+from etherlyzer.terminal.utility import read_multiline
 
 
 def run(args):
-    index = RegistryIndex.from_registries(
-        Registry().get_registries()
+    index = IEEEIndex.from_registries(
+        Catalog().get_all_registries()
     )
     if args.interactive:
         data = read_multiline()
-        entries = (RegistryIndex.lookup_bulk_from_file(
-            indextype=index.mac_index,
-            stream=data,
+        entries = (IEEEIndex.get_bulk(
+            ieee_index=index.mac_index,
+            path_or_text=data,
         ))
     else:  # elif args.file:
-        entries = (RegistryIndex.lookup_bulk_from_file(
-            indextype=index.mac_index,
-            stream=Path(args.file),
+        entries = (IEEEIndex.get_bulk(
+            ieee_index=index.mac_index,
+            path_or_text=Path(args.file),
         ))
 
     for entry in entries:

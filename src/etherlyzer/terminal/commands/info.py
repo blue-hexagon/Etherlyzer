@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from etherlyzer.ieee.registry import Registry
+from etherlyzer.ieee.catalog import Catalog
 from etherlyzer import __version__
 
 
 def run(args):
-    manager = Registry()
+    manager = Catalog()
 
     print()
 
@@ -14,7 +14,7 @@ def run(args):
 
     print("Registries")
 
-    for registry in manager.get_registries(update=False):
+    for registry in manager.get_all_registries(check_for_updates=False):
         print(
             f"IEEE Name: {registry.name} ({registry.full_name})"
             f"\nLegacy Name: {registry.legacy_name}"

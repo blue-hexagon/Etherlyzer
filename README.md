@@ -2,13 +2,15 @@
 
 EtherLyzer is a Python library and command-line utility for identifying, classifying, and working with Ethernet-related identifiers.
 
-It provides fast, offline lookups for:
+It provides fast, high-performance offline lookups:
 
-* IEEE MAC address registries (MA-L, MA-M, MA-S)
-* EtherTypes
+* IEEE MAC address registries (EtherType, MA-L/OUI-24, MA-M/OUI-28, MA-S/OUI-36, MANID, OPID, CID, IAB)
 * Protocol identifiers
-* Vendor information
-* High-performance bulk lookups and indexing
+* Block sizes and vendor information
+
+Etherlyzer provides a CLI utilty supporting single and bulk-processing + a Python library/API.
+
+It builds high-performance indexes of fresh datasets that by default (althrough this can be adjusted) update once every 24 hours.
 
 EtherLyzer is designed for network engineers, cybersecurity professionals, automation, and asset discovery.
 
@@ -16,19 +18,18 @@ EtherLyzer is designed for network engineers, cybersecurity professionals, autom
 
 ## What can EtherLyzer do?
 
-EtherLyzer maintains a local copy of IEEE registries, enabling fast, offline lookups without requiring Internet access.
+EtherLyzer maintains a local copy of IEEE registries, enabling fast, offline lookups without requiring Internet access and sharing MAC adresses with a third-party that might collect your searches and correlate them with your IP and more.
 
 Typical use cases include:
 
 * Identify the manufacturer of a MAC address.
 * Distinguish between MA-L, MA-M, and MA-S allocations.
 * Look up EtherTypes (e.g. IPv4, IPv6, ARP, LLDP).
-* Identify industrial, AV, IoT, network infrastructure vendors and a bunch more.
-* Bulk-process thousands of MAC addresses from text files in seconds.
+* Identify vendor information.
+* Bulk-process thousands of MAC addresses from CLI/API in seconds.
 * Build high-performance lookup indexes for repeated searches.
 * Automatically synchronize the local IEEE registry database (update interval configurable).
-* Validate and normalize MAC addresses from virtually any format.
-* Format MAC addresses using Cisco, Windows, Linux or custom formats.
+* Validate, normalize and format MAC addresses from and to, virtually any format.
 * Export lookup results as CSV or other delimited formats.
 * Integrate into automation scripts, inventory systems, NAC workflows, NOC/SOC tooling and asset discovery solutions.
 
@@ -37,10 +38,11 @@ Etherlyzer automatically fetches the official IEEE registry listings once every 
 
 The synchronization interval can be adjusted to your preference in the shipped `etherlyzer.env` file.
 
-
 ---
 
-## Brief Example
+## Showcasing
+
+### Identify HW Vendor
 
 ```text
 etherlyzer identify --type mac 001a2b3c4d5e
@@ -65,7 +67,7 @@ Registry
 
 ```
 
-## The Data Layer
+### The Data Layer
 
 From the command-line: `etherlyzer info`:
 
@@ -162,8 +164,15 @@ URL: https://standards-oui.ieee.org/ethertype/eth.csv
 Prefix bits: None
 Last retrieved: 2026-09-28 17:33:29.763446+00:00
 Update interval: 1 day, 0:00:00
-
 ```
+### Format Nasty MAC Addresses
+
+```shell
+etherlyzer format l..iIdOØ1!23-4oo.. --fix-typos --casing "upper" --block-size 4 --separator .
+
+> 111D.0012.3400
+```
+
 ## Installation
 
 Clone the repository:

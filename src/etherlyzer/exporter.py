@@ -1,4 +1,4 @@
-from etherlyzer.misc.settings import config
+from etherlyzer.util.settings import config
 from etherlyzer.formatters import MACFormatter
 
 from etherlyzer.ieee.registry import IEEEEntry
