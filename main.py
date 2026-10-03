@@ -1,4 +1,4 @@
-from etherlyzer.ieee.database import IEEEIndex
+from etherlyzer.ieee.index import IEEEIndex
 from etherlyzer.exporter import RegistryMatchExporter
 from etherlyzer.ieee.catalog import Catalog
 

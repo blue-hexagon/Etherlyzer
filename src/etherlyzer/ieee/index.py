@@ -1,6 +1,8 @@
+import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
+from time import sleep
 from typing import TypeVar
 
 from etherlyzer.ieee.registry import RegCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
@@ -38,6 +40,30 @@ class MACIndex:
                 or self.prefixes_28.get(mac[:7])
                 or self.prefixes_24.get(mac[:6])
         )
+
+    def walk(self):
+        yield from self.prefixes_36
+        yield from self.prefixes_28
+        yield from self.prefixes_24
+
+
+@dataclass(slots=True)
+class VendorIndex:
+    vendors: dict[str, list[IEEEEntry]] = field(default_factory=dict)
+
+    @staticmethod
+    def normalize_vendor_name(name: str) -> str:
+        name = name.casefold()
+        name = re.sub(r"[.,/\\()\-_'\"&]+", " ", name)
+        name = re.sub(r"\s+", " ", name)
+        return name.strip()
+
+    def insert(self, entry: IEEEEntry) -> None:
+        key = self.normalize_vendor_name(entry.organization_name)
+        self.vendors.setdefault(key, []).append(entry)
+
+    def lookup(self, vendor: str) -> list[IEEEEntry] | None:
+        return self.vendors.get(self.normalize_vendor_name(vendor))
 
 
 @dataclass(slots=True)
@@ -86,6 +112,7 @@ class IEEEIndex:
     mac_index: MACIndex = field(default_factory=MACIndex)
     protocol_index: ProtocolIndex = field(default_factory=ProtocolIndex)
     identifier_index: IdentifierIndex = field(default_factory=IdentifierIndex)
+    vendor_index: VendorIndex = field(default_factory=VendorIndex)
 
     @classmethod
     def from_registries(
@@ -110,7 +137,17 @@ class IEEEIndex:
 
                 case _:
                     raise ValueError(f"Unsupported registry category: {registry.category}")
+        mac_walker = index.mac_index.walk()
+        v_index = VendorIndex()
 
+        while True:
+            try:
+                entry = index.get_from_mac_index(next(mac_walker))
+                if entry is not None:
+                    v_index.insert(entry)
+            except StopIteration:
+                break
+        index.vendor_index = v_index
         return index
 
     def get_from_mac_index(self, mac: str) -> IEEEEntry | None:
@@ -147,7 +184,7 @@ class IEEEIndex:
         return ieee_entries
 
     @staticmethod
-    def get_single(indextype: MACIndex | IdentifierIndex | ProtocolIndex, mac: str):
+    def get_single(indextype: VendorIndex | MACIndex | IdentifierIndex | ProtocolIndex, mac: str):
         ieee_entry = indextype.lookup(mac)
         if ieee_entry:
             return ieee_entry

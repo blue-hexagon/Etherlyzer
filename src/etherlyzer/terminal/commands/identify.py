@@ -1,7 +1,7 @@
 import re
 
 from etherlyzer.formatters import MACFormatter
-from etherlyzer.ieee.database import IEEEIndex
+from etherlyzer.ieee.index import IEEEIndex
 from etherlyzer.ieee.catalog import Catalog
 from etherlyzer.ieee.registry import RegCategory, EtherTypeEntry
 
@@ -23,7 +23,7 @@ def run(args):
         return 1
     print(f"")
     print(f"Organization")
-    short = re.sub(r"(,.*|Co.*)$", "", entry.organization_name).strip() # TODO: Test
+    short = re.sub(r"(,.*|Co.*)$", "", entry.organization_name).strip()  # TODO: Test
     print(f"  Name         : {short}")
     print(f"  Full Name    : {entry.organization_name}")
     print(f"  Address")
@@ -53,8 +53,17 @@ def run(args):
         # @formatter:on
     except KeyError:
         pass
-    print()
-    print(f"{short}")
+    other_bloks = index.vendor_index.lookup(entry.organization_name)
+    # print(f"  {index.vendor_index.lookup(entry.organization_name)}")
+    fmt_counter = 0
+    if other_bloks:
+        print(f"  Other Blocks : {len(other_bloks)}")  # TODO
+        for assignment in other_bloks:
+            fmt_counter += 9
+            print(f"    {MACFormatter.format_default(assignment.assignment)}", end=" ")
+            if fmt_counter > 90+45:
+                fmt_counter = 0
+                print()
     print()
     if isinstance(entry, EtherTypeEntry):
         print(f"  Protocol    : {entry.protocol}")

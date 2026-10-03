@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from etherlyzer.ieee.database import IEEEIndex
+from etherlyzer.ieee.index import IEEEIndex
 from etherlyzer.ieee.catalog import Catalog
 from etherlyzer.terminal.utility import read_multiline
 
