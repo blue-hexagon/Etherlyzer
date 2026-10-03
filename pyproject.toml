@@ -1,6 +1,6 @@
 [project]
 name = "etherlyzer"
-version = "0.5.2"
+version = "0.5.3"
 description = "Fast offline lookup and classification of Ethernet-related identifiers."
 readme = "README.md"
 requires-python = ">=3.14"
@@ -38,9 +38,9 @@ classifiers = [
 
 dependencies = [
     "requests (>=2.34.2,<3.0.0)",
-    "python-dotenv>=1.2.2,<2.0.0",
-    "platformdirs (>=4.10.0,<5.0.0)",
-    "pandas (>=3.0.5,<4.0.0)",
+    "python-dotenv>=1.2.4,<2.0.0",
+    "platformdirs (>=4.12.2,<5.0.0)",
+    "pandas (>=3.0.6,<4.0.0)",
     "tqdm (>=4.70.1,<5.0.0)",
 ]
 
@@ -58,15 +58,15 @@ packages = [
     { include = "etherlyzer", from = "src" }
 ]
 include = [
-    { path = "etherlyzer.env", format = ["sdist", "wheel"] }
+    { path = "src/etherlyzer/etherlyzer.env", format = ["sdist", "wheel"] }
 ]
 
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.1.1"
 pytest-cov = "^7.1.0"
-mypy = "^2.2.0"
-ruff = "^0.15.21"
+mypy = "^2.4.0"
+ruff = "^0.16.10"
 
 
 [tool.pytest.ini_options]

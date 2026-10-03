@@ -5,28 +5,38 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv("etherlyzer.env")
+from etherlyzer.util.dirs import DATA_PLATFORM_DIR
 
 
-class MACCase(StrEnum):
+
+class MACCasing(StrEnum):
     UPPER = "upper"
     LOWER = "lower"
 
 
 @dataclass(slots=True, frozen=True)
-class Settings:
+class EtherlyzerKnobs:
     db_update_interval_hours: int = 24
 
     field_separator: str = ";"
     mac_separator: str = "."
     mac_block_size: int = 4
-    mac_case: MACCase = MACCase.UPPER
+    mac_case: MACCasing = MACCasing.UPPER
 
     show_sync_messages: bool = False
 
+    def __post_init__(self) -> None:  # noqa
+        if not (DATA_PLATFORM_DIR / "etherlyzer.env").exists():
+            from importlib.resources import files
+            import shutil
+            template_env = files("etherlyzer").joinpath("etherlyzer.env")
+            destination_env = DATA_PLATFORM_DIR / "etherlyzer.env"
+            with template_env.open("rb") as src, destination_env.open("wb") as dst:
+                shutil.copyfileobj(src, dst)
+        load_dotenv(DATA_PLATFORM_DIR / "etherlyzer.env")
 
 
-def validate_config(conf: Settings) -> None:
+def validate_knobs(conf: EtherlyzerKnobs) -> None:
     if conf.db_update_interval_hours <= 0:
         raise ValueError(
             "DB_UPDATE_INTERVAL_HOURS must be greater than zero."
@@ -48,7 +58,7 @@ def validate_config(conf: Settings) -> None:
         )
 
 
-def load_config(cls: type[Settings]) -> Settings:
+def load_config(cls: type[EtherlyzerKnobs]) -> EtherlyzerKnobs:
     values = {}
 
     for field in fields(cls):
@@ -90,5 +100,5 @@ def load_config(cls: type[Settings]) -> Settings:
     return cls(**values)
 
 
-config = load_config(Settings)
-validate_config(config)
+config = load_config(EtherlyzerKnobs)
+validate_knobs(config)

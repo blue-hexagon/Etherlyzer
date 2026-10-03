@@ -8,8 +8,8 @@ from requests import RequestException
 from tqdm import tqdm
 
 from etherlyzer.ieee.csv_parser import IEEERegistryReader
-from etherlyzer.util.dirs import IEEE_DATA_PLATDIR
-from etherlyzer.util.settings import config
+from etherlyzer.util.dirs import DATA_PLATFORM_DIR
+from etherlyzer.util.knobs import config
 
 
 class RegCategory(StrEnum):
@@ -96,7 +96,7 @@ class IEEERegistry:
 
     @property
     def filepath(self) -> Path:
-        return IEEE_DATA_PLATDIR / Path("".join([self.name, ".csv"]))
+        return DATA_PLATFORM_DIR / Path("".join([self.name, ".csv"]))
 
     @property
     def assignment_length(self) -> int:
