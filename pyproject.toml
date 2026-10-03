@@ -1,10 +1,10 @@
 [project]
 name = "etherlyzer"
-version = "0.3.0"
+version = "0.5.1"
 description = "Fast offline lookup and classification of Ethernet-related identifiers."
 readme = "README.md"
 requires-python = ">=3.14"
-license = { text = "MIT" }
+license = "MIT"
 
 authors = [
     { name = "Tobias Andersen" }
