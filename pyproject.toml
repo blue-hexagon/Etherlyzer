@@ -1,6 +1,6 @@
 [project]
 name = "etherlyzer"
-version = "0.5.1"
+version = "0.5.2"
 description = "Fast offline lookup and classification of Ethernet-related identifiers."
 readme = "README.md"
 requires-python = ">=3.14"
