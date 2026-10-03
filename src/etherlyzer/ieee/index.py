@@ -63,7 +63,14 @@ class VendorIndex:
         self.vendors.setdefault(key, []).append(entry)
 
     def lookup(self, vendor: str) -> list[IEEEEntry] | None:
-        return self.vendors.get(self.normalize_vendor_name(vendor))
+        ieee_mac_entries = self.vendors.get(self.normalize_vendor_name(vendor))
+        ieee_mac_entries.sort(
+            key=lambda entry: int(
+                "".join(c for c in entry.assignment if c in "0123456789ABCDEFabcdef"),
+                16,
+            )
+        )
+        return ieee_mac_entries
 
 
 @dataclass(slots=True)
