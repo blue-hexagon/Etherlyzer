@@ -57,9 +57,8 @@ etherlyzer = "etherlyzer.terminal.cli:main"
 packages = [
     { include = "etherlyzer", from = "src" }
 ]
-
 include = [
-    { path = "src/etherlyzer/data/*.csv", format = ["sdist", "wheel"] }
+    { path = "etherlyzer.env", format = ["sdist", "wheel"] }
 ]
 
 
