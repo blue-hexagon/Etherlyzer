@@ -12,8 +12,6 @@ Etherlyzer provides a CLI utilty supporting both single and bulk-processing, as 
 
 EtherLyzer is designed for network engineers, cybersecurity professionals, automation, and asset discovery.
 
----
-
 ## What can EtherLyzer do?
 
 EtherLyzer maintains a local copy of IEEE registries, enabling fast, offline lookups without requiring Internet access and sharing MAC adresses with a third-party that might collect your searches and correlate them with your IP and more.
@@ -36,181 +34,9 @@ Etherlyzer automatically fetches the official IEEE registry listings once every 
 
 The synchronization interval can be adjusted to your preference in the shipped `etherlyzer.env` file.
 
-## Roadmap
-
-* Implement a seperate vendor index and correlate assignment-blocks when identifying MAC addresses.
-
----
-
 ## Showcasing
 
-### Identify HW Vendor
-
-Longest prefix match in action:
-IAB is legacy. It's still very much in use today, but no new entries are added to the index.
-This example shows Etherlyzer performing a longest-prefix match.
-
-IAB is registered in MA-L listing, but if we provide the first 9 hex-digits we can identify the IAB.
-
-
-```text
-etherlyzer identify --type mac 40-D8-55-11-A3-E1
-
-Organization
-  Name         : Sicon srl
-  Full Name    : Sicon srl
-  Address
-    Via Sila 1/3 Isola Vicentina Vicenza IT 36033
-
-Registry
-  IEEE Type    : IAB [Individual Address Block]
-  Assignment   : 40-d8-55-11-a
-  Range        : 40-d8-55-11-a0-00 - 40-d8-55-11-af-ff
-  Legacy       : True
-  Legacy Name  : None
-  Prefix Bits  : 36 bits
-  Address Bits : 12 bits
-  Addresses    : 4,096
-
-
-etherlyzer identify  40-D8-55         
-
-Organization
-  Name         : IEEE Registration Authority
-  Full Name    : IEEE Registration Authority
-  Address
-    445 Hoes Lane Piscataway NJ US 08554
-
-Registry
-  IEEE Type    : MA-L [MAC Address Block Large]
-  Assignment   : 40-d8-55
-  Range        : 40-d8-55-00-00-00 - 40-d8-55-ff-ff-ff
-  Legacy       : False
-  Prefix Bits  : 24 bits
-  Address Bits : 24 bits
-  Addresses    : 16,777,216
-
-IEEE Registration Authority
-
-```
-
-### The Data Layer
-
-From the command-line: `etherlyzer info`:
-
-```text
-(etherlyzer-py3.14) PS C:\Users\T\Desktop\EtherTools> etherlyzer info
-
-EtherLyzer 0.3.0
-
-Registries
-IEEE Name: MA-L (MAC Address Block Large)
-Legacy Name: OUI
-Category: mac
-Description: Large IEEE MAC address allocation. Formerly known as the Organizationally Unique Identifier (OUI). Used by vendors requiring large address spaces.
-Is Legacy: False
-Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\MA-L.csv
-URL: https://standards-oui.ieee.org/oui/oui.csv
-Prefix bits: 24
-Last retrieved: 2026-09-28 17:33:17.442158+00:00
-Update interval: 1 day, 0:00:00
-
-IEEE Name: MA-M (MAC Address Block Medium)
-Legacy Name: OUI-28
-Category: mac
-Description: Medium-sized IEEE MAC address allocation intended for organizations requiring fewer addresses than MA-L.
-Is Legacy: False
-Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\MA-M.csv
-URL: https://standards-oui.ieee.org/oui28/mam.csv
-Prefix bits: 28
-Last retrieved: 2026-09-28 17:33:20.061122+00:00
-Update interval: 1 day, 0:00:00
-
-IEEE Name: MA-S (MAC Address Block Small)
-Legacy Name: OUI-36
-Category: mac
-Description: Small IEEE MAC address allocation for embedded devices, IoT, industrial equipment, and smaller manufacturers.
-Is Legacy: False
-Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\MA-S.csv
-URL: https://standards-oui.ieee.org/oui36/oui36.csv
-Prefix bits: 36
-Last retrieved: 2026-09-28 17:33:22.278145+00:00
-Update interval: 1 day, 0:00:00
-
-IEEE Name: MANID (Manufacturer Identifier)
-Legacy Name: None
-Category: identifier
-Description: Manufacturer identifier registry maintained by the IEEE Registration Authority. Used to uniquely identify manufacturers rather than allocating MAC addresses.
-Is Legacy: False
-Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\MANID.csv
-URL: https://standards-oui.ieee.org/manid/manid.csv
-Prefix bits: None
-Last retrieved: 2026-09-28 17:33:23.313482+00:00
-Update interval: 1 day, 0:00:00
-
-IEEE Name: OPID (OUI-based Protocol Identifier)
-Legacy Name: None
-Category: identifier
-Description: Registry of protocol identifiers based on IEEE-assigned organizational identifiers. Used by vendor-specific and IEEE protocols.
-Is Legacy: False
-Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\OPID.csv
-URL: https://standards-oui.ieee.org/bopid/opid.csv
-Prefix bits: None
-Last retrieved: 2026-09-28 17:33:24.455807+00:00
-Update interval: 1 day, 0:00:00
-
-IEEE Name: CID (Company Identifier)
-Legacy Name: None
-Category: identifier
-Description: Unique company identifiers assigned by IEEE. Identifies organizations independently of MAC address allocations.
-Is Legacy: False
-Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\CID.csv
-URL: https://standards-oui.ieee.org/cid/cid.csv
-Prefix bits: None
-Last retrieved: 2026-09-28 17:33:25.409803+00:00
-Update interval: 1 day, 0:00:00
-
-IEEE Name: IAB (Individual Address Block)
-Legacy Name: None
-Category: mac
-Description: Legacy IEEE MAC address allocation scheme superseded by MA-S. Retained for compatibility with older hardware.
-Is Legacy: True
-Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\IAB.csv
-URL: https://standards-oui.ieee.org/iab/iab.csv
-Prefix bits: 36
-Last retrieved: 2026-09-28 17:33:27.785458+00:00
-Update interval: 1 day, 0:00:00
-
-IEEE Name: EtherType (EtherType Registry)
-Legacy Name: None
-Category: protocol
-Description: Registry mapping EtherType values to Ethernet protocols, including IPv4, IPv6, ARP, VLAN tagging, LLDP, MPLS, 802.1X, and many vendor-specific protocols.
-Is Legacy: False
-Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\EtherType.csv
-URL: https://standards-oui.ieee.org/ethertype/eth.csv
-Prefix bits: None
-Last retrieved: 2026-09-28 17:33:29.763446+00:00
-Update interval: 1 day, 0:00:00
-```
-### Format Nasty MAC Addresses
-
-```shell
-etherlyzer format l..iIdOØ1!23-4oo.. --fix-typos --casing "upper" --block-size 4 --separator .
-
-> 111D.0012.3400
-```
-
-## Installation
-
-Clone the repository:
-
-*Not published to pypi yet(!).*
-
-```bash
-pip install etherlyzer
-```
-
-## Commandline Interface
+### Commandline Interface
 ```text
 usage: etherlyzer [-h] [-v] {validize,format,update,info,identify} ...
 
@@ -229,11 +55,48 @@ Commands:
     identify            Search vendors, protocols or assignments
 ```
 
-### Example: validize
+### MAC Hardware Vendor Identification
 
-Validates and normalizes MAC adresses in bulk.
+IAB is also registered in the MA-L listings under `IEEE Registration`, but if we provide a specific hardware address (e.g. the first 9 hex-digits) we can identify the IAB (doing longest-prefix match).
+
+
+```text
+> etherlyzer identify  00-50-C2f71                                                                      
+
+Organization
+  Name            : RF
+  Full Name       : RF Code
+  Address
+    9229 Waterford Centre Blvd #500 Austin TX US 78758
+
+Registry
+  IEEE Type       : IAB [Individual Address Block]
+  Assignment      : 00-50-c2-f7-1
+  Range           : 00-50-c2-f7-10-00 - 00-50-c2-f7-1f-ff
+  Legacy          : True
+  Legacy Name     : None
+  Prefix Bits     : 36 bits
+  Address Bits    : 12 bits
+  Addresses       : 4,096
+
+Vendor Blocks
+  Total Blocks    : 10
+  Address Capacity
+    Total         : 40,960
+    MA-L          : 0
+    MA-M          : 0
+    MA-S          : 16,384
+    IAB           : 24,576
+    Registered Blocks (B=IAB, S=MA-S, M=MA-M, L=MA-L)
+      [B] 00-50-c2-1a-6      [B] 00-50-c2-68-9      [B] 00-50-c2-be-5      [B] 00-50-c2-db-1      [B] 00-50-c2-f7-1
+      [B] 40-d8-55-19-4      [S] 70-b3-d5-94-b      [S] 70-b3-d5-a5-1      [S] 70-b3-d5-ad-b      [S] 8c-1f-64-59-6
+```
+
+### Validate and Normalize MAC Addresses
 
 Validation runs first after which candidates are normalized and optionally a masked output of the MACs failing validation are output.
+
+The validation shows the specific errors using single-character mask-flags.
 
 ```text
 v = valid hex digit
@@ -243,6 +106,8 @@ I = invalid character
 r/R = relaxed typo candidate
 l/L = lenient typo candidate
 ```
+
+The command output is also customizable:
 
 Options:
 ```text
@@ -259,8 +124,6 @@ options:
   -o, --show-originals  Displays the original MAC addresses after the normalized MAC address on each line.
   -n, --no-info         Doesn't display an OK or ERR before each line depending on whether the outout succeeded normalization.
 ```
-
-Example
 
 ```text
 etherlyzer validize --bulk --linenumbers
@@ -323,13 +186,18 @@ OK  001a2b3c4d5e    << 00:1a-2b.3c:4d-5e
 
 Normalized 10/26 MAC addresses. Invalid MAC addresses identified: 16/26
 ```
+### Format Nasty MAC Addresses
 
+```shell
+etherlyzer format l..iIdOØ1!23-4oo.. --fix-typos --casing "upper" --block-size 4 --separator .
+
+111D.0012.3400
+```
 
 ## Configuration
 
-The included `etherlyzer.env` file provides sensible defaults and works out of the box.
+The included `etherlyzer.env` file provides sensible defaults and works out of the box but is configurable.
 
-Example configuration:
 
 ```dotenv
 #---------------------------------------------------DATASET
@@ -360,24 +228,105 @@ USE_FILE_ENABLED=true
 USE_FILE=in.txt
 ```
 
----
+## Data Layer
 
-## Running
+From the command-line: `etherlyzer info` you can inspect the different registries where data is gathered from and inspect synchronization.
 
-Using Poetry:
+```text
+(etherlyzer-py3.14) PS C:\Users\T\Desktop\EtherTools> etherlyzer info
 
-```bash
-poetry run python main.py
+EtherLyzer 0.3.0
+
+Registries
+IEEE Name: MA-L (MAC Address Block Large)
+Legacy Name: OUI
+Category: mac
+Description: Large IEEE MAC address allocation. Formerly known as the Organizationally Unique Identifier (OUI). Used by vendors requiring large address spaces.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\MA-L.csv
+URL: https://standards-oui.ieee.org/oui/oui.csv
+Prefix bits: 24
+Last retrieved: 2026-09-28 17:33:17.442158+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: MA-M (MAC Address Block Medium)
+Legacy Name: OUI-28
+Category: mac
+Description: Medium-sized IEEE MAC address allocation intended for organizations requiring fewer addresses than MA-L.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\MA-M.csv
+URL: https://standards-oui.ieee.org/oui28/mam.csv
+Prefix bits: 28
+Last retrieved: 2026-09-28 17:33:20.061122+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: MA-S (MAC Address Block Small)
+Legacy Name: OUI-36
+Category: mac
+Description: Small IEEE MAC address allocation for embedded devices, IoT, industrial equipment, and smaller manufacturers.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\MA-S.csv
+URL: https://standards-oui.ieee.org/oui36/oui36.csv
+Prefix bits: 36
+Last retrieved: 2026-09-28 17:33:22.278145+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: CID (Company Identifier)
+Legacy Name: None
+Category: identifier
+Description: Unique company identifiers assigned by IEEE. Identifies organizations independently of MAC address allocations.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\CID.csv
+URL: https://standards-oui.ieee.org/cid/cid.csv
+Prefix bits: None
+Last retrieved: 2026-09-28 17:33:25.409803+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: IAB (Individual Address Block)
+Legacy Name: None
+Category: mac
+Description: Legacy IEEE MAC address allocation scheme superseded by MA-S. Retained for compatibility with older hardware.
+Is Legacy: True
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\IAB.csv
+URL: https://standards-oui.ieee.org/iab/iab.csv
+Prefix bits: 36
+Last retrieved: 2026-09-28 17:33:27.785458+00:00
+Update interval: 1 day, 0:00:00
+
+IEEE Name: EtherType (EtherType Registry)
+Legacy Name: None
+Category: protocol
+Description: Registry mapping EtherType values to Ethernet protocols, including IPv4, IPv6, ARP, VLAN tagging, LLDP, MPLS, 802.1X, and many vendor-specific protocols.
+Is Legacy: False
+Filepath: C:\Users\T\AppData\Local\Manjana\etherlyzer\Cache\1.0\EtherType.csv
+URL: https://standards-oui.ieee.org/ethertype/eth.csv
+Prefix bits: None
+Last retrieved: 2026-09-28 17:33:29.763446+00:00
+Update interval: 1 day, 0:00:00
 ```
 
-Or activate the virtual environment first:
+## Installation
 
-```bash
+### Developer Installation
+
+```text
+git clone https://github.com/blue-hexagon/Etherlyzer
+poetry install
 poetry env activate
-python main.py
 ```
 
----
+### Library Installation
+
+```text
+poetry env activate
+poetry add etherlyzer
+```
+
+### CLI Installation
+
+```bash
+pip install etherlyzer
+```
 
 ## Project Structure
 
@@ -386,12 +335,10 @@ EtherLyzer/
 ├── data/
 ├── src/
 │   └── etherlyzer/
-├── .env
+├── etherlyzer.env
 ├── pyproject.toml
 └── README.md
 ```
-
----
 
 ## Requirements
 
@@ -400,9 +347,7 @@ Developed with:
 * Python 3.14+
 * Poetry
 
-The project may also run on earlier Python versions with minor modifications, although Python 3.14 is the officially supported development target.
-
----
+The project may also run on earlier Python versions with minor modifications, although Python 3.14 is the officially supported development target for now.
 
 ## License
 
