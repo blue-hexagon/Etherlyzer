@@ -11,11 +11,11 @@ def run(args):
     registry = Catalog()
     index = IEEEIndex.from_registries(registry.get_all_registries(check_for_updates=False))
     if args.type.lower() == RegCategory.MAC.value:
-        entry = index.get_single(index.mac_index, args.mac)
+        entry = index.get_single(index.mac_index, args.value)
     elif args.type.lower() == RegCategory.PROTOCOL.value:
-        entry = index.get_single(index.protocol_index, args.mac)
+        entry = index.get_single(index.protocol_index, args.value)
     elif args.type.lower() == RegCategory.IDENTIFIER.value:
-        entry = index.get_single(index.identifier_index, args.mac)
+        entry = index.get_single(index.identifier_index, args.value)
     else:
         print(f"No valid type ({args.type}) selected.")
         return 1
@@ -63,17 +63,17 @@ def run(args):
         total_addresses_mam = 0
         total_addresses_mas = 0
         total_addresses_iab = 0
-        for entry in other_bloks:
-            if entry.registry == "MA-L":
+        for ent in other_bloks:
+            if ent.registry == "MA-L":
                 total_addresses += 2 ** 24
                 total_addresses_mal += 2 ** 24
-            elif entry.registry == "MA-M":
+            elif ent.registry == "MA-M":
                 total_addresses += 2 ** 20
                 total_addresses_mam += 2 ** 20
-            elif entry.registry == "MA-S":
+            elif ent.registry == "MA-S":
                 total_addresses += 2 ** 12
                 total_addresses_mas += 2 ** 12
-            elif entry.registry == "IAB":
+            elif ent.registry == "IAB":
                 total_addresses += 2 ** 12
                 total_addresses_iab += 2 ** 12
         print(f"")
