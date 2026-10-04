@@ -1,7 +1,7 @@
-from etherlyzer.util.settings import config
+from etherlyzer.util.knobs import etherlyzer_knobs
 from etherlyzer.formatters import MACFormatter
 
-from etherlyzer.ieee.registry import IEEEEntry
+from etherlyzer.ieee.ieee_registry import IEEEEntry
 
 
 class RegistryMatchExporter:
@@ -10,9 +10,9 @@ class RegistryMatchExporter:
         for entry in entries:
             try:
                 print(
-                    f"{entry.registry}{config.field_separator}"
-                    f"{MACFormatter.format_default(entry.assignment)}{config.field_separator}"
-                    f"{entry.organization_name}{config.field_separator}"
+                    f"{entry.registry}{etherlyzer_knobs.field_separator}"
+                    f"{MACFormatter.format_default(entry.assignment)}{etherlyzer_knobs.field_separator}"
+                    f"{entry.organization_name}{etherlyzer_knobs.field_separator}"
                     f"{entry.organization_address}"
                     f""
                 )

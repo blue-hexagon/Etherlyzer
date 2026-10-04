@@ -3,7 +3,7 @@ import re
 from etherlyzer.formatters import MACFormatter
 from etherlyzer.ieee.index import IEEEIndex
 from etherlyzer.ieee.catalog import Catalog
-from etherlyzer.ieee.registry import RegCategory, EtherTypeEntry
+from etherlyzer.ieee.ieee_registry import RegCategory, EtherTypeEntry
 
 
 def run(args):

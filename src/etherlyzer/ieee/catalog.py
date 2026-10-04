@@ -1,4 +1,4 @@
-from etherlyzer.ieee.registry import RegCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
+from etherlyzer.ieee.ieee_registry import RegCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
 
 
 class Catalog:

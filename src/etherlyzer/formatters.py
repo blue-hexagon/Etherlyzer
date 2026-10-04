@@ -1,7 +1,7 @@
 from enum import StrEnum
 from typing import Literal
 
-from etherlyzer.util.settings import config
+from etherlyzer.util.knobs import etherlyzer_knobs
 from string import punctuation
 
 
@@ -43,11 +43,11 @@ class MACFormatter:
     @classmethod
     def format_default(cls, mac: str) -> str:
         mac = cls.normalize(mac)
-        mac = config.mac_separator.join(
-            mac[i: i + config.mac_block_size] for i in range(0, len(mac), config.mac_block_size)
+        mac = etherlyzer_knobs.mac_separator.join(
+            mac[i: i + etherlyzer_knobs.mac_block_size] for i in range(0, len(mac), etherlyzer_knobs.mac_block_size)
         )
 
-        return getattr(mac, config.mac_case.value)()
+        return getattr(mac, etherlyzer_knobs.mac_case.value)()
 
     @classmethod
     def format_with_stuffed_hex(cls, mac: str, stuffed_hex: str) -> str:

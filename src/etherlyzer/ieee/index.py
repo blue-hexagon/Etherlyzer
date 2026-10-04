@@ -5,7 +5,7 @@ from pathlib import Path
 from time import sleep
 from typing import TypeVar
 
-from etherlyzer.ieee.registry import RegCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
+from etherlyzer.ieee.ieee_registry import RegCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
 
 HEX_DIGITS = frozenset("0123456789ABCDEF")
 

@@ -32,7 +32,7 @@ Typical use cases include:
 
 Etherlyzer automatically fetches the official IEEE registry listings once every 24 hours, ensuring that the local registry data remains up to date. IEEE states that its public listings are updated every 24 hours.
 
-The synchronization interval can be adjusted to your preference in the shipped `etherlyzer.env` file.
+The synchronization interval can be adjusted to your preference in the shipped `src/etherlyzer/etherlyzer.env` file.
 
 ## Showcasing
 
@@ -196,7 +196,7 @@ etherlyzer format l..iIdOØ1!23-4oo.. --fix-typos --casing "upper" --block-size 
 
 ## Configuration
 
-The included `etherlyzer.env` file provides sensible defaults and works out of the box but is configurable.
+The included `src/etherlyzer/etherlyzer.env` file provides sensible defaults and works out of the box but is configurable.
 
 
 ```dotenv

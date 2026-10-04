@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from etherlyzer.ieee.csv_parser import IEEERegistryReader
 from etherlyzer.util.dirs import DATA_PLATFORM_DIR
-from etherlyzer.util.knobs import config
+from etherlyzer.util.knobs import etherlyzer_knobs
 
 
 class RegCategory(StrEnum):
@@ -123,11 +123,11 @@ class IEEERegistry:
         now = datetime.datetime.now(datetime.UTC)
         f_not_exists = not self.filepath.exists()
 
-        if f_not_exists and config.show_sync_messages:
+        if f_not_exists and etherlyzer_knobs.show_sync_messages:
             print(f"Cache for {self.name} not found.")
-        elif expires <= now and config.show_sync_messages:
+        elif expires <= now and etherlyzer_knobs.show_sync_messages:
             print(f"Cache for {self.name} has expired.")
-        elif config.show_sync_messages:
+        elif etherlyzer_knobs.show_sync_messages:
             print(f"Cache for {self.name} expires at: {expires_humanized} UTC")
 
         return f_not_exists or expires <= now
@@ -138,7 +138,7 @@ class IEEERegistry:
 
         while attempts <= max_attempts:
             try:
-                if config.show_sync_messages:
+                if etherlyzer_knobs.show_sync_messages:
                     print(f"Saving Registry: {self.name}")
 
                 res = requests.get(
@@ -158,7 +158,7 @@ class IEEERegistry:
                             unit_scale=True,
                             unit_divisor=1024,
                             desc=f"Saving {self.name}",
-                            disable=not config.show_sync_messages,
+                            disable=not etherlyzer_knobs.show_sync_messages,
                     ) as progress:
                         for chunk in res.iter_content(chunk_size=8192):
                             if chunk:
@@ -168,7 +168,7 @@ class IEEERegistry:
                 return None
 
             except RequestException as exc:
-                if config.show_sync_messages:
+                if etherlyzer_knobs.show_sync_messages:
                     print(
                         f"Request timed out on attempt "
                         f"{attempts} of {max_attempts}."
