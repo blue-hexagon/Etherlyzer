@@ -1,8 +1,8 @@
 from . import (
-    bulk,
+    whois,
     format,
-    info,
-    normalize,
-    identify,
-    update,
+    registries,
+    validate,
+    inspect,
+    sync,
 )

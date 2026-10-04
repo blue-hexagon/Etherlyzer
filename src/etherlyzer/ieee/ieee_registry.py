@@ -68,7 +68,6 @@ class IEEERegistry:
     address_bits: int | None = None
     address_count: int | None = None
 
-
     update_interval: datetime.timedelta = datetime.timedelta(days=1)
     last_retrieved: datetime.datetime = None  # noqa; set in post-init
 
@@ -117,7 +116,7 @@ class IEEERegistry:
             self.save()
         return IEEERegistryReader.load(self.filepath, self.model)
 
-    def need_updates(self):
+    def need_updates(self, inform_if_synced_about_expiration=False):
         expires = self.last_retrieved + self.update_interval
         expires_humanized = expires.replace(microsecond=0)
         now = datetime.datetime.now(datetime.UTC)
@@ -127,8 +126,9 @@ class IEEERegistry:
             print(f"Cache for {self.name} not found.")
         elif expires <= now and etherlyzer_knobs.show_sync_messages:
             print(f"Cache for {self.name} has expired.")
-        elif etherlyzer_knobs.show_sync_messages:
-            print(f"Cache for {self.name} expires at: {expires_humanized} UTC")
+        elif etherlyzer_knobs.show_sync_messages and inform_if_synced_about_expiration:
+            namelen = len("EtherType") - len(self.name)
+            print(f"Cache for {self.name} expires at: {' '*namelen} {expires_humanized} UTC")
 
         return f_not_exists or expires <= now
 

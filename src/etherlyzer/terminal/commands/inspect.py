@@ -1,3 +1,4 @@
+import argparse
 import re
 
 from etherlyzer.formatters import MACFormatter
@@ -67,8 +68,8 @@ def run(args):
                 total_addresses += 2 ** 24
                 total_addresses_mal += 2 ** 24
             elif entry.registry == "MA-M":
-                total_addresses += 20 ** 2
-                total_addresses_mam += 20 ** 2
+                total_addresses += 2 ** 20
+                total_addresses_mam += 2 ** 20
             elif entry.registry == "MA-S":
                 total_addresses += 2 ** 12
                 total_addresses_mas += 2 ** 12
@@ -102,7 +103,23 @@ def run(args):
 
 
 def register(subparsers):
-    parser = subparsers.add_parser("identify", help="Search vendors, protocols or assignments")
+    parser = subparsers.add_parser(
+        "inspect",
+        help="Inspect an IEEE assignment and display registry, organization, range, and allocation details.",
+        description=(
+            "Inspect a single IEEE assignment and display detailed registry metadata, "
+            "organization information, address range, and related vendor allocations."
+        ),
+        epilog=r"""
+Examples:
+  etherlyzer inspect 00:11:22:33:44:55
+  etherlyzer inspect -t mac 00:11:22:33:44:55
+  etherlyzer inspect -t protocol 0800
+  etherlyzer inspect -t identifier <identifier>
+""",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
     parser.add_argument(
         "-t",
         "--type",
@@ -110,6 +127,13 @@ def register(subparsers):
         choices=list(RegCategory),
         default="mac",
         metavar="{mac|protocol|identifier}",
+        help="IEEE registry category to search (default: mac).",
     )
-    parser.add_argument("mac", help="Search string", type=str)
+
+    parser.add_argument(
+        "value",
+        type=str,
+        help="IEEE assignment or identifier to inspect.",
+    )
+
     parser.set_defaults(func=run)

@@ -1,3 +1,5 @@
+import argparse
+
 from etherlyzer.terminal.utility import read_multiline
 from etherlyzer.formatters import MACFormatter
 
@@ -6,9 +8,9 @@ def run(args):
     if args.bulk:
         macs = read_multiline(linetype="MAC addresses")
     else:
-        macs = args.mac
+        macs = [args.mac]
 
-    linenumber = 1
+    linenumber = 0
     padding = len(str(len(macs))) + 2
     normalized_count = 0
     invalid_count = 0
@@ -47,53 +49,68 @@ def run(args):
     return 0
 
 
+
 def register(subparsers):
     parser = subparsers.add_parser(
-        "validize",
-        help="Validates and normalizes MAC addresses (this command does not perform any sort of typo-correction - use `format` for that purpose).",
+        "validate",
+        help="Validate and normalize MAC addresses with optional diagnostics and filtering.",
+        description=(
+            "Validate and normalize MAC addresses without typo correction. "
+            "Malformed input is reported rather than corrected; use `format` "
+            "for corrective formatting."
+        ),
+        epilog=r"""
+Examples:
+  etherlyzer validate 00:11:22:33:44:55
+  etherlyzer validate -b
+  etherlyzer validate -b --strict
+  etherlyzer validate -b --linenumbers --show-info
+  etherlyzer validate -b --show-originals
+""",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
-    parser.add_argument(
+    source = parser.add_mutually_exclusive_group(required=True)
+
+    source.add_argument(
         "mac",
         nargs="?",
-        help="MAC address to normalize",
+        help="MAC address to validate and normalize.",
     )
 
-    parser.add_argument(
+    source.add_argument(
         "-b",
         "--bulk",
         action="store_true",
-        help="Read multiple MAC addresses interactively",
+        help="Read multiple MAC addresses interactively.",
     )
+
     parser.add_argument(
         "-l",
         "--linenumbers",
         action="store_true",
-        help="Show linenumbers corresponding to each MAC address (kind of only useful when validizing in bulk)",
-        dest="linenumbers"
+        help="Prefix output lines with their corresponding input line number.",
     )
 
     parser.add_argument(
         "-s",
         "--strict",
-        dest="strict",
         action="store_true",
-        help="Only return MAC's that can be normalized without errors.",
+        help="Suppress invalid entries and output only successfully normalized MAC addresses.",
     )
 
     parser.add_argument(
         "-o",
         "--show-originals",
-        dest="show_originals",
         action="store_true",
-        help="Displays the original MAC addresses after the normalized MAC address on each line.",
+        help="Show the original input alongside each normalized MAC address.",
     )
+
     parser.add_argument(
         "-i",
         "--show-info",
-        dest="show_info",
         action="store_true",
-        help="Displays an OK or ERR before each line depending on whether the outout succeeded normalization.",
+        help="Prefix each result with OK or ERR to indicate validation status.",
     )
 
     parser.set_defaults(

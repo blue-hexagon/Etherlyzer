@@ -66,8 +66,6 @@ class MACFormatter:
         if fix_typos:
             mac = cls.fix_typos(mac)
         mac = cls.normalize(mac)
-        if len(mac) > 12:
-            raise ValueError(f"Malformed MAC address is of length: {len(mac)}!")
         mac = separator.join(mac[i: i + block_size] for i in range(0, len(mac), block_size))
         if case == "upper":
             return mac.upper()

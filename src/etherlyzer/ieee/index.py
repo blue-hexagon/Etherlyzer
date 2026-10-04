@@ -191,7 +191,7 @@ class IEEEIndex:
         return ieee_entries
 
     @staticmethod
-    def get_single(indextype: VendorIndex | MACIndex | IdentifierIndex | ProtocolIndex, mac: str):
+    def get_single(indextype: VendorIndex | MACIndex | IdentifierIndex | ProtocolIndex, mac: str) -> IEEEEntry | None:
         ieee_entry = indextype.lookup(mac)
         if ieee_entry:
             return ieee_entry

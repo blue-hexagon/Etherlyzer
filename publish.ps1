@@ -4,6 +4,9 @@ poetry version $version
 
 Remove-Item -Recurse -Force .\dist -ErrorAction SilentlyContinue
 
+poetry install
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 poetry check
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
