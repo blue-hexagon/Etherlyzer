@@ -14,7 +14,7 @@ poetry build
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 git add pyproject.toml poetry.lock
-git commit -m "Prepare release v$version"
+git commit -m "Fix inspect argument handling and lookup-state bugs for v$version"
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 git tag -a "v$version" -m "Release v$version"
