@@ -37,8 +37,7 @@ def run(args):
             path_or_text=args.file,
         )
     else:
-        pass
-    return 1
+        return 1
     if entries:
         for entry in entries:
             print(

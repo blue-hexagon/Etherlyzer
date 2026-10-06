@@ -51,6 +51,12 @@ def run(args):
         print(f"  Prefix Bits     : {reg.prefix_bits} bits")
         print(f"  Address Bits    : {reg.address_bits} bits")
         print(f"  Addresses       : {reg.address_count:,}") # noqa
+        first_octet = int(entry.assignment[:2], 16)
+
+        is_group = bool(first_octet & 0x01)
+        is_local = bool(first_octet & 0x02)
+        print(f"  Delivery        : {'Unicast (Individual)' if not is_group else 'Multicast (Group)'}")
+        print(f"  Administration  : {'Universal' if not is_local else 'Local'}")
         # @formatter:on
     except KeyError:
         pass

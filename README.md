@@ -403,14 +403,14 @@ The output includes information such as:
 
 Supported registry types include:
 
-| Registry | Category | Purpose |
-|---|---|---|
-| MA-L | MAC | Large MAC address allocations / OUI-24 |
-| MA-M | MAC | Medium MAC address allocations / OUI-28 |
-| MA-S | MAC | Small MAC address allocations / OUI-36 |
-| IAB | MAC | Legacy Individual Address Blocks |
-| CID | Identifier | IEEE Company Identifiers |
-| EtherType | Protocol | Ethernet protocol identifiers |
+| Registry  | Category   | Purpose                                 |
+|-----------|------------|-----------------------------------------|
+| MA-L      | MAC        | Large MAC address allocations / OUI-24  |
+| MA-M      | MAC        | Medium MAC address allocations / OUI-28 |
+| MA-S      | MAC        | Small MAC address allocations / OUI-36  |
+| IAB       | MAC        | Legacy Individual Address Blocks        |
+| CID       | Identifier | IEEE Company Identifiers                |
+| EtherType | Protocol   | Ethernet protocol identifiers           |
 
 # Synchronization
 
@@ -439,11 +439,9 @@ On first use, the configuration is copied to EtherLyzer's platform-specific appl
 Example configuration:
 
 ```dotenv
-#---------------------------------------------------DATASET
 # Maximum age of the local IEEE database before synchronization, in hours
 DB_UPDATE_INTERVAL_HOURS=24
 
-#---------------------------------------------------EXPORT
 # Field delimiter used for CSV and stdout output
 FIELD_SEPARATOR="\t"
 
@@ -457,7 +455,6 @@ MAC_BLOCK_SIZE=2
 # Supported values: upper, lower
 MAC_CASE=lower
 
-#---------------------------------------------------DISPLAY
 # Print database synchronization messages
 SHOW_SYNC_MESSAGES=true
 ```
