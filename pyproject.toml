@@ -3,7 +3,7 @@ name = "etherlyzer"
 version = "0.9.3"
 description = "Fast offline lookup and classification of Ethernet-related identifiers."
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.14,<4"
 license = "MIT"
 
 authors = [
@@ -37,11 +37,11 @@ classifiers = [
 ]
 
 dependencies = [
-    "requests (>=2.34.2,<3.0.0)",
+    "requests>=2.34.2,<3.0.0",
     "python-dotenv>=1.2.4,<2.0.0",
-    "platformdirs (>=4.12.2,<5.0.0)",
-    "pandas (>=3.0.6,<4.0.0)",
-    "tqdm (>=4.70.1,<5.0.0)",
+    "platformdirs>=4.12.2,<5.0.0",
+    "pandas>=3.0.6,<4.0.0",
+    "tqdm>=4.70.1,<5.0.0",
 ]
 
 [project.urls]
@@ -62,11 +62,29 @@ include = [
 ]
 
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^9.1.1"
-pytest-cov = "^7.1.0"
-mypy = "^2.4.0"
-ruff = "^0.16.10"
+[dependency-groups]
+dev = [
+    "pytest>=9",
+    "pytest-cov>=7",
+    "ruff>=0.16",
+    "mypy>=2.4",
+    "pre-commit>=4",
+    "bandit>=1.9",
+    "pip-audit>=2.10.0",
+    "vulture>=2.14",
+    "types-toml>=0.10.8.20260518,<0.11.0.0"
+]
+docs = [
+    "sphinx (>=9.1.0,<10.0.0)",
+    "furo (>=2025.12.19,<2026.0.0)",
+    "myst-parser (>=5.1.0,<6.0.0)",
+    "sphinx-copybutton (>=0.5.2,<0.6.0)",
+    "sphinx-autobuild (>=2025.8.25,<2026.0.0)",
+    "sphinx-design (>=0.7.0,<0.8.0)",
+    "sphinxcontrib-mermaid (>=2.1.0,<3.0.0)",
+    "sphinx-autodoc-typehints (>=3.13.0,<4.0.0)",
+    "sphinx-sitemap (>=2.9.0,<3.0.0)"
+]
 
 
 [tool.pytest.ini_options]
