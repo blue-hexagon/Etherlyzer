@@ -6,7 +6,7 @@ dev.md
 .idea/
 # C extensions
 *.so
-
+docs/_build/
 # Distribution / packaging
 .Python
 build/
