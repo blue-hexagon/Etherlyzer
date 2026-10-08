@@ -171,32 +171,33 @@
                         {%- if show_copyright %}
                         <div class="copyright">
                             Copyright &#169; 2026 &ndash;
-                            <a class="muted-link muted-link-footer" href="https://github.com/blue-hexagon">
+                            <a class="muted-link muted-link-footer" href="https://github.com/blue-hexagon/">
                                 blue-hexagon
                             </a>
                             ·
-                            <a class="muted-link muted-link-footer" href="https://manjana.dev">
+                            <a class="muted-link muted-link-footer" href="https://manjana.dev/">
                                 manjana.dev
                             </a>
                             ·
                             built with
-                            <a class="muted-link muted-link-footer" href="https://manjana.dev">
+                            <a class="muted-link muted-link-footer" href="https://www.sphinx-doc.org/en/master/">
                                 Sphinx
                             </a>
                             and
                             <a class="muted-link muted-link-footer" href="https://github.com/pradyunsg/furo">
                                 Furo
                             </a>
-                            ·
-                            {% trans last_updated=last_updated|e -%}
-                            Last updated on {{ last_updated }}
-                            {%- endtrans -%}
                         </div>
                         {%- endif %}
 
                         <div class="last-updated"></div>
                     </div>
                     <div class="right-details">
+                        {% trans last_updated=last_updated|e -%}
+                        <div class="left-details">
+                            Last updated on {{ last_updated }}
+                        </div>
+                        {%- endtrans -%}
                         {% if theme_footer_icons or READTHEDOCS -%}
                         <div class="icons">
                             {% if theme_footer_icons -%}

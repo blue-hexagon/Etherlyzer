@@ -2,7 +2,7 @@
 
 EtherLyzer is a Python library and command-line toolkit for identifying, classifying, validating, formatting, and inspecting Ethernet-related identifiers.
 
-{bdg-primary}`v{{ version }}` {bdg-info}`Python 3.14+` {bdg-success}`MIT`
+{{ version_badge }} {bdg-info}`Python 3.14+` {bdg-success}`MIT`
 
 ::::{grid} 2
 :gutter: 3

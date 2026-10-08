@@ -61,7 +61,10 @@ myst_enable_extensions = [
 ]
 myst_substitutions = {
     "project": project,
-    "version": release,
+    "version": version,
+    "release": release,
+    "version_badge": f"{{bdg-primary}}`v{version}`",
+
 }
 pygments_style = "friendly"
 pygments_dark_style = "dracula"
@@ -71,7 +74,7 @@ highlight_options = {
     }
 }
 html_favicon = "_static/favicon.ico"
-html_last_updated_fmt = "%Y-%m-%d"
+html_last_updated_fmt = "%Y-%m-%d %H:%M:%S"
 copybutton_prompt_text = r">>> |\.\.\. |\$ |PS [^>]*> "
 copybutton_prompt_is_regexp = True
 intersphinx_mapping = {
