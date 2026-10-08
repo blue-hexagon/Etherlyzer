@@ -118,7 +118,7 @@ Paste MAC addresses. Type ;;; and press <Enter> when done:
 ```
 
 **Output**
-```terminaloutput
+```text
 
 1.  ERR 001a2b3c4d5e6f. => vvvvvvvvvvvvVVVV
 2.  ERR 001a2b3c4d5e6f  => vvvvvvvvvvvvVV
