@@ -1,8 +1,9 @@
 import argparse
 import re
+from locale import normalize
 
 from etherlyzer.formatters import MACFormatter
-from etherlyzer.ieee.eui48_classifier import classify_mac
+from etherlyzer.ieee.eui48_classifier import classify_mac, DeliveryType
 from etherlyzer.ieee.index import IEEEIndex
 from etherlyzer.ieee.catalog import Catalog
 from etherlyzer.ieee.ieee_registry import RegCategory, EtherTypeEntry
@@ -127,18 +128,44 @@ def run(args):
     match args.type.lower():
         case RegCategory.MAC.value:
             entry = index.get_single(index.mac_index, args.value)
-            if entry is None:
-                classified_mac = classify_mac(args.value)
-                print(f"Administration: {classified_mac.administration}")
-                print(f"Delivery: {classified_mac.delivery}")
-                print(f"Broadcast: {classified_mac.is_broadcast}")
-                print(f"Is Zero: {classified_mac.is_zero}")
-                print(f"SLAP Quadrant: {classified_mac.slap_quadrant}")
-                print("No matching entry found.")
-                return 1
-            else:
+            if entry is not None:
                 inspect_universal_eui48(args, entry, index)
                 return 0
+            classified_mac = classify_mac(args.value)
+
+            normalized = MACFormatter.normalize(args.value).ljust(12, "0")
+            mac_int = int(normalized, 16)
+
+            first_octet = mac_int >> 40
+
+            ul_bit = (first_octet >> 1) & 1
+            ig_bit = first_octet & 1
+
+            print("MAC Address")
+            print(f"  Address          : {MACFormatter.format_with_stuffed_hex(args.value, '0')}")
+            print(f"  First Octet      : 0x{first_octet:02X}")
+            print(f"  Binary           : {first_octet:08b}")
+
+            print("  Special Bits")
+            print(
+                f"    U/L            : {ul_bit} ({'Local / Locally Administered' if ul_bit else 'Universal / Universally Administered'})")
+            print(f"    I/G            : {ig_bit} ({'Group / Multicast' if ig_bit else 'Individual / Unicast'})")
+            print(f"  Broadcast        : {classified_mac.is_broadcast}")
+            if classified_mac.slap_quadrant is not None:
+                slap = classified_mac.slap_quadrant
+            elif classified_mac.delivery == DeliveryType.GROUP:
+                slap = "Not Applicable (Group Address)"
+            else:
+                slap = "Not Applicable (Universal Address)"
+
+            print(f"  SLAP Quadrant    : {slap}")
+
+            if classified_mac.is_zero:
+                print("  Classification   : Unspecified / Zero Address")
+
+            print("  IEEE Assignment  : Not Applicable")
+            return 0
+            print("No matching entry found.")
         case RegCategory.PROTOCOL.value:
             entry = index.get_single(index.protocol_index, args.value)
             inspect_ethertype(args, entry, index)
