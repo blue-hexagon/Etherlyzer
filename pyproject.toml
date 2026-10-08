@@ -88,12 +88,19 @@ docs = [
 
 
 [tool.pytest.ini_options]
+minversion = "8.0"
 testpaths = ["tests"]
-pythonpath = ["src"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
 addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
+]
+markers = [
+    "integration: tests involving multiple Etherlyzer components",
+    "network: tests requiring external network access",
 ]
 
 
