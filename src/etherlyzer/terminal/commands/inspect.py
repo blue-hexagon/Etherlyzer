@@ -2,26 +2,21 @@ import argparse
 import re
 
 from etherlyzer.formatters import MACFormatter
+from etherlyzer.ieee.eui48_classifier import classify_mac
 from etherlyzer.ieee.index import IEEEIndex
 from etherlyzer.ieee.catalog import Catalog
 from etherlyzer.ieee.ieee_registry import RegCategory, EtherTypeEntry
 
 
-def run(args):
-    registry = Catalog()
-    index = IEEEIndex.from_registries(registry.get_all_registries(check_for_updates=False))
-    if args.type.lower() == RegCategory.MAC.value:
-        entry = index.get_single(index.mac_index, args.value)
-    elif args.type.lower() == RegCategory.PROTOCOL.value:
-        entry = index.get_single(index.protocol_index, args.value)
-    elif args.type.lower() == RegCategory.IDENTIFIER.value:
-        entry = index.get_single(index.identifier_index, args.value)
-    else:
-        print(f"No valid type ({args.type}) selected.")
-        return 1
-    if entry is None:
-        print("No matching entry found.")
-        return 1
+def run_arg_check(args):
+    if args.show_vendor_blocks and args.type != "mac":
+        raise argparse.ArgumentError(
+            None,
+            "--show-vendor-blocks is only supported for MAC assignments."
+        )
+
+
+def inspect_universal_eui48(args, entry, index):
     print(f"")
     print(f"Organization")
     short = re.sub(r"(,.*|Co.*)$", "", entry.organization_name).strip()  # TODO: Test
@@ -54,9 +49,26 @@ def run(args):
         first_octet = int(entry.assignment[:2], 16)
 
         is_group = bool(first_octet & 0x01)
-        is_local = bool(first_octet & 0x02)
         print(f"  Delivery        : {'Unicast (Individual)' if not is_group else 'Multicast (Group)'}")
-        print(f"  Administration  : {'Universal' if not is_local else 'Local'}")
+        is_local = bool(first_octet & 0x02)
+        if is_local:
+            is_local_detailed = chr(first_octet)
+            print(f"  Administration")
+            match is_local_detailed:
+                case "A":
+                    print("  Type: Extended Local (ELI)")
+                case "E":
+                    print("  Type: Standard Assigned (SAI)")
+                case "2":
+                    print("  Type: Administratively Assigned (AAI)")
+                case "6":
+                    print("  Type: Reserved")
+                case _:
+                    pass
+
+            print(f"    ")
+        else:
+            print(f"  Administration  : Universal")
         # @formatter:on
     except KeyError:
         pass
@@ -91,17 +103,50 @@ def run(args):
         print(f"    MA-M          : {total_addresses_mam:,}")
         print(f"    MA-S          : {total_addresses_mas:,}")
         print(f"    IAB           : {total_addresses_iab:,}")
-        print(f"    Registered Blocks (B=IAB, S=MA-S, M=MA-M, L=MA-L)")
-        for entry in other_bloks:
-            fmt_counter += 9
-            print(f"      [{entry.registry.replace("-", "")[2:]}] {MACFormatter.format_default(entry.assignment)}",
-                  end="")
-            if fmt_counter >= 45:
-                fmt_counter = 0
-                print()
+        if args.show_vendor_blocks:
+            print(f"    Registered Blocks (B=IAB, S=MA-S, M=MA-M, L=MA-L)")
+            for entry in other_bloks:
+                fmt_counter += 9
+                print(f"      [{entry.registry.replace("-", "")[2:]}] {MACFormatter.format_default(entry.assignment)}",
+                      end="")
+                if fmt_counter >= 45:
+                    fmt_counter = 0
+                    print()
     print()
+
+
+def inspect_ethertype(args, entry, index):
     if isinstance(entry, EtherTypeEntry):
         print(f"  Protocol    : {entry.protocol}")
+
+
+def run(args):
+    run_arg_check(args)
+    registry = Catalog()
+    index = IEEEIndex.from_registries(registry.get_all_registries(check_for_updates=False))
+    match args.type.lower():
+        case RegCategory.MAC.value:
+            entry = index.get_single(index.mac_index, args.value)
+            if entry is None:
+                classified_mac = classify_mac(args.value)
+                print(f"Administration: {classified_mac.administration}")
+                print(f"Delivery: {classified_mac.delivery}")
+                print(f"Broadcast: {classified_mac.is_broadcast}")
+                print(f"Is Zero: {classified_mac.is_zero}")
+                print(f"SLAP Quadrant: {classified_mac.slap_quadrant}")
+                print("No matching entry found.")
+                return 1
+            else:
+                inspect_universal_eui48(args, entry, index)
+                return 0
+        case RegCategory.PROTOCOL.value:
+            entry = index.get_single(index.protocol_index, args.value)
+            inspect_ethertype(args, entry, index)
+        case RegCategory.IDENTIFIER.value:
+            entry = index.get_single(index.identifier_index, args.value)
+        case _:
+            print(f"No valid type ({args.type}) selected.")
+            return 1
 
     print()
 
@@ -135,7 +180,12 @@ Examples:
         metavar="{mac|protocol|identifier}",
         help="IEEE registry category to search (default: mac).",
     )
-
+    parser.add_argument(
+        "--show-vendor-blocks",
+        action="store_true",
+        default=False,
+        help="Display vendor address blocks associated with the matched MAC assignment.",
+    )
     parser.add_argument(
         "value",
         type=str,
