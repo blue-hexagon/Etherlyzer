@@ -7,7 +7,7 @@
 </picture>
 
 <p>
-  <strong>Local Ethernet intelligence for engineers, security tooling, and automation.</strong>
+  <strong>Lightweight Ethernet Address Intelligence Engine</strong>
 </p>
 
 <p>
@@ -40,10 +40,13 @@
 
 ---
 
-Etherlyzer turns IEEE registry data into a fast, local CLI and Python API for identifying, inspecting, validating, and normalizing Ethernet identifiers.
+A lightweight, offline-first Python toolkit for analyzing Ethernet identifiers and IEEE EUI-48 address allocations.
 
-Identify the organization behind a MAC address, determine the exact IEEE allocation it belongs to, inspect its address range and assignment size, correlate related vendor allocations, resolve EtherTypes, and clean up MAC input — without relying on a third-party lookup API.
+Etherlyzer goes beyond conventional MAC vendor lookups by combining IEEE registry data, address classification, allocation analysis, and organizational correlation into a unified command-line interface and Python API.
 
+Identify the organization behind a MAC address, determine its IEEE-registered allocation, inspect address ranges and allocation capacities, correlate related vendor blocks, resolve EtherTypes, and validate or normalize MAC addresses — all locally, without relying on third-party lookup APIs.
+
+Built for network engineers, security researchers, and developers who need fast, reliable, standards-aware insight into Ethernet addressing.
 ## Why Etherlyzer?
 
 Most MAC lookup tools stop at:
