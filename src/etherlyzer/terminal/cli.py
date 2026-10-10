@@ -5,11 +5,13 @@ import argparse
 from etherlyzer import __version__
 from etherlyzer.terminal.commands import (
     format,
-    inspect,
     registries,
     sync,
     validate,
     whois,
+)
+from etherlyzer.terminal.commands.inspect import (
+    registration
 )
 
 
@@ -51,7 +53,7 @@ Run `etherlyzer <command> --help` for command-specific options and examples.
     whois.register(subparsers)
     validate.register(subparsers)
     format.register(subparsers)
-    inspect.register(subparsers)
+    registration.register(subparsers)
     registries.register(subparsers)
     sync.register(subparsers)
 

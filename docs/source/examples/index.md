@@ -15,7 +15,7 @@ MA-L    00000C  Cisco Systems, Inc
 ```
 ## Inspect the complete IEEE allocation
 
-Vendor identification tells you who owns an address. `inspect` shows what the
+Vendor identification tells you who owns an address. `inspections.py` shows what the
 address actually belongs to.
 
 **Command**

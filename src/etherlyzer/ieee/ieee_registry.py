@@ -1,4 +1,5 @@
 import datetime
+import re
 from dataclasses import dataclass, fields, astuple
 from enum import StrEnum
 from pathlib import Path
@@ -37,6 +38,21 @@ class IEEEEntry(BaseEntry):
     assignment: str
     organization_name: str
     organization_address: str
+
+    def registry_short_str(self) -> str:
+        return self.registry.replace("-", "")[2:]
+
+    def short_name(self) -> str:
+        return re.sub(r"(,.*|Co.*)$", "", self.organization_name).strip()
+
+    def format_vendor_addr(self) -> list[str]:
+        addr_representation = []
+        for addr in self.organization_address.split(","):
+            addr = addr.split("  ")
+            for line in addr:
+                if line:
+                    addr_representation.append(line.strip())
+        return addr_representation
 
 
 @dataclass(frozen=True, slots=True)
@@ -128,7 +144,7 @@ class IEEERegistry:
             print(f"Cache for {self.name} has expired.")
         elif etherlyzer_knobs.show_sync_messages and inform_if_synced_about_expiration:
             namelen = len("EtherType") - len(self.name)
-            print(f"Cache for {self.name} expires at: {' '*namelen} {expires_humanized} UTC")
+            print(f"Cache for {self.name} expires at: {' ' * namelen} {expires_humanized} UTC")
 
         return f_not_exists or expires <= now
 

@@ -3,20 +3,20 @@ from enum import StrEnum
 
 
 class Administration(StrEnum):
-    UNIVERSAL = "universal"
-    LOCAL = "local"
+    UNIVERSAL = "Universal"
+    LOCAL = "Local"
 
 
 class DeliveryType(StrEnum):
-    INDIVIDUAL = "individual"
-    GROUP = "group"
+    INDIVIDUAL = "Individual"
+    GROUP = "Group"
 
 
 class SLAPQuadrant(StrEnum):
-    AAI = "administratively_assigned"
-    ELI = "extended_local"
-    RESERVED = "reserved"
-    SAI = "standard_assigned"
+    AAI = "Administratively Assigned (AAI)"
+    ELI = "Extended Local (ELI)"
+    RESERVED = "Reserved"
+    SAI = "Standard Assigned (SAI)"
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,18 +29,25 @@ class MACClassification:
 
 
 def classify_mac(mac: str) -> MACClassification:
-    mac = int(mac.replace(":", "").replace("-", ""), 16)
-    if not 0 <= mac < (1 << 48):
-        raise ValueError("Expected a 48-bit MAC address")
+    normalized = mac.replace(":", "").replace("-", "")
 
-    first = mac >> 40
+    if not normalized or len(normalized) > 12:
+        raise ValueError("Expected a MAC address of 1–12 hexadecimal digits")
+
+    if not all(c in "0123456789abcdefABCDEF" for c in normalized):
+        raise ValueError("Invalid hexadecimal MAC address")
+
+    normalized = normalized.ljust(12, "0")
+    mac_int = int(normalized, 16)
+
+    first = mac_int >> 40
 
     is_local = bool(first & 0x02)
     is_group = bool(first & 0x01)
 
     quadrant = None
 
-    if is_local:
+    if is_local and not is_group:
         quadrant = {
             0x00: SLAPQuadrant.AAI,
             0x08: SLAPQuadrant.ELI,
@@ -57,7 +64,7 @@ def classify_mac(mac: str) -> MACClassification:
             DeliveryType.GROUP
             if is_group else DeliveryType.INDIVIDUAL
         ),
-        is_broadcast=mac == (1 << 48) - 1,
-        is_zero=mac == 0,
+        is_broadcast=mac_int == 0xFFFFFFFFFFFF,
+        is_zero=mac_int == 0,
         slap_quadrant=quadrant,
     )
