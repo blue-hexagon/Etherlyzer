@@ -15,6 +15,61 @@ Depending on the registry category, it can display information such as:
 
 For an overview of the supported IEEE registries, see {doc}`../concepts/ieee-registries`.
 
+## Inspection Branches
+
+Etherlyzer uses **quadrant-based inspection** rather than enforcing a single, unified output schema across all MAC address types.
+
+Each address is normalized, validated, and classified using the **Universal/Local (U/L)** and **Individual/Group (I/G)** bits of its first octet. These bits determine which of four specialized inspection branches handles the address.
+
+See {doc}`../concepts/mac-addresses` for details about MAC address classification and the Structured Local Address Plan (SLAP).
+
+```text
+                       MAC Input
+                           │
+                           ▼
+                   Normalize / Validate
+                           │
+                           ▼
+                     Classify MAC
+                      U/L + I/G
+                           │
+            ┌──────────────┴──────────────┐
+            │                             │
+       Universal                       Local
+            │                             │
+      ┌─────┴─────┐                 ┌─────┴─────┐
+      │           │                 │           │
+  Individual     Group          Individual     Group
+      │           │                 │           │
+      ▼           ▼                 ▼           ▼
+   EUI-48      Universal          SLAP        Local
+ Allocations    Group           Analysis      Group
+      │                             │
+      ▼                      ┌──────┴──────┐
+ MA-L / MA-M                 │             │
+ MA-S / IAB               ELI/CID      AAI/SAI/
+                                       Reserved
+```
+
+### Inspection Types
+
+| Branch                   | Classification   | Inspection Focus                                                                                              |
+|--------------------------|------------------|---------------------------------------------------------------------------------------------------------------|
+| **Universal Individual** | U/L = 0, I/G = 0 | IEEE EUI-48 allocation resolution, registry metadata, registered organizations, and associated address blocks |
+| **Universal Group**      | U/L = 0, I/G = 1 | Group addressing, standardized multicast assignments, and recognized protocol mappings                        |
+| **Local Individual**     | U/L = 1, I/G = 0 | SLAP quadrant classification, CID resolution for ELI candidates, and locally administered addressing          |
+| **Local Group**          | U/L = 1, I/G = 1 | Locally administered group addressing, broadcast detection, and recognized multicast mappings                 |
+
+All four branches share common address normalization, validation, bit-level classification, and formatting conventions. Their additional inspection capabilities differ according to the applicable addressing schemes and available registry or protocol information.
+
+```{note}
+The four inspection branches represent structural MAC address classifications, not four separate IEEE registries.
+
+Special-purpose addresses, such as the all-zero address and Ethernet broadcast, retain their underlying U/L and I/G classifications but require additional interpretation.
+
+The Structured Local Address Plan (SLAP) is optional. An address matching a SLAP quadrant's bit pattern does not necessarily follow that quadrant's intended assignment scheme.
+```
+
 ## Basic usage
 
 MAC registry inspection is the default:
