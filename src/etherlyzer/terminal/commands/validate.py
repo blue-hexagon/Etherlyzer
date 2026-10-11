@@ -1,7 +1,7 @@
 import argparse
 
-from etherlyzer.terminal.utility import read_multiline
 from etherlyzer.formatters import MACFormatter
+from etherlyzer.terminal.utility import read_multiline
 
 
 def run(args):
@@ -18,9 +18,7 @@ def run(args):
         validated_mac, validation_mask = MACFormatter.validate(mac)
         if args.linenumbers:
             linenumber += 1
-            if MACFormatter.mask_is_valid(validation_mask):
-                print(f"{linenumber}.".ljust(padding, " "), end="")
-            elif not args.strict:
+            if MACFormatter.mask_is_valid(validation_mask) or not args.strict:
                 print(f"{linenumber}.".ljust(padding, " "), end="")
 
         if not args.strict and not MACFormatter.mask_is_valid(validation_mask):

@@ -1,25 +1,43 @@
+from dataclasses import dataclass
+
 from etherlyzer.ieee.ieee_registry import IEEEEntry
 
 
-def get_vendor_block_totals(vendors_other_blocks: list[IEEEEntry]) -> tuple[int, int, int, int, int]:
-    total_addresses = 0
-    total_addresses_mal = 0
-    total_addresses_mam = 0
-    total_addresses_mas = 0
-    total_addresses_iab = 0
+@dataclass
+class IEEEAllocation:
+    registry: str
+    total_addresses: int = 0
+    total_blocks: int = 0
+
+    def add_addresses(self, added: int):
+        self.total_addresses += added
+
+    def increment_blocks(self):
+        self.total_blocks += 1
+
+
+def get_vendor_total_addr_space(vendors_other_blocks: list[IEEEEntry]) -> tuple[
+    int, int, IEEEAllocation, IEEEAllocation, IEEEAllocation, IEEEAllocation
+]:
+    mal = IEEEAllocation("MA-L")
+    mam = IEEEAllocation("MA-M")
+    mas = IEEEAllocation("MA-S")
+    iab = IEEEAllocation("IAB")
     for ent in vendors_other_blocks:
         if ent.registry == "MA-L":
-            total_addresses += 2 ** 24
-            total_addresses_mal += 2 ** 24
+            mal.add_addresses(2 ** 24)
+            mal.increment_blocks()
         elif ent.registry == "MA-M":
-            total_addresses += 2 ** 20
-            total_addresses_mam += 2 ** 20
+            mal.add_addresses(2 ** 20)
+            mal.increment_blocks()
         elif ent.registry == "MA-S":
-            total_addresses += 2 ** 12
-            total_addresses_mas += 2 ** 12
+            mal.add_addresses(2 ** 12)
+            mal.increment_blocks()
         elif ent.registry == "IAB":
-            total_addresses += 2 ** 12
-            total_addresses_iab += 2 ** 12
+            iab.add_addresses(2 ** 12)
+            iab.increment_blocks()
         else:
             raise RuntimeError(f"Unexpected error occured because of a invalid registry identifier: {ent.registry}")
-    return total_addresses, total_addresses_iab, total_addresses_mal, total_addresses_mam, total_addresses_mas
+    tot_blocks = mal.total_blocks + mam.total_blocks + mas.total_blocks + iab.total_blocks
+    tot_addrs = mal.total_addresses + mam.total_addresses + mas.total_addresses + iab.total_addresses
+    return tot_blocks, tot_addrs, iab, mal, mam, mas

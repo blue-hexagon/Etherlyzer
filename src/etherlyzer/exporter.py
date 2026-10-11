@@ -1,7 +1,6 @@
-from etherlyzer.util.knobs import etherlyzer_knobs
 from etherlyzer.formatters import MACFormatter
-
 from etherlyzer.ieee.ieee_registry import IEEEEntry
+from etherlyzer.util.knobs import etherlyzer_knobs
 
 
 class RegistryMatchExporter:

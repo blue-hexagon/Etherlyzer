@@ -1,5 +1,6 @@
 import datetime
-from dataclasses import dataclass, fields, astuple
+import re
+from dataclasses import astuple, dataclass, fields
 from enum import StrEnum
 from pathlib import Path
 
@@ -37,6 +38,21 @@ class IEEEEntry(BaseEntry):
     assignment: str
     organization_name: str
     organization_address: str
+
+    def registry_short_str(self) -> str:
+        return self.registry.replace("-", "")[2:]
+
+    def short_name(self) -> str:
+        return re.sub(r"(,.*|Co.*)$", "", self.organization_name).strip()
+
+    def format_vendor_addr(self) -> list[str]:
+        addr_representation = []
+        for addr in self.organization_address.split(","):
+            addr = addr.split("  ")
+            for line in addr:
+                if line:
+                    addr_representation.append(line.strip())
+        return addr_representation
 
 
 @dataclass(frozen=True, slots=True)
@@ -128,7 +144,7 @@ class IEEERegistry:
             print(f"Cache for {self.name} has expired.")
         elif etherlyzer_knobs.show_sync_messages and inform_if_synced_about_expiration:
             namelen = len("EtherType") - len(self.name)
-            print(f"Cache for {self.name} expires at: {' '*namelen} {expires_humanized} UTC")
+            print(f"Cache for {self.name} expires at: {' ' * namelen} {expires_humanized} UTC")
 
         return f_not_exists or expires <= now
 
@@ -151,23 +167,22 @@ class IEEERegistry:
 
                 total_size = int(res.headers.get("content-length", 0)) or None
 
-                with open(self.filepath, "wb") as f:
-                    with tqdm(
-                            total=total_size or None,
-                            unit="B",
-                            unit_scale=True,
-                            unit_divisor=1024,
-                            desc=f"Saving {self.name}",
-                            disable=not etherlyzer_knobs.show_sync_messages,
-                    ) as progress:
-                        for chunk in res.iter_content(chunk_size=8192):
-                            if chunk:
-                                f.write(chunk)
-                                progress.update(len(chunk))
+                with open(self.filepath, "wb") as f, tqdm(
+                        total=total_size or None,
+                        unit="B",
+                        unit_scale=True,
+                        unit_divisor=1024,
+                        desc=f"Saving {self.name}",
+                        disable=not etherlyzer_knobs.show_sync_messages,
+                ) as progress:
+                    for chunk in res.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+                            progress.update(len(chunk))
 
                 return None
 
-            except RequestException as exc:
+            except RequestException:
                 if etherlyzer_knobs.show_sync_messages:
                     print(
                         f"Request timed out on attempt "

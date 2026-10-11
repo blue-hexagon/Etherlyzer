@@ -20,7 +20,7 @@ etherlyzer whois -f ./macs.txt
 etherlyzer whois -i
 ```
 
-For detailed registry, assignment, range, and allocation information, see {doc}`inspect`.
+For detailed registry, assignment, range, and allocation information, see {doc}`display.py`.
 
 ## Command reference
 
