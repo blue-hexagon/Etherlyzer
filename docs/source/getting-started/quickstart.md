@@ -7,7 +7,7 @@ EtherLyzer provides commands for identifying, inspecting, validating, and format
 | Command      | Purpose                                                                                       |
 |--------------|-----------------------------------------------------------------------------------------------|
 | `whois`      | Identify IEEE vendors and organizations for MAC addresses.                                    |
-| `inspections.py`    | Inspect an IEEE assignment and display registry, organization, range, and allocation details. |
+| `display.py`    | Inspect an IEEE assignment and display registry, organization, range, and allocation details. |
 | `validate`   | Validate and normalize MAC addresses with optional diagnostics and filtering.                 |
 | `format`     | Normalize MAC address formatting with optional typo correction.                               |
 | `registries` | Show local IEEE registry metadata and synchronization status.                                 |

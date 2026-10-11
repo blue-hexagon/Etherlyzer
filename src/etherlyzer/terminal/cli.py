@@ -11,7 +11,7 @@ from etherlyzer.terminal.commands import (
     whois,
 )
 from etherlyzer.terminal.commands.inspect import (
-    registration
+    controller
 )
 
 
@@ -53,7 +53,7 @@ Run `etherlyzer <command> --help` for command-specific options and examples.
     whois.register(subparsers)
     validate.register(subparsers)
     format.register(subparsers)
-    registration.register(subparsers)
+    controller.register(subparsers)
     registries.register(subparsers)
     sync.register(subparsers)
 

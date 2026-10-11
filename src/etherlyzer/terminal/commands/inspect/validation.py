@@ -12,7 +12,7 @@ def validate_args(args):
             None,
             "--show-vendor-stats is only supported for MAC assignments."
         )
-    elif args.show_mac_analysis and args.type != "mac":
+    elif args.show_mac_autopsy and args.type != "mac":
         raise argparse.ArgumentError(
             None,
             "--show-mac-analysis is only supported for MAC assignments."

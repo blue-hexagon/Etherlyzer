@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
+from etherlyzer.formatters import MACFormatter
+
 
 class Administration(StrEnum):
     UNIVERSAL = "Universal"
@@ -26,19 +28,18 @@ class MACClassification:
     is_broadcast: bool
     is_zero: bool
     slap_quadrant: SLAPQuadrant | None
+    normalized: str
+    normalized_pad0:str
 
 
 def classify_mac(mac: str) -> MACClassification:
-    normalized = mac.replace(":", "").replace("-", "")
+    normalized = MACFormatter.normalize(mac)
 
     if not normalized or len(normalized) > 12:
-        raise ValueError("Expected a MAC address of 1–12 hexadecimal digits")
+        raise ValueError("Expected a full or partial MAC address of 1–12 hexadecimal digits")
 
-    if not all(c in "0123456789abcdefABCDEF" for c in normalized):
-        raise ValueError("Invalid hexadecimal MAC address")
-
-    normalized = normalized.ljust(12, "0")
-    mac_int = int(normalized, 16)
+    normalized_padded = normalized.ljust(12, "0")
+    mac_int = int(normalized_padded, 16)
 
     first = mac_int >> 40
 
@@ -67,4 +68,6 @@ def classify_mac(mac: str) -> MACClassification:
         is_broadcast=mac_int == 0xFFFFFFFFFFFF,
         is_zero=mac_int == 0,
         slap_quadrant=quadrant,
+        normalized=normalized,
+        normalized_pad0=normalized_padded,
     )

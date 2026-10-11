@@ -4,9 +4,10 @@ from etherlyzer.formatters import MACFormatter
 from etherlyzer.ieee.analytics import get_vendor_total_addr_space
 from etherlyzer.ieee.eui48_classifier import DeliveryType, Administration, SLAPQuadrant
 from etherlyzer.ieee.ieee_registry import IEEEEntry, IEEERegistry
+from etherlyzer.ieee.index import IEEEIndex
 
 
-def show_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]):
+def display_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]):
     tot_blocks, tot_addr, iab_alloc, mal_alloc, mam_alloc, mas_alloc = get_vendor_total_addr_space(
         vendor_correlated_entries)
     print(f"\nAssociated Allocations")
@@ -27,7 +28,7 @@ def show_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]):
     print(f"    Capacity         : {iab_alloc.total_addresses:,}")
 
 
-def show_all_vendor_blocks(args, vendor_correlated_entries: list[IEEEEntry]):
+def display_all_vendor_blocks(args, vendor_correlated_entries: list[IEEEEntry]):
     if args.show_vendor_blocks:
         fmt_vendorblocks_width_count = 0
         fmt_vendorblocks_max_width = 45
@@ -44,7 +45,7 @@ def show_all_vendor_blocks(args, vendor_correlated_entries: list[IEEEEntry]):
             print()  # Required exactly here.
 
 
-def show_registration(entry, reg: IEEERegistry):
+def display_registration(entry, reg: IEEERegistry):
     stuffed_input_0 = MACFormatter.format_with_stuffed_hex(entry.assignment, "0")
     sutffed_input_f = MACFormatter.format_with_stuffed_hex(entry.assignment, "f")
     print("\nIEEE Registry")
@@ -59,7 +60,7 @@ def show_registration(entry, reg: IEEERegistry):
         print(f"  Address Capacity    : {reg.address_count:,}")
 
 
-def show_organization(entry, short_orgname):
+def display_organization(entry, short_orgname):
     print(f"\nOrganization")
     print(f"  Name              : {short_orgname}")
     print(f"  Full Name         : {entry.organization_name}")
@@ -68,9 +69,88 @@ def show_organization(entry, short_orgname):
         print(f"    {addr_piece}")
 
 
-def show_mac_autopsy(args, classified_mac, index, no_valid_entry: bool):
+def display_ieee_identifier(args, index: IEEEIndex, eval_flags, classified_mac):
+    normalized = MACFormatter.normalize(args.value)
+    is_complete = len(normalized) == 12
+    mac_entry = None
+    cid_entry = None
+
+    if classified_mac.administration == Administration.UNIVERSAL:
+        if classified_mac.delivery == DeliveryType.INDIVIDUAL:
+            mac_entry = index.get_single(index.mac_index, normalized)
+
+    elif classified_mac.slap_quadrant == SLAPQuadrant.ELI:
+        if len(normalized) >= 6:
+            cid_entry = index.get_single(
+                index.identifier_index,
+                normalized[:6],
+            )
+    if classified_mac.is_zero and is_complete:
+        assignment = "Not Applicable (Zero Address)"
+
+    elif classified_mac.is_broadcast and is_complete:
+        assignment = "Not Applicable (Broadcast Address)"
+
+    elif classified_mac.delivery == DeliveryType.GROUP:
+        assignment = "Not Applicable (Group Address)"
+
+    elif classified_mac.administration == Administration.UNIVERSAL:
+        if is_complete:
+            assignment = (
+                "EUI-48 Candidate (Registered Block)"
+                if mac_entry is not None
+                else "Universal Individual (Unverified)"
+            )
+        else:
+            assignment = (
+                "Universal Individual Prefix (Registered Block)"
+                if mac_entry is not None
+                else "Universal Individual Prefix (Unverified)"
+            )
+
+    elif classified_mac.slap_quadrant == SLAPQuadrant.ELI:
+        if is_complete:
+            assignment = (
+                "ELI-48 Candidate (Registered CID)"
+                if cid_entry is not None
+                else "ELI-48 Candidate (Unregistered CID)"
+                if len(normalized) >= 6
+                else "ELI-48 Candidate (CID Not Evaluated)"
+            )
+        else:
+            assignment = (
+                "ELI Prefix (Registered CID)"
+                if cid_entry is not None
+                else "ELI Prefix (Unregistered CID)"
+                if len(normalized) >= 6
+                else "ELI Prefix (Incomplete CID)"
+            )
+
+    elif classified_mac.slap_quadrant == SLAPQuadrant.AAI:
+        assignment = "AAI Quadrant"
+
+    elif classified_mac.slap_quadrant == SLAPQuadrant.SAI:
+        assignment = "SAI Quadrant"
+
+    elif classified_mac.slap_quadrant == SLAPQuadrant.RESERVED:
+        assignment = "Reserved SLAP Quadrant"
+
+    else:
+        assignment = "Unknown"
+    print(f"\nIEEE Identifier")
+    print(f"  Type                : {assignment}")
+    print(f"  SLAP Quadrant       : {classified_mac.slap_quadrant}")
+
+
+def display_mac_autopsy(args, index, eval_flags, classified_mac):
     cid_length = 6
     normalized = MACFormatter.normalize(args.value)
+    canonical_mac = MACFormatter.format_custom(args.value, block_size=2, separator="-", case="upper")
+    try:
+        bit_reversed_mac = MACFormatter.reverse_bits(normalized)
+    except ValueError as exc:
+        bit_reversed_mac = "NA"
+
     mac_int = int(normalized, 16)
     mac_int_padded = int(normalized.ljust(12, "0"), 16)
     first_octet = mac_int_padded >> 40
@@ -82,46 +162,25 @@ def show_mac_autopsy(args, classified_mac, index, no_valid_entry: bool):
     octal_width = (bit_width + 2) // 3
     binary = f"{mac_int:0{bit_width}b}"
     binary = ".".join(binary[i:i + 4] for i in range(0, len(binary), 4))
-    if classified_mac.slap_quadrant is not None:
-        slap = classified_mac.slap_quadrant
-    elif classified_mac.delivery == DeliveryType.GROUP:
-        slap = "Not Applicable (Group Address)"
-    else:
-        slap = "Not Applicable (Universal Address)"
-
-    if classified_mac.is_zero:
-        assignment = "Not Applicable (Zero Address)"
-    elif classified_mac.is_broadcast:
-        assignment = "Not Applicable (Broadcast Address)"
-    elif classified_mac.delivery == DeliveryType.GROUP:
-        assignment = "Not Applicable (Group Address)"
-    elif classified_mac.administration == Administration.LOCAL:
-        assignment = "Not Applicable (Local Address)"
-    elif no_valid_entry:
-        assignment = "Not Found"
-    else:
-        assignment = "EUI-48 Candidate"
 
     print(f"MAC Address Autopsy")
     print(f"  Input")
     print(f"    Value             : {args.value}")
     print(f"    Length            : {len(normalized) * 4} bits")
+    print(f"  Representations")
+    print(f"    Canonical         : {canonical_mac}")
+    print(f"    Bit-Reversed      : {bit_reversed_mac}")
     print(f"    To Hex            : {mac_int:0{len(normalized)}X}")
     print(f"    To Decimal        : {mac_int:,}")
     print(f"    To Octal          : {mac_int:0{octal_width}o}")
     print(f"    To Binary         : {binary}")
     print(f"    To Bytes          : {mac_int.to_bytes(bit_width // 8, 'big').hex(' ').upper()}")
+    print(f"  Address Properties")
+    print(f"    Null Address      : {classified_mac.is_zero}")
+    print(f"    Broadcast         : {classified_mac.is_broadcast}")
     print(f"    Special Bits")
     print(f"      U/L             : {ul_bit} {ul_bit_addon}")
     print(f"      I/G             : {ig_bit} {ig_bit_addon}")
-    print(f"  Address Properties")
-    print(f"    Broadcast         : {classified_mac.is_broadcast}")
-
-    show_cid_registration(index, normalized, slap)
-
-    print(f"\nIEEE Identifier")
-    print(f"  SLAP Quadrant    : {slap}")
-    print(f"  Type             : {assignment}")
     return 0
 
 

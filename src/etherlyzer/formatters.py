@@ -61,7 +61,7 @@ class MACFormatter:
             block_size: int,
             separator: Literal[".", ":", "-"],
             case: Literal["upper", "lower"],
-            fix_typos: bool,
+            fix_typos: bool = False,
     ) -> str:
         if fix_typos:
             mac = cls.fix_typos(mac)
@@ -139,14 +139,18 @@ class MACFormatter:
                 mac = mac.replace(c, "#")
         return mac
 
+    @staticmethod
+    def reverse_bits(mac: str) -> str:
+        normalized = MACFormatter.normalize(mac)
 
-if __name__ == "__main__":
-    print(
-        MACFormatter().format_custom(
-            mac="ab:cd:ef:fg:de:dd",
-            separator=":",
-            block_size=2,
-            case="upper",
-            fix_typos=False,
+        if len(normalized) % 2:
+            raise ValueError("Bit reversal requires complete octets.")
+
+        octets = bytes.fromhex(normalized)
+
+        reversed_octets = bytes(
+            int(f"{octet:08b}"[::-1], 2)
+            for octet in octets
         )
-    )
+
+        return reversed_octets.hex(":").upper()
