@@ -44,7 +44,8 @@ class MACFormatter:
     def format_default(cls, mac: str) -> str:
         mac = cls.normalize(mac)
         mac = etherlyzer_knobs.mac_separator.join(
-            mac[i: i + etherlyzer_knobs.mac_block_size] for i in range(0, len(mac), etherlyzer_knobs.mac_block_size)
+            mac[i : i + etherlyzer_knobs.mac_block_size]
+            for i in range(0, len(mac), etherlyzer_knobs.mac_block_size)
         )
 
         return getattr(mac, etherlyzer_knobs.mac_case.value)()
@@ -56,17 +57,17 @@ class MACFormatter:
 
     @classmethod
     def format_custom(
-            cls,
-            mac: str,
-            block_size: int,
-            separator: Literal[".", ":", "-"],
-            case: Literal["upper", "lower"],
-            fix_typos: bool = False,
+        cls,
+        mac: str,
+        block_size: int,
+        separator: Literal[".", ":", "-"],
+        case: Literal["upper", "lower"],
+        fix_typos: bool = False,
     ) -> str:
         if fix_typos:
             mac = cls.fix_typos(mac)
         mac = cls.normalize(mac)
-        mac = separator.join(mac[i: i + block_size] for i in range(0, len(mac), block_size))
+        mac = separator.join(mac[i : i + block_size] for i in range(0, len(mac), block_size))
         if case == "upper":
             return mac.upper()
         return mac.lower()
@@ -146,9 +147,6 @@ class MACFormatter:
 
         octets = bytes.fromhex(normalized)
 
-        reversed_octets = bytes(
-            int(f"{octet:08b}"[::-1], 2)
-            for octet in octets
-        )
+        reversed_octets = bytes(int(f"{octet:08b}"[::-1], 2) for octet in octets)
 
         return reversed_octets.hex(":").upper()

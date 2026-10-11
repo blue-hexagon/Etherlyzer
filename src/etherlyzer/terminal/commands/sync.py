@@ -10,7 +10,7 @@ def run(args):
     manager = Catalog()
     start = time.perf_counter()
     print("Synchronizing IEEE registries...\n")
-    manager.get_all_registries(check_for_updates=True,inform_if_synced_about_expiration=True)
+    manager.get_all_registries(check_for_updates=True, inform_if_synced_about_expiration=True)
     elapsed = time.perf_counter() - start
     print()
     print(f"Synchronization completed in {elapsed:.2f} seconds.")

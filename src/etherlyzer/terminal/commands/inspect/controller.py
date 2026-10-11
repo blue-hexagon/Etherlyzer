@@ -23,19 +23,11 @@ def run(args):
     validate_args(args)
 
     registry = Catalog()
-    index = IEEEIndex.from_registries(
-        registry.get_all_registries(
-            check_for_updates=False
-        )
-    )
+    index = IEEEIndex.from_registries(registry.get_all_registries(check_for_updates=False))
     eval_flags = EvaluatedFlags(
         show_mac_autopsy=args.all or args.show_mac_autopsy,
-        show_vendor_stats=(
-                args.all
-                or args.show_vendor_stats
-                or args.show_vendor_blocks
-        ),
-        show_vendor_blocks=args.all or args.show_vendor_blocks
+        show_vendor_stats=(args.all or args.show_vendor_stats or args.show_vendor_blocks),
+        show_vendor_blocks=args.all or args.show_vendor_blocks,
     )
 
     match args.type.lower():
@@ -46,7 +38,9 @@ def run(args):
             inspect_ethertype(args, entry, index)
         case RegCategory.IDENTIFIER.value:
             entry = index.get_single(index.identifier_index, args.value)
-            show_cid_registration(index, MACFormatter.normalize(args.value), classify_mac(args.value))
+            show_cid_registration(
+                index, MACFormatter.normalize(args.value), classify_mac(args.value)
+            )
         case _:
             print(f"No valid type ({args.type}) selected.")
             return 1

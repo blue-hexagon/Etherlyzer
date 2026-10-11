@@ -9,15 +9,9 @@ T = TypeVar("T")
 
 
 class IEEERegistryReader:
-
     @staticmethod
     def normalize(name: str) -> str:
-        return (
-            name.strip()
-            .lower()
-            .replace("-", "_")
-            .replace(" ", "_")
-        )
+        return name.strip().lower().replace("-", "_").replace(" ", "_")
 
     @staticmethod
     def convert(value: str, typ: type) -> Any:
@@ -41,10 +35,7 @@ class IEEERegistryReader:
 
     @classmethod
     def load(cls, path: str | Path, model: type[T]) -> list[T]:
-        model_fields = {
-            cls.normalize(field.name): field
-            for field in fields(model)
-        }
+        model_fields = {cls.normalize(field.name): field for field in fields(model)}
 
         objects: list[T] = []
 
@@ -74,7 +65,12 @@ class IEEERegistryReader:
         missing = [
             field.name
             for field in model_fields.values()
-            if (field.name not in kwargs and field.default is MISSING and field.default_factory is MISSING)
+            if (
+                field.name not in kwargs
+                and field.default is MISSING
+                and field.default_factory is MISSING
+            )
         ]
 
-        if missing: raise ValueError(f"Missing required fields: {', '.join(missing)}")
+        if missing:
+            raise ValueError(f"Missing required fields: {', '.join(missing)}")

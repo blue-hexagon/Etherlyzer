@@ -73,7 +73,7 @@ These bits are independent. A group address may therefore be universally or loca
     `x0-xx-xx-xx-xx-xx`  
     `x4-xx-xx-xx-xx-xx`  
     `x8-xx-xx-xx-xx-xx`  
-    `xC-xx-xx-xx-xx-xx`
+    `xC-xx-xx-xx-xx-xx`  
   -  Local Individual</br>SLAP Quadrant </br>
     `x2-xx-xx-xx-xx-xx`  
     `x6-xx-xx-xx-xx-xx`  
@@ -84,7 +84,7 @@ These bits are independent. A group address may therefore be universally or loca
     `x1-xx-xx-xx-xx-xx`  
     `x5-xx-xx-xx-xx-xx`  
     `x9-xx-xx-xx-xx-xx`  
-    `xD-xx-xx-xx-xx-xx`
+    `xD-xx-xx-xx-xx-xx`  
   -  Local Group</br>Locally Administered Multicast</br>
     `x3-xx-xx-xx-xx-xx`  
     `x7-xx-xx-xx-xx-xx`  

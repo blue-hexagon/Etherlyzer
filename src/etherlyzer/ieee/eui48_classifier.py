@@ -57,14 +57,8 @@ def classify_mac(mac: str) -> MACClassification:
         }[first & 0x0C]
 
     return MACClassification(
-        administration=(
-            Administration.LOCAL
-            if is_local else Administration.UNIVERSAL
-        ),
-        delivery=(
-            DeliveryType.GROUP
-            if is_group else DeliveryType.INDIVIDUAL
-        ),
+        administration=(Administration.LOCAL if is_local else Administration.UNIVERSAL),
+        delivery=(DeliveryType.GROUP if is_group else DeliveryType.INDIVIDUAL),
         is_broadcast=mac_int == 0xFFFFFFFFFFFF and len(normalized) == 12,
         is_zero=mac_int == 0 and len(normalized) == 12,
         slap_quadrant=quadrant,

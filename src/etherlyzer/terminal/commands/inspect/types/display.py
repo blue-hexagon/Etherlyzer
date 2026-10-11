@@ -9,7 +9,8 @@ from etherlyzer.ieee.index import IEEEIndex
 
 def display_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]):
     tot_blocks, tot_addr, iab_alloc, mal_alloc, mam_alloc, mas_alloc = get_vendor_total_addr_space(
-        vendor_correlated_entries)
+        vendor_correlated_entries
+    )
     print("\nAssociated Allocations")
     print("  Total")
     print(f"    Blocks           : {tot_blocks:,}")
@@ -36,8 +37,10 @@ def display_all_vendor_blocks(args, vendor_correlated_entries: list[IEEEEntry]):
         print("  Registered Blocks (B=IAB, S=MA-S, M=MA-M, L=MA-L)")
         for entry in vendor_correlated_entries:
             fmt_vendorblocks_width_count += fmt_vendorblocks_width_increment
-            print(f"      [{entry.registry_short_str()}] {MACFormatter.format_default(entry.assignment)}",
-                  end="")
+            print(
+                f"      [{entry.registry_short_str()}] {MACFormatter.format_default(entry.assignment)}",
+                end="",
+            )
             if fmt_vendorblocks_width_count >= fmt_vendorblocks_max_width:  # max width
                 fmt_vendorblocks_width_count = 0
                 print()  # Required exactly here.
@@ -145,7 +148,9 @@ def display_ieee_identifier(args, index: IEEEIndex, eval_flags, classified_mac):
 def display_mac_autopsy(args, index, eval_flags, classified_mac):
     cid_length = 6
     normalized = MACFormatter.normalize(args.value)
-    canonical_mac = MACFormatter.format_custom(args.value, block_size=2, separator="-", case="upper")
+    canonical_mac = MACFormatter.format_custom(
+        args.value, block_size=2, separator="-", case="upper"
+    )
     try:
         bit_reversed_mac = MACFormatter.reverse_bits(normalized)
     except ValueError:
@@ -155,13 +160,15 @@ def display_mac_autopsy(args, index, eval_flags, classified_mac):
     mac_int_padded = int(normalized.ljust(12, "0"), 16)
     first_octet = mac_int_padded >> 40
     ul_bit = (first_octet >> 1) & 1
-    ul_bit_addon = 'Local / Locally Administered' if ul_bit else 'Universal / Universally Administered'
+    ul_bit_addon = (
+        "Local / Locally Administered" if ul_bit else "Universal / Universally Administered"
+    )
     ig_bit = first_octet & 1
-    ig_bit_addon = 'Group / Multicast' if ig_bit else 'Individual / Unicast'
+    ig_bit_addon = "Group / Multicast" if ig_bit else "Individual / Unicast"
     bit_width = len(normalized) * 4
     octal_width = (bit_width + 2) // 3
     binary = f"{mac_int:0{bit_width}b}"
-    binary = ".".join(binary[i:i + 4] for i in range(0, len(binary), 4))
+    binary = ".".join(binary[i : i + 4] for i in range(0, len(binary), 4))
 
     print("MAC Address Autopsy")
     print("  Input")
