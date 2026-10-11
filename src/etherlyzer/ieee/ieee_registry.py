@@ -1,6 +1,6 @@
 import datetime
 import re
-from dataclasses import dataclass, fields, astuple
+from dataclasses import astuple, dataclass, fields
 from enum import StrEnum
 from pathlib import Path
 
@@ -167,23 +167,22 @@ class IEEERegistry:
 
                 total_size = int(res.headers.get("content-length", 0)) or None
 
-                with open(self.filepath, "wb") as f:
-                    with tqdm(
-                            total=total_size or None,
-                            unit="B",
-                            unit_scale=True,
-                            unit_divisor=1024,
-                            desc=f"Saving {self.name}",
-                            disable=not etherlyzer_knobs.show_sync_messages,
-                    ) as progress:
-                        for chunk in res.iter_content(chunk_size=8192):
-                            if chunk:
-                                f.write(chunk)
-                                progress.update(len(chunk))
+                with open(self.filepath, "wb") as f, tqdm(
+                        total=total_size or None,
+                        unit="B",
+                        unit_scale=True,
+                        unit_divisor=1024,
+                        desc=f"Saving {self.name}",
+                        disable=not etherlyzer_knobs.show_sync_messages,
+                ) as progress:
+                    for chunk in res.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+                            progress.update(len(chunk))
 
                 return None
 
-            except RequestException as exc:
+            except RequestException:
                 if etherlyzer_knobs.show_sync_messages:
                     print(
                         f"Request timed out on attempt "

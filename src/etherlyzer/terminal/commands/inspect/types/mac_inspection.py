@@ -1,12 +1,25 @@
-from etherlyzer.ieee.catalog import Catalog
-from etherlyzer.ieee.eui48_classifier import classify_mac, Administration, DeliveryType, MACClassification, SLAPQuadrant
-from etherlyzer.ieee.index import IEEEIndex
 from typing import TYPE_CHECKING
+
+from etherlyzer.ieee.catalog import Catalog
+from etherlyzer.ieee.eui48_classifier import (
+    Administration,
+    DeliveryType,
+    MACClassification,
+    SLAPQuadrant,
+    classify_mac,
+)
+from etherlyzer.ieee.index import IEEEIndex
 
 if TYPE_CHECKING:
     from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags
-from etherlyzer.terminal.commands.inspect.types.display import display_registration, display_mac_autopsy, \
-    display_all_vendor_blocks, display_organization, display_associated_block_counts, display_ieee_identifier
+from etherlyzer.terminal.commands.inspect.types.display import (
+    display_all_vendor_blocks,
+    display_associated_block_counts,
+    display_ieee_identifier,
+    display_mac_autopsy,
+    display_organization,
+    display_registration,
+)
 
 
 def inspect_universal_individual(

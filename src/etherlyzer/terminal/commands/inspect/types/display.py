@@ -2,7 +2,7 @@ from typing import Any
 
 from etherlyzer.formatters import MACFormatter
 from etherlyzer.ieee.analytics import get_vendor_total_addr_space
-from etherlyzer.ieee.eui48_classifier import DeliveryType, Administration, SLAPQuadrant
+from etherlyzer.ieee.eui48_classifier import Administration, DeliveryType, SLAPQuadrant
 from etherlyzer.ieee.ieee_registry import IEEEEntry, IEEERegistry
 from etherlyzer.ieee.index import IEEEIndex
 
@@ -10,20 +10,20 @@ from etherlyzer.ieee.index import IEEEIndex
 def display_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]):
     tot_blocks, tot_addr, iab_alloc, mal_alloc, mam_alloc, mas_alloc = get_vendor_total_addr_space(
         vendor_correlated_entries)
-    print(f"\nAssociated Allocations")
-    print(f"  Total")
+    print("\nAssociated Allocations")
+    print("  Total")
     print(f"    Blocks           : {tot_blocks:,}")
     print(f"    Capacity         : {tot_addr:,}")
-    print(f"  MA-L")
+    print("  MA-L")
     print(f"    Blocks           : {mal_alloc.total_blocks:,}")
     print(f"    Capacity         : {mal_alloc.total_addresses:,}")
-    print(f"  MA-M")
+    print("  MA-M")
     print(f"    Blocks           : {mam_alloc.total_blocks:,}")
     print(f"    Capacity         : {mam_alloc.total_addresses:,}")
-    print(f"  MA-S")
+    print("  MA-S")
     print(f"    Blocks           : {mas_alloc.total_blocks:,}")
     print(f"    Capacity         : {mas_alloc.total_addresses:,}")
-    print(f"  IAB")
+    print("  IAB")
     print(f"    Blocks           : {iab_alloc.total_blocks:,}")
     print(f"    Capacity         : {iab_alloc.total_addresses:,}")
 
@@ -33,7 +33,7 @@ def display_all_vendor_blocks(args, vendor_correlated_entries: list[IEEEEntry]):
         fmt_vendorblocks_width_count = 0
         fmt_vendorblocks_max_width = 45
         fmt_vendorblocks_width_increment = 9
-        print(f"  Registered Blocks (B=IAB, S=MA-S, M=MA-M, L=MA-L)")
+        print("  Registered Blocks (B=IAB, S=MA-S, M=MA-M, L=MA-L)")
         for entry in vendor_correlated_entries:
             fmt_vendorblocks_width_count += fmt_vendorblocks_width_increment
             print(f"      [{entry.registry_short_str()}] {MACFormatter.format_default(entry.assignment)}",
@@ -61,10 +61,10 @@ def display_registration(entry, reg: IEEERegistry):
 
 
 def display_organization(entry, short_orgname):
-    print(f"\nOrganization")
+    print("\nOrganization")
     print(f"  Name              : {short_orgname}")
     print(f"  Full Name         : {entry.organization_name}")
-    print(f"  Address")
+    print("  Address")
     for addr_piece in entry.format_vendor_addr():
         print(f"    {addr_piece}")
 
@@ -137,7 +137,7 @@ def display_ieee_identifier(args, index: IEEEIndex, eval_flags, classified_mac):
 
     else:
         assignment = "Unknown"
-    print(f"\nIEEE Identifier")
+    print("\nIEEE Identifier")
     print(f"  Type                : {assignment}")
     print(f"  SLAP Quadrant       : {classified_mac.slap_quadrant}")
 
@@ -148,7 +148,7 @@ def display_mac_autopsy(args, index, eval_flags, classified_mac):
     canonical_mac = MACFormatter.format_custom(args.value, block_size=2, separator="-", case="upper")
     try:
         bit_reversed_mac = MACFormatter.reverse_bits(normalized)
-    except ValueError as exc:
+    except ValueError:
         bit_reversed_mac = "NA"
 
     mac_int = int(normalized, 16)
@@ -163,11 +163,11 @@ def display_mac_autopsy(args, index, eval_flags, classified_mac):
     binary = f"{mac_int:0{bit_width}b}"
     binary = ".".join(binary[i:i + 4] for i in range(0, len(binary), 4))
 
-    print(f"MAC Address Autopsy")
-    print(f"  Input")
+    print("MAC Address Autopsy")
+    print("  Input")
     print(f"    Value             : {args.value}")
     print(f"    Length            : {len(normalized) * 4} bits")
-    print(f"  Representations")
+    print("  Representations")
     print(f"    Canonical         : {canonical_mac}")
     print(f"    Bit-Reversed      : {bit_reversed_mac}")
     print(f"    To Hex            : {mac_int:0{len(normalized)}X}")
@@ -175,10 +175,10 @@ def display_mac_autopsy(args, index, eval_flags, classified_mac):
     print(f"    To Octal          : {mac_int:0{octal_width}o}")
     print(f"    To Binary         : {binary}")
     print(f"    To Bytes          : {mac_int.to_bytes(bit_width // 8, 'big').hex(' ').upper()}")
-    print(f"  Address Properties")
+    print("  Address Properties")
     print(f"    Null Address      : {classified_mac.is_zero}")
     print(f"    Broadcast         : {classified_mac.is_broadcast}")
-    print(f"    Special Bits")
+    print("    Special Bits")
     print(f"      U/L             : {ul_bit} {ul_bit_addon}")
     print(f"      I/G             : {ig_bit} {ig_bit_addon}")
     return 0
@@ -191,9 +191,9 @@ def show_cid_registration(index, normalized: str, slap: str | Any):
         print("    CID")
         if cid_entry is not None:
             print(f"      Organization   : {cid_entry.organization_name}")
-            print(f"      Address")
+            print("      Address")
             for address_piece in cid_entry.format_vendor_addr():
                 print(f"        {address_piece}")
 
         else:
-            print(f"      Organization   : Not Registered")
+            print("      Organization   : Not Registered")

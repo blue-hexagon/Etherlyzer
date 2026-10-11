@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypeVar
 
-from etherlyzer.ieee.ieee_registry import RegCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
+from etherlyzer.ieee.ieee_registry import EtherTypeEntry, IEEEEntry, IEEERegistry, RegCategory
 
 HEX_DIGITS = frozenset("0123456789ABCDEF")
 

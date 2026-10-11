@@ -1,8 +1,8 @@
 from enum import StrEnum
+from string import punctuation
 from typing import Literal
 
 from etherlyzer.util.knobs import etherlyzer_knobs
-from string import punctuation
 
 
 class MacMaskLetter(StrEnum):
@@ -90,9 +90,7 @@ class MACFormatter:
                     normalized_mac += ch.lower()
                     validation_mask += MacMaskLetter.EXCESS_HEX
                 valid_letter_count += 1
-            elif ch in cls.VALID_SEPERATORS:
-                pass
-            elif ch in punctuation:
+            elif ch in cls.VALID_SEPERATORS or ch in punctuation:
                 pass
             elif ch in cls.RELAXED_TYPOS:
                 if valid_norm_mac_check():

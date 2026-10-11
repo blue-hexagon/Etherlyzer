@@ -6,9 +6,9 @@ from etherlyzer.ieee.catalog import Catalog
 from etherlyzer.ieee.eui48_classifier import classify_mac
 from etherlyzer.ieee.ieee_registry import RegCategory
 from etherlyzer.ieee.index import IEEEIndex
-from etherlyzer.terminal.commands.inspect.types.mac_inspection import inspect_ieee_quadrants
 from etherlyzer.terminal.commands.inspect.types.display import show_cid_registration
 from etherlyzer.terminal.commands.inspect.types.ethertype_inspection import inspect_ethertype
+from etherlyzer.terminal.commands.inspect.types.mac_inspection import inspect_ieee_quadrants
 from etherlyzer.terminal.commands.inspect.validation import validate_args
 
 

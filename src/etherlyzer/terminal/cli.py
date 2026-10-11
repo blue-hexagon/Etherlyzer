@@ -10,9 +10,7 @@ from etherlyzer.terminal.commands import (
     validate,
     whois,
 )
-from etherlyzer.terminal.commands.inspect import (
-    controller
-)
+from etherlyzer.terminal.commands.inspect import controller
 
 
 def build_parser() -> argparse.ArgumentParser:

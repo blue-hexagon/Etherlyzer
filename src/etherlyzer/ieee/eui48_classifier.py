@@ -29,14 +29,14 @@ class MACClassification:
     is_zero: bool
     slap_quadrant: SLAPQuadrant | None
     normalized: str
-    normalized_pad0:str
+    normalized_pad0: str
 
 
 def classify_mac(mac: str) -> MACClassification:
     normalized = MACFormatter.normalize(mac)
 
-    if not normalized or len(normalized) > 12:
-        raise ValueError("Expected a full or partial MAC address of 1–12 hexadecimal digits")
+    if not normalized or len(normalized) > 12 or len(normalized) < 6:
+        raise ValueError("Expected a full or partial MAC address of 6–12 hexadecimal digits")
 
     normalized_padded = normalized.ljust(12, "0")
     mac_int = int(normalized_padded, 16)
@@ -65,8 +65,8 @@ def classify_mac(mac: str) -> MACClassification:
             DeliveryType.GROUP
             if is_group else DeliveryType.INDIVIDUAL
         ),
-        is_broadcast=mac_int == 0xFFFFFFFFFFFF,
-        is_zero=mac_int == 0,
+        is_broadcast=mac_int == 0xFFFFFFFFFFFF and len(normalized) == 12,
+        is_zero=mac_int == 0 and len(normalized) == 12,
         slap_quadrant=quadrant,
         normalized=normalized,
         normalized_pad0=normalized_padded,
