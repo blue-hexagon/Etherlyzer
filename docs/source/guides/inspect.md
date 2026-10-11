@@ -1,6 +1,6 @@
 # Inspect IEEE Assignments
 
-The `display.py` command performs detailed inspection of IEEE registry assignments and identifiers.
+The `inspect` command performs detailed inspection of IEEE registry assignments and identifiers.
 
 Depending on the registry category, it can display information such as:
 
