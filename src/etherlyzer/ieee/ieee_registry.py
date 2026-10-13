@@ -3,6 +3,7 @@ import re
 from dataclasses import astuple, dataclass, fields
 from enum import StrEnum
 from pathlib import Path
+from typing import Any
 
 import requests
 from requests import RequestException
@@ -25,10 +26,10 @@ class BaseEntry:
     def get_header(cls) -> list[str]:
         return [f.name for f in fields(cls)]
 
-    def get_row(self) -> tuple:
+    def get_row(self) -> tuple[str, ...]:
         return astuple(self)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(astuple(self))
 
 
@@ -87,7 +88,7 @@ class IEEERegistry:
     update_interval: datetime.timedelta = datetime.timedelta(days=1)
     last_retrieved: datetime.datetime = None  # noqa; set in post-init
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         # Check that filepath exists
         # Get file mod ts if, else set to 0.0 (epoch zero)
         # Modify stateful variable that is used later to ensure a (recent) copy exists.
@@ -127,12 +128,12 @@ class IEEERegistry:
             )
         }
 
-    def load(self):
+    def load(self) -> list[Any]:
         if not self.filepath.exists():
             self.save()
         return IEEERegistryReader.load(self.filepath, self.model)
 
-    def need_updates(self, inform_if_synced_about_expiration=False):
+    def need_updates(self, inform_if_synced_about_expiration: bool = False) -> bool:
         expires = self.last_retrieved + self.update_interval
         expires_humanized = expires.replace(microsecond=0)
         now = datetime.datetime.now(datetime.UTC)

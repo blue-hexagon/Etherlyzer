@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 from dataclasses import dataclass
 
@@ -19,7 +21,7 @@ class EvaluatedFlags:
     show_vendor_blocks: bool
 
 
-def run(args):
+def run(args: argparse.Namespace) -> int:
     validate_args(args)
 
     registry = Catalog()
@@ -50,7 +52,7 @@ def run(args):
     return 0
 
 
-def register(subparsers):
+def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser(
         "inspect",
         help="Inspect an IEEE assignment and display registry, organization, range, and allocation details.",

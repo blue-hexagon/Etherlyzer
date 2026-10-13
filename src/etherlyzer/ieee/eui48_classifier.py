@@ -36,7 +36,7 @@ def classify_mac(mac: str) -> MACClassification:
     normalized = MACFormatter.normalize(mac)
 
     if not normalized or len(normalized) > 12 or len(normalized) < 6:
-        raise ValueError("Expected a full or partial MAC address of 6–12 hexadecimal digits")
+        raise ValueError("Expected a full or partial MAC address of 6-12 hexadecimal digits")
 
     normalized_padded = normalized.ljust(12, "0")
     mac_int = int(normalized_padded, 16)

@@ -5,7 +5,7 @@ from etherlyzer.util.knobs import etherlyzer_knobs
 
 class RegistryMatchExporter:
     @staticmethod
-    def export_csv_to_console(entries: list[IEEEEntry]):
+    def export_csv_to_console(entries: list[IEEEEntry]) -> None:
         for entry in entries:
             try:
                 print(
@@ -20,7 +20,7 @@ class RegistryMatchExporter:
                 pass
 
     @staticmethod
-    def export_humanized_to_console(entries: list[IEEEEntry]):
+    def export_humanized_to_console(entries: list[IEEEEntry]) -> None:
         for entry in entries:
             mac = MACFormatter.format_default(entry.assignment)
             try:

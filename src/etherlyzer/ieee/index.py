@@ -63,12 +63,13 @@ class VendorIndex:
 
     def lookup(self, vendor: str) -> list[IEEEEntry] | None:
         ieee_mac_entries = self.vendors.get(self.normalize_vendor_name(vendor))
-        ieee_mac_entries.sort(
-            key=lambda entry: int(
-                "".join(c for c in entry.assignment if c in "0123456789ABCDEFabcdef"),
-                16,
+        if ieee_mac_entries is not None:
+            ieee_mac_entries.sort(
+                key=lambda entry: int(
+                    "".join(c for c in entry.assignment if c in "0123456789ABCDEFabcdef"),
+                    16,
+                )
             )
-        )
         return ieee_mac_entries
 
 
@@ -167,7 +168,7 @@ class IEEEIndex:
     @staticmethod
     def get_bulk(
         ieee_index: MACAllocationIndex | IdentifierIndex | ProtocolIndex,
-        path_or_text: Path | list[str],
+        path_or_text: Path | str | list[str],
     ) -> list[IEEEEntry]:
         # Pass a list[str] from interactive or pass a Path
         if isinstance(path_or_text, Path):
@@ -191,7 +192,7 @@ class IEEEIndex:
     @staticmethod
     def get_single(
         indextype: VendorIndex | MACAllocationIndex | IdentifierIndex | ProtocolIndex, mac: str
-    ) -> IEEEEntry | None:
+    ) -> IEEEEntry | list[IEEEEntry] | None:
         ieee_entry = indextype.lookup(mac)
         if ieee_entry:
             return ieee_entry

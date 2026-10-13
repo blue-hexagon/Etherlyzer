@@ -9,10 +9,10 @@ class IEEEAllocation:
     total_addresses: int = 0
     total_blocks: int = 0
 
-    def add_addresses(self, added: int):
+    def add_addresses(self, added: int) -> None:
         self.total_addresses += added
 
-    def increment_blocks(self):
+    def increment_blocks(self) -> None:
         self.total_blocks += 1
 
 

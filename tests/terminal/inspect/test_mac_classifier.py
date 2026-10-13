@@ -17,7 +17,9 @@ from etherlyzer.ieee.eui48_classifier import (
         ("3333ff123456", Administration.LOCAL, DeliveryType.GROUP),
     ],
 )
-def test_mac_classification(value, administration, delivery):
+def test_mac_classification(
+    value: str, administration: Administration, delivery: DeliveryType
+) -> None:
     result = classify_mac(value)
 
     assert result.administration == administration
@@ -49,7 +51,7 @@ def test_mac_classification(value, administration, delivery):
         ("AE1234", SLAPQuadrant.SAI),
     ],
 )
-def test_mac_classification_slap_quadrant(value, slap_quadrant):
+def test_mac_classification_slap_quadrant(value: str, slap_quadrant: SLAPQuadrant) -> None:
     result = classify_mac(value)
 
     assert result.slap_quadrant == slap_quadrant
@@ -67,7 +69,7 @@ def test_mac_classification_slap_quadrant(value, slap_quadrant):
         "00E000dabcdef",
     ],
 )
-def test_mac_classification_slap_quadrant_fails(value):
+def test_mac_classification_slap_quadrant_fails(value: str) -> None:
     with pytest.raises(ValueError):
         classify_mac(value)
 
@@ -80,7 +82,7 @@ def test_mac_classification_slap_quadrant_fails(value):
         ("000000000000", True),
     ],
 )
-def test_zero_address(value, expected):
+def test_zero_address(value: str, expected: bool) -> None:
     result = classify_mac(value)
 
     assert result.is_zero is expected
@@ -94,7 +96,7 @@ def test_zero_address(value, expected):
         ("ffffffffffff", True),
     ],
 )
-def test_broadcast_address(value, expected):
+def test_broadcast_address(value: str, expected: bool) -> None:
     result = classify_mac(value)
 
     assert result.is_broadcast is expected

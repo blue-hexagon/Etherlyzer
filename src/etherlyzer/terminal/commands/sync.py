@@ -6,7 +6,7 @@ import time
 from etherlyzer.ieee.catalog import Catalog
 
 
-def run(args):
+def run(args: argparse.Namespace) -> int:
     manager = Catalog()
     start = time.perf_counter()
     print("Synchronizing IEEE registries...\n")
@@ -17,7 +17,7 @@ def run(args):
     return 0
 
 
-def register(subparsers):
+def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser(
         "sync",
         help="Synchronize the local IEEE registry database with upstream sources.",

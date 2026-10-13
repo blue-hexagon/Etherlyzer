@@ -6,7 +6,7 @@ from etherlyzer import __version__
 from etherlyzer.ieee.catalog import Catalog
 
 
-def run(args):
+def run(args: argparse.Namespace) -> int:
     manager = Catalog()
 
     print()
@@ -36,7 +36,7 @@ def run(args):
     return 0
 
 
-def register(subparsers):
+def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser(
         "registries",
         help="Show local IEEE registry metadata and synchronization status.",

@@ -1,8 +1,10 @@
+from typing import ClassVar
+
 from etherlyzer.ieee.ieee_registry import EtherTypeEntry, IEEEEntry, IEEERegistry, RegCategory
 
 
 class Catalog:
-    IEEE_REGISTRIES = {  # noqa
+    IEEE_REGISTRIES: ClassVar[dict[str, IEEERegistry]] = {
         "mal": IEEERegistry(
             enabled=True,
             name="MA-L",
@@ -104,13 +106,11 @@ class Catalog:
     }
 
     @classmethod
-    def db_is_initialized(cls):
+    def db_is_initialized(cls) -> bool:
         db_init_checks: list[bool] = []
         for registry in cls.IEEE_REGISTRIES.values():
             db_init_checks.append(registry.filepath.exists())
-        if not all([check for check in db_init_checks]):
-            return False
-        return True
+        return all(list(db_init_checks))
 
     @staticmethod
     def get_registry(registry_name: str) -> IEEERegistry:

@@ -122,6 +122,7 @@ exclude_lines = [
 [tool.mypy]
 python_version = "3.14"
 strict = true
+mypy_path = "src"
 files = ["src", "tests"]
 
 warn_unused_configs = true

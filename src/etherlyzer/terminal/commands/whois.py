@@ -8,7 +8,7 @@ from etherlyzer.ieee.index import IEEEIndex
 from etherlyzer.terminal.utility import read_multiline
 
 
-def run(args):
+def run(args: argparse.Namespace) -> int:
     index = IEEEIndex.from_registries(Catalog().get_all_registries())
     if args.mac:
         entry = index.get_single(indextype=index.mac_index, mac=args.mac)
@@ -50,7 +50,7 @@ def run(args):
     return 0
 
 
-def register(subparsers):
+def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]):
     parser = subparsers.add_parser(
         "whois",
         help="Identify IEEE vendors and organizations for MAC addresses.",
