@@ -43,9 +43,9 @@ def run(args):
 
     print()
     print(
-        f"Normalized {normalized_count}/{len(macs)} MAC addresses. Invalid MAC addresses identified: {invalid_count}/{len(macs)}")
+        f"Normalized {normalized_count}/{len(macs)} MAC addresses. Invalid MAC addresses identified: {invalid_count}/{len(macs)}"
+    )
     return 0
-
 
 
 def register(subparsers):

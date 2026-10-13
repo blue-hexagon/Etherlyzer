@@ -119,12 +119,14 @@ class Catalog:
             raise RuntimeError(f"Unknown registry {registry_name}")
         return reg
 
-    def get_all_registries(self, check_for_updates=True, inform_if_synced_about_expiration=False) -> list[IEEERegistry]:
+    def get_all_registries(
+        self, check_for_updates=True, inform_if_synced_about_expiration=False
+    ) -> list[IEEERegistry]:
         for registry in self.IEEE_REGISTRIES.values():
             # If not checking for updates, we still need a present dataset.
-            if (check_for_updates and registry.need_updates(
-                    inform_if_synced_about_expiration)) or not self.db_is_initialized():
-
+            if (
+                check_for_updates and registry.need_updates(inform_if_synced_about_expiration)
+            ) or not self.db_is_initialized():
                 status = registry.save()
                 if status is False:
                     break

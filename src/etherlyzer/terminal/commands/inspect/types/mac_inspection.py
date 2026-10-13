@@ -23,10 +23,7 @@ from etherlyzer.terminal.commands.inspect.types.display import (
 
 
 def inspect_universal_individual(
-        args,
-        index: IEEEIndex,
-        eval_flags: EvaluatedFlags,
-        classified_mac: MACClassification
+    args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
 ) -> bool | None:
     entry = index.get_single(index.mac_index, args.value)
 
@@ -37,9 +34,7 @@ def inspect_universal_individual(
 
         if eval_flags.show_vendor_stats or eval_flags.show_vendor_blocks:
             # vendor_index: VendorIndex = index.vendor_index
-            vendor_correlated_entries = index.vendor_index.lookup(
-                entry.organization_name
-            )
+            vendor_correlated_entries = index.vendor_index.lookup(entry.organization_name)
 
             if vendor_correlated_entries:
                 if eval_flags.show_vendor_stats:
@@ -58,15 +53,17 @@ def inspect_universal_individual(
     return False
 
 
-def inspect_universal_group(args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification):
+def inspect_universal_group(
+    args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
+):
     print("UG")
 
 
 def inspect_local_individual(
-        args,
-        index: IEEEIndex,
-        eval_flags: EvaluatedFlags,
-        classified_mac: MACClassification,
+    args,
+    index: IEEEIndex,
+    eval_flags: EvaluatedFlags,
+    classified_mac: MACClassification,
 ) -> None:
     print("LI")
     params = {
@@ -90,43 +87,59 @@ def inspect_local_individual(
             inspect_local_individual_reserved(**params)
 
         case _:
-            raise ValueError(
-                f"Unexpected SLAP quadrant: {classified_mac.slap_quadrant}"
-            )
+            raise ValueError(f"Unexpected SLAP quadrant: {classified_mac.slap_quadrant}")
 
 
-def inspect_local_individual_eli(args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification):
+def inspect_local_individual_eli(
+    args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
+):
     print()
 
 
-def inspect_local_individual_reserved(args, index: IEEEIndex, eval_flags: EvaluatedFlags,
-                                      classified_mac: MACClassification):
+def inspect_local_individual_reserved(
+    args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
+):
     print()
 
 
-def inspect_local_individual_sai(args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification):
+def inspect_local_individual_sai(
+    args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
+):
     print()
 
 
-def inspect_local_individual_aai(args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification):
+def inspect_local_individual_aai(
+    args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
+):
     print()
 
 
-def inspect_local_group(args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification):
+def inspect_local_group(
+    args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
+):
     print("LG")
 
 
-def inspect_zero_address(args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification):
+def inspect_zero_address(
+    args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
+):
     print("Zero")
 
 
-def inspect_broadcast_address(args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification):
+def inspect_broadcast_address(
+    args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
+):
     print("Broadcast")
 
 
 def inspect_ieee_quadrants(args, index: IEEEIndex, eval_flags: EvaluatedFlags) -> int:
     classified_mac = classify_mac(args.value)
-    params = {"args": args, "index": index, "eval_flags": eval_flags, "classified_mac": classified_mac}
+    params = {
+        "args": args,
+        "index": index,
+        "eval_flags": eval_flags,
+        "classified_mac": classified_mac,
+    }
 
     if eval_flags.show_mac_autopsy:
         display_mac_autopsy(**params)

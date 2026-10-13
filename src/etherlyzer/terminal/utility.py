@@ -1,9 +1,9 @@
 def read_multiline(
-        linetype: str = "text",
-        prompt: str = "Paste $1. Type $2 and press <Enter> when done:",
-        marker: str = ";;;"
+    linetype: str = "text",
+    prompt: str = "Paste $1. Type $2 and press <Enter> when done:",
+    marker: str = ";;;",
 ) -> list[str]:
-    """ linetype: the kind of input you are reading, will be pasted into the prompts $1"""
+    """linetype: the kind of input you are reading, will be pasted into the prompts $1"""
     print(prompt.replace("$1", linetype).replace("$2", marker))
 
     lines = []

@@ -13,4 +13,9 @@ from etherlyzer.formatters import MACFormatter
     ],
 )
 def test_normalizes_mac_formats(value, expected):
-    assert MACFormatter.format_custom(mac=value, block_size=2, separator=":", case="lower", fix_typos=False) == expected
+    assert (
+        MACFormatter.format_custom(
+            mac=value, block_size=2, separator=":", case="lower", fix_typos=False
+        )
+        == expected
+    )

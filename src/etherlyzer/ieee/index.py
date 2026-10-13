@@ -35,9 +35,9 @@ class MACAllocationIndex:
 
         # Order is important - longest prefix match
         return (
-                self.prefixes_36.get(mac[:9])
-                or self.prefixes_28.get(mac[:7])
-                or self.prefixes_24.get(mac[:6])
+            self.prefixes_36.get(mac[:9])
+            or self.prefixes_28.get(mac[:7])
+            or self.prefixes_24.get(mac[:6])
         )
 
     def walk(self):
@@ -77,9 +77,9 @@ class ProtocolIndex:
     ethertype: dict[str, EtherTypeEntry] = field(default_factory=dict)
 
     def insert(
-            self,
-            registry: IEEERegistry,
-            entries: Iterable[EtherTypeEntry],
+        self,
+        registry: IEEERegistry,
+        entries: Iterable[EtherTypeEntry],
     ) -> None:
         self.ethertype.update({entry.assignment.upper(): entry for entry in entries})
 
@@ -121,8 +121,8 @@ class IEEEIndex:
 
     @classmethod
     def from_registries(
-            cls,
-            registries: Iterable[IEEERegistry],
+        cls,
+        registries: Iterable[IEEERegistry],
     ) -> IEEEIndex:
 
         index = cls()
@@ -166,8 +166,8 @@ class IEEEIndex:
 
     @staticmethod
     def get_bulk(
-            ieee_index: MACAllocationIndex | IdentifierIndex | ProtocolIndex,
-            path_or_text: Path | list[str],
+        ieee_index: MACAllocationIndex | IdentifierIndex | ProtocolIndex,
+        path_or_text: Path | list[str],
     ) -> list[IEEEEntry]:
         # Pass a list[str] from interactive or pass a Path
         if isinstance(path_or_text, Path):
@@ -189,7 +189,9 @@ class IEEEIndex:
         return ieee_entries
 
     @staticmethod
-    def get_single(indextype: VendorIndex | MACAllocationIndex | IdentifierIndex | ProtocolIndex, mac: str) -> IEEEEntry | None:
+    def get_single(
+        indextype: VendorIndex | MACAllocationIndex | IdentifierIndex | ProtocolIndex, mac: str
+    ) -> IEEEEntry | None:
         ieee_entry = indextype.lookup(mac)
         if ieee_entry:
             return ieee_entry

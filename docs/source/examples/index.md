@@ -9,13 +9,13 @@ This section collects practical EtherLyzer workflows.
 etherlyzer whois 00:00:0c:12:34:56
 ```
 
-**Output** 
+**Output**
 ```text
 MA-L    00000C  Cisco Systems, Inc
 ```
 ## Inspect the complete IEEE allocation
 
-Vendor identification tells you who owns an address. `display.py` shows what the
+Vendor identification tells you who owns an address. `inspect` shows what the
 address actually belongs to.
 
 **Command**
@@ -37,7 +37,7 @@ Registry
   Prefix Bits     : 24 bits
   Address Bits    : 24 bits
   Addresses       : 16,777,216
-  
+
 Vendor Blocks
   Total Blocks    : 1258
   Address Capacity
