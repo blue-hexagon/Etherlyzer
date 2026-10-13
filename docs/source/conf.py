@@ -64,7 +64,6 @@ myst_substitutions = {
     "version": version,
     "release": release,
     "version_badge": f"{{bdg-primary}}`v{version}`",
-
 }
 pygments_style = "friendly"
 pygments_dark_style = "dracula"
@@ -91,7 +90,6 @@ html_theme_options = {
     "dark_logo": "logo_dark.png",
     "sidebar_hide_name": True,
     "top_of_page_buttons": ["view", "edit"],
-
 }
 html_title = project
 autosummary_generate = True

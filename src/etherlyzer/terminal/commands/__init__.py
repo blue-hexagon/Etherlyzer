@@ -1,8 +1,8 @@
 from . import (
-    whois,
     format,
-    registries,
-    validate,
     inspect,
+    registries,
     sync,
+    validate,
+    whois,
 )

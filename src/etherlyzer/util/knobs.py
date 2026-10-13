@@ -1,6 +1,5 @@
 import os
 import shutil
-
 from dataclasses import MISSING, dataclass, fields
 from enum import Enum, StrEnum
 from importlib.resources import files
@@ -44,24 +43,16 @@ def _load_environment() -> None:
 
 def _validate_knobs(etherlyzer_knobs: EtherlyzerKnobs) -> None:
     if etherlyzer_knobs.db_update_interval_hours <= 0:
-        raise ValueError(
-            "DB_UPDATE_INTERVAL_HOURS must be greater than zero."
-        )
+        raise ValueError("DB_UPDATE_INTERVAL_HOURS must be greater than zero.")
 
     if len(etherlyzer_knobs.field_separator) != 1:
-        raise ValueError(
-            "FIELD_SEPARATOR must contain exactly one character."
-        )
+        raise ValueError("FIELD_SEPARATOR must contain exactly one character.")
 
     if etherlyzer_knobs.mac_separator not in {"", ":", "-", "."}:
-        raise ValueError(
-            "MAC_SEPARATOR must be one of '', ':', '-', or '.'."
-        )
+        raise ValueError("MAC_SEPARATOR must be one of '', ':', '-', or '.'.")
 
     if etherlyzer_knobs.mac_block_size not in {2, 4, 12}:
-        raise ValueError(
-            "MAC_BLOCK_SIZE must be 2, 4, or 12."
-        )
+        raise ValueError("MAC_BLOCK_SIZE must be 2, 4, or 12.")
 
 
 def knobs_builder(cls: type[EtherlyzerKnobs]) -> EtherlyzerKnobs:
@@ -80,16 +71,12 @@ def knobs_builder(cls: type[EtherlyzerKnobs]) -> EtherlyzerKnobs:
                 values[field.name] = field.default_factory()
                 continue
 
-            raise ValueError(
-                f"Missing required environment variable {env_name}"
-            )
+            raise ValueError(f"Missing required environment variable {env_name}")
 
         type_ = field.type
 
         if type_ is bool:
-            values[field.name] = value.lower() in {
-                "1", "true", "yes", "on"
-            }
+            values[field.name] = value.lower() in {"1", "true", "yes", "on"}
 
         elif type_ is int:
             values[field.name] = int(value)
@@ -107,9 +94,7 @@ def knobs_builder(cls: type[EtherlyzerKnobs]) -> EtherlyzerKnobs:
             values[field.name] = type_(value)
 
         else:
-            raise TypeError(
-                f"Unsupported config type: {type_}"
-            )
+            raise TypeError(f"Unsupported config type: {type_}")
 
     return cls(**values)
 

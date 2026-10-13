@@ -1,8 +1,8 @@
 from enum import StrEnum
+from string import punctuation
 from typing import Literal
 
 from etherlyzer.util.knobs import etherlyzer_knobs
-from string import punctuation
 
 
 class MacMaskLetter(StrEnum):
@@ -44,7 +44,8 @@ class MACFormatter:
     def format_default(cls, mac: str) -> str:
         mac = cls.normalize(mac)
         mac = etherlyzer_knobs.mac_separator.join(
-            mac[i: i + etherlyzer_knobs.mac_block_size] for i in range(0, len(mac), etherlyzer_knobs.mac_block_size)
+            mac[i : i + etherlyzer_knobs.mac_block_size]
+            for i in range(0, len(mac), etherlyzer_knobs.mac_block_size)
         )
 
         return getattr(mac, etherlyzer_knobs.mac_case.value)()
@@ -56,17 +57,17 @@ class MACFormatter:
 
     @classmethod
     def format_custom(
-            cls,
-            mac: str,
-            block_size: int,
-            separator: Literal[".", ":", "-"],
-            case: Literal["upper", "lower"],
-            fix_typos: bool,
+        cls,
+        mac: str,
+        block_size: int,
+        separator: Literal[".", ":", "-"],
+        case: Literal["upper", "lower"],
+        fix_typos: bool = False,
     ) -> str:
         if fix_typos:
             mac = cls.fix_typos(mac)
         mac = cls.normalize(mac)
-        mac = separator.join(mac[i: i + block_size] for i in range(0, len(mac), block_size))
+        mac = separator.join(mac[i : i + block_size] for i in range(0, len(mac), block_size))
         if case == "upper":
             return mac.upper()
         return mac.lower()
@@ -90,9 +91,7 @@ class MACFormatter:
                     normalized_mac += ch.lower()
                     validation_mask += MacMaskLetter.EXCESS_HEX
                 valid_letter_count += 1
-            elif ch in cls.VALID_SEPERATORS:
-                pass
-            elif ch in punctuation:
+            elif ch in cls.VALID_SEPERATORS or ch in punctuation:
                 pass
             elif ch in cls.RELAXED_TYPOS:
                 if valid_norm_mac_check():
@@ -139,14 +138,15 @@ class MACFormatter:
                 mac = mac.replace(c, "#")
         return mac
 
+    @staticmethod
+    def reverse_bits(mac: str) -> str:
+        normalized = MACFormatter.normalize(mac)
 
-if __name__ == "__main__":
-    print(
-        MACFormatter().format_custom(
-            mac="ab:cd:ef:fg:de:dd",
-            separator=":",
-            block_size=2,
-            case="upper",
-            fix_typos=False,
-        )
-    )
+        if len(normalized) % 2:
+            raise ValueError("Bit reversal requires complete octets.")
+
+        octets = bytes.fromhex(normalized)
+
+        reversed_octets = bytes(int(f"{octet:08b}"[::-1], 2) for octet in octets)
+
+        return reversed_octets.hex(":").upper()

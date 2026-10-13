@@ -2,10 +2,9 @@ import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from time import sleep
 from typing import TypeVar
 
-from etherlyzer.ieee.ieee_registry import RegCategory, IEEEEntry, EtherTypeEntry, IEEERegistry
+from etherlyzer.ieee.ieee_registry import EtherTypeEntry, IEEEEntry, IEEERegistry, RegCategory
 
 HEX_DIGITS = frozenset("0123456789ABCDEF")
 
@@ -13,7 +12,7 @@ T = TypeVar("T")
 
 
 @dataclass(slots=True)
-class MACIndex:
+class MACAllocationIndex:
     prefixes_36: dict[str, IEEEEntry] = field(default_factory=dict)
     prefixes_28: dict[str, IEEEEntry] = field(default_factory=dict)
     prefixes_24: dict[str, IEEEEntry] = field(default_factory=dict)
@@ -36,9 +35,9 @@ class MACIndex:
 
         # Order is important - longest prefix match
         return (
-                self.prefixes_36.get(mac[:9])
-                or self.prefixes_28.get(mac[:7])
-                or self.prefixes_24.get(mac[:6])
+            self.prefixes_36.get(mac[:9])
+            or self.prefixes_28.get(mac[:7])
+            or self.prefixes_24.get(mac[:6])
         )
 
     def walk(self):
@@ -78,9 +77,9 @@ class ProtocolIndex:
     ethertype: dict[str, EtherTypeEntry] = field(default_factory=dict)
 
     def insert(
-            self,
-            registry: IEEERegistry,
-            entries: Iterable[EtherTypeEntry],
+        self,
+        registry: IEEERegistry,
+        entries: Iterable[EtherTypeEntry],
     ) -> None:
         self.ethertype.update({entry.assignment.upper(): entry for entry in entries})
 
@@ -110,21 +109,20 @@ class IdentifierIndex:
 
     def lookup(self, identifier: str) -> IEEEEntry | None:
         identifier = identifier.upper()
-
         return self.cid.get(identifier) or self.opid.get(identifier) or self.manid.get(identifier)
 
 
 @dataclass(slots=True)
 class IEEEIndex:
-    mac_index: MACIndex = field(default_factory=MACIndex)
+    mac_index: MACAllocationIndex = field(default_factory=MACAllocationIndex)
     protocol_index: ProtocolIndex = field(default_factory=ProtocolIndex)
     identifier_index: IdentifierIndex = field(default_factory=IdentifierIndex)
     vendor_index: VendorIndex = field(default_factory=VendorIndex)
 
     @classmethod
     def from_registries(
-            cls,
-            registries: Iterable[IEEERegistry],
+        cls,
+        registries: Iterable[IEEERegistry],
     ) -> IEEEIndex:
 
         index = cls()
@@ -168,8 +166,8 @@ class IEEEIndex:
 
     @staticmethod
     def get_bulk(
-            ieee_index: MACIndex | IdentifierIndex | ProtocolIndex,
-            path_or_text: Path | list[str],
+        ieee_index: MACAllocationIndex | IdentifierIndex | ProtocolIndex,
+        path_or_text: Path | list[str],
     ) -> list[IEEEEntry]:
         # Pass a list[str] from interactive or pass a Path
         if isinstance(path_or_text, Path):
@@ -191,7 +189,9 @@ class IEEEIndex:
         return ieee_entries
 
     @staticmethod
-    def get_single(indextype: VendorIndex | MACIndex | IdentifierIndex | ProtocolIndex, mac: str) -> IEEEEntry | None:
+    def get_single(
+        indextype: VendorIndex | MACAllocationIndex | IdentifierIndex | ProtocolIndex, mac: str
+    ) -> IEEEEntry | None:
         ieee_entry = indextype.lookup(mac)
         if ieee_entry:
             return ieee_entry
