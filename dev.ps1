@@ -75,7 +75,7 @@ function Coverage {
     }
 }
 
-function PreCommit {
+function PreCommitAll {
     Invoke-Step "Pre-commit" {
         poetry run pre-commit run --all-files
     }
@@ -138,7 +138,7 @@ function Check {
 }
 
 function CI {
-    PreCommit
+    PreCommitAll
     TypeCheck
     Test
     Audit
@@ -203,8 +203,8 @@ $commands = @{
         Help   = "Run the test suite and generate a code coverage report."
     }
 
-    precommit = @{
-        Action = ${function:PreCommit}
+    precommitall = @{
+        Action = ${function:PreCommitAll}
         Help   = "Run all configured pre-commit hooks against the repository."
     }
 

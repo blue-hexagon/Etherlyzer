@@ -48,7 +48,7 @@ class MACFormatter:
             for i in range(0, len(mac), etherlyzer_knobs.mac_block_size)
         )
 
-        return getattr(mac, etherlyzer_knobs.mac_case.value)()
+        return str(getattr(mac, etherlyzer_knobs.mac_case.value)())
 
     @classmethod
     def format_with_stuffed_hex(cls, mac: str, stuffed_hex: str) -> str:

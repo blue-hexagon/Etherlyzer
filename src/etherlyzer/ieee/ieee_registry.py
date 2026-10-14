@@ -1,6 +1,6 @@
 import datetime
 import re
-from dataclasses import astuple, dataclass, fields
+from dataclasses import astuple, dataclass, field, fields
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
@@ -48,8 +48,8 @@ class IEEEEntry(BaseEntry):
 
     def format_vendor_addr(self) -> list[str]:
         addr_representation = []
-        for addr in self.organization_address.split(","):
-            addr = addr.split("  ")
+        for addr_outer in self.organization_address.split(","):
+            addr = addr_outer.split("  ")
             for line in addr:
                 if line:
                     addr_representation.append(line.strip())
@@ -86,7 +86,7 @@ class IEEERegistry:
     address_count: int | None = None
 
     update_interval: datetime.timedelta = datetime.timedelta(days=1)
-    last_retrieved: datetime.datetime = None  # noqa; set in post-init
+    last_retrieved: datetime.datetime = field(init=False)
 
     def __post_init__(self) -> None:
         # Check that filepath exists
@@ -131,7 +131,7 @@ class IEEERegistry:
     def load(self) -> list[Any]:
         if not self.filepath.exists():
             self.save()
-        return IEEERegistryReader.load(self.filepath, self.model)
+        return IEEERegistryReader.load_file(self.filepath, self.model)
 
     def need_updates(self, inform_if_synced_about_expiration: bool = False) -> bool:
         expires = self.last_retrieved + self.update_interval

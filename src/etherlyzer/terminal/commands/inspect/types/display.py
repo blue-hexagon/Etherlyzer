@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags
 
 
-def display_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]):
+def display_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]) -> None:
     tot_blocks, tot_addr, iab_alloc, mal_alloc, mam_alloc, mas_alloc = get_vendor_total_addr_space(
         vendor_correlated_entries
     )
@@ -40,7 +40,9 @@ def display_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]):
     print(f"    Capacity         : {iab_alloc.total_addresses:,}")
 
 
-def display_all_vendor_blocks(args: argparse.Namespace, vendor_correlated_entries: list[IEEEEntry]):
+def display_all_vendor_blocks(
+    args: argparse.Namespace, vendor_correlated_entries: list[IEEEEntry]
+) -> None:
     if args.show_vendor_blocks:
         fmt_vendorblocks_width_count = 0
         fmt_vendorblocks_max_width = 45
@@ -59,7 +61,7 @@ def display_all_vendor_blocks(args: argparse.Namespace, vendor_correlated_entrie
             print()  # Required exactly here.
 
 
-def display_registration(entry: IEEEEntry, reg: IEEERegistry):
+def display_registration(entry: IEEEEntry, reg: IEEERegistry) -> None:
     stuffed_input_0 = MACFormatter.format_with_stuffed_hex(entry.assignment, "0")
     sutffed_input_f = MACFormatter.format_with_stuffed_hex(entry.assignment, "f")
     print("\nIEEE Registry")
@@ -74,7 +76,7 @@ def display_registration(entry: IEEEEntry, reg: IEEERegistry):
         print(f"  Address Capacity    : {reg.address_count:,}")
 
 
-def display_organization(entry: IEEEEntry, short_orgname: str):
+def display_organization(entry: IEEEEntry, short_orgname: str) -> None:
     print("\nOrganization")
     print(f"  Name              : {short_orgname}")
     print(f"  Full Name         : {entry.organization_name}")
@@ -88,7 +90,7 @@ def display_ieee_identifier(
     index: IEEEIndex,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
-):
+) -> None:
     normalized = MACFormatter.normalize(args.value)
     is_complete = len(normalized) == 12
     mac_entry = None
@@ -165,7 +167,7 @@ def display_mac_autopsy(
     index: IEEEIndex,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
-):
+) -> None:
     cid_length = 6  # noqa: F841 ; TODO
     normalized = MACFormatter.normalize(args.value)
     canonical_mac = MACFormatter.format_custom(
@@ -208,10 +210,9 @@ def display_mac_autopsy(
     print("    Special Bits")
     print(f"      U/L             : {ul_bit} {ul_bit_addon}")
     print(f"      I/G             : {ig_bit} {ig_bit_addon}")
-    return 0
 
 
-def show_cid_registration(index: IEEEIndex, normalized: str, slap: SLAPQuadrant):
+def show_cid_registration(index: IEEEIndex, normalized: str, slap: SLAPQuadrant) -> None:
     cid_length = 6
     if slap == SLAPQuadrant.ELI:
         cid_entry = index.get_single(indextype=index.identifier_index, mac=normalized[:cid_length])

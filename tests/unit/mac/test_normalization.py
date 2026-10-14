@@ -22,5 +22,5 @@ from etherlyzer.formatters import MACFormatter
         ("001a . 2b3c . 4d5e", "001a2b3c4d5e"),
     ],
 )
-def test_normalizes_mac(value:str, expected:str):
+def test_normalizes_mac(value: str, expected: str) -> None:
     assert MACFormatter.normalize(value) == expected

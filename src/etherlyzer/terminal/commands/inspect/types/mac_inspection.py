@@ -1,5 +1,5 @@
 import argparse
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from etherlyzer.ieee.catalog import Catalog
 from etherlyzer.ieee.eui48_classifier import (
@@ -21,6 +21,13 @@ from etherlyzer.terminal.commands.inspect.types.display import (
     display_organization,
     display_registration,
 )
+
+
+class InspectionParams(TypedDict):
+    args: argparse.Namespace
+    index: IEEEIndex
+    eval_flags: EvaluatedFlags
+    classified_mac: MACClassification
 
 
 def inspect_universal_individual(
@@ -62,7 +69,7 @@ def inspect_universal_group(
     index: IEEEIndex,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
-):
+) -> None:
     print("UG")
 
 
@@ -73,7 +80,7 @@ def inspect_local_individual(
     classified_mac: MACClassification,
 ) -> None:
     print("LI")
-    params = {
+    params: InspectionParams = {
         "args": args,
         "index": index,
         "eval_flags": eval_flags,
@@ -102,7 +109,7 @@ def inspect_local_individual_eli(
     index: IEEEIndex,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
-):
+) -> None:
     print()
 
 
@@ -111,7 +118,7 @@ def inspect_local_individual_reserved(
     index: IEEEIndex,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
-):
+) -> None:
     print()
 
 
@@ -120,7 +127,7 @@ def inspect_local_individual_sai(
     index: IEEEIndex,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
-):
+) -> None:
     print()
 
 
@@ -129,7 +136,7 @@ def inspect_local_individual_aai(
     index: IEEEIndex,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
-):
+) -> None:
     print()
 
 
@@ -138,13 +145,13 @@ def inspect_local_group(
     index: IEEEIndex,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
-):
+) -> None:
     print("LG")
 
 
 def inspect_zero_address(
     args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
-):
+) -> None:
     print("Zero")
 
 
@@ -153,7 +160,7 @@ def inspect_broadcast_address(
     index: IEEEIndex,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
-):
+) -> None:
     print("Broadcast")
 
 
@@ -161,7 +168,7 @@ def inspect_ieee_quadrants(
     args: argparse.Namespace, index: IEEEIndex, eval_flags: EvaluatedFlags
 ) -> int:
     classified_mac = classify_mac(args.value)
-    params = {
+    params: InspectionParams = {
         "args": args,
         "index": index,
         "eval_flags": eval_flags,

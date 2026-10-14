@@ -50,7 +50,7 @@ def run(args: argparse.Namespace) -> int:
     return 0
 
 
-def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]):
+def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser(
         "whois",
         help="Identify IEEE vendors and organizations for MAC addresses.",

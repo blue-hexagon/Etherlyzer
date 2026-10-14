@@ -120,7 +120,7 @@ class Catalog:
         return reg
 
     def get_all_registries(
-        self, check_for_updates=True, inform_if_synced_about_expiration=False
+        self, check_for_updates: bool = True, inform_if_synced_about_expiration: bool = False
     ) -> list[IEEERegistry]:
         for registry in self.IEEE_REGISTRIES.values():
             # If not checking for updates, we still need a present dataset.
@@ -132,5 +132,5 @@ class Catalog:
                     break
         return list(self.IEEE_REGISTRIES.values())
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> IEEERegistry:
         return self.IEEE_REGISTRIES[key]

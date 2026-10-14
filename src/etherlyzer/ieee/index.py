@@ -1,5 +1,5 @@
 import re
-from collections.abc import Iterable
+from collections.abc import Generator, Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypeVar
@@ -40,7 +40,7 @@ class MACAllocationIndex:
             or self.prefixes_24.get(mac[:6])
         )
 
-    def walk(self):
+    def walk(self) -> Generator[str]:
         yield from self.prefixes_36
         yield from self.prefixes_28
         yield from self.prefixes_24
@@ -170,19 +170,20 @@ class IEEEIndex:
         ieee_index: MACAllocationIndex | IdentifierIndex | ProtocolIndex,
         path_or_text: Path | str | list[str],
     ) -> list[IEEEEntry]:
-        # Pass a list[str] from interactive or pass a Path
+        # Pass a list[str] from interactive or pass a Path or str (path)
+        ieee_entries_as_set: set[IEEEEntry] = set()
+
         if isinstance(path_or_text, Path):
             with open(path_or_text) as f:
                 text_data = f.readlines()
         else:
             text_data = path_or_text
-        ieee_entries: set[IEEEEntry] = set()
         for line in text_data:
             ieee_entry = ieee_index.lookup(line)
             if ieee_entry:
-                ieee_entries.add(ieee_entry)
+                ieee_entries_as_set.add(ieee_entry)
 
-        ieee_entries: list[IEEEEntry] = list(ieee_entries)
+        ieee_entries: list[IEEEEntry] = list(ieee_entries_as_set)
         # Sort by name, and then by registry-name reversed
         ieee_entries = sorted(ieee_entries, key=lambda e: e.organization_name)
         ieee_entries = sorted(ieee_entries, key=lambda e: e.registry, reverse=True)

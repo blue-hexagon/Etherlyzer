@@ -6,3 +6,12 @@ from . import (
     validate,
     whois,
 )
+
+__all__ = [
+    "format",
+    "inspect",
+    "registries",
+    "sync",
+    "validate",
+    "whois",
+]
