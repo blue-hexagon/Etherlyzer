@@ -2,7 +2,7 @@ import re
 from collections.abc import Generator, Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TypeVar
+from typing import Protocol, TypeVar
 
 from etherlyzer.ieee.ieee_registry import EtherTypeEntry, IEEEEntry, IEEERegistry, RegCategory
 
@@ -11,8 +11,13 @@ HEX_DIGITS = frozenset("0123456789ABCDEF")
 T = TypeVar("T")
 
 
+class IEEEIndexProtocol(Protocol):
+    def get_many(self, identifier: str) -> list[IEEEEntry | EtherTypeEntry] | None: ...
+    def get_one(self, identifier: str) -> IEEEEntry | EtherTypeEntry | None: ...
+
+
 @dataclass(slots=True)
-class MACAllocationIndex:
+class MACAllocationIndex(IEEEIndexProtocol):
     prefixes_36: dict[str, IEEEEntry] = field(default_factory=dict)
     prefixes_28: dict[str, IEEEEntry] = field(default_factory=dict)
     prefixes_24: dict[str, IEEEEntry] = field(default_factory=dict)
@@ -30,8 +35,8 @@ class MACAllocationIndex:
 
         target.update({entry.assignment.upper(): entry for entry in entries})
 
-    def lookup(self, mac: str) -> IEEEEntry | None:
-        mac = "".join(c for c in mac.upper() if c in HEX_DIGITS)
+    def get_one(self, identifier: str) -> IEEEEntry | None:
+        mac = "".join(c for c in identifier.upper() if c in HEX_DIGITS)
 
         # Order is important - longest prefix match
         return (
@@ -47,7 +52,7 @@ class MACAllocationIndex:
 
 
 @dataclass(slots=True)
-class VendorIndex:
+class VendorIndex(IEEEIndexProtocol):
     vendors: dict[str, list[IEEEEntry]] = field(default_factory=dict)
 
     @staticmethod
@@ -58,11 +63,15 @@ class VendorIndex:
         return name.strip()
 
     def insert(self, entry: IEEEEntry) -> None:
-        key = self.normalize_vendor_name(entry.organization_name)
+        key = self.normalize_vendor_name(
+            entry.organization_name,
+        )
         self.vendors.setdefault(key, []).append(entry)
 
-    def lookup(self, vendor: str) -> list[IEEEEntry] | None:
-        ieee_mac_entries = self.vendors.get(self.normalize_vendor_name(vendor))
+    def get_many(self, identifier: str) -> list[IEEEEntry] | None:
+        ieee_mac_entries = self.vendors.get(
+            self.normalize_vendor_name(identifier),
+        )
         if ieee_mac_entries is not None:
             ieee_mac_entries.sort(
                 key=lambda entry: int(
@@ -74,23 +83,22 @@ class VendorIndex:
 
 
 @dataclass(slots=True)
-class ProtocolIndex:
+class ProtocolIndex(IEEEIndexProtocol):
     ethertype: dict[str, EtherTypeEntry] = field(default_factory=dict)
 
     def insert(
         self,
-        registry: IEEERegistry,
         entries: Iterable[EtherTypeEntry],
     ) -> None:
         self.ethertype.update({entry.assignment.upper(): entry for entry in entries})
 
-    def lookup(self, ethertype: str) -> EtherTypeEntry | None:
-        ethertype = "".join(c for c in ethertype.upper() if c in HEX_DIGITS)
+    def get_one(self, identifier: str) -> EtherTypeEntry | None:
+        ethertype = "".join(c for c in identifier.upper() if c in HEX_DIGITS)
         return self.ethertype.get(ethertype)
 
 
 @dataclass(slots=True)
-class IdentifierIndex:
+class IdentifierIndex(IEEEIndexProtocol):
     cid: dict[str, IEEEEntry] = field(default_factory=dict)
     opid: dict[str, IEEEEntry] = field(default_factory=dict)
     manid: dict[str, IEEEEntry] = field(default_factory=dict)
@@ -108,7 +116,7 @@ class IdentifierIndex:
 
         target.update({entry.assignment.upper(): entry for entry in entries})
 
-    def lookup(self, identifier: str) -> IEEEEntry | None:
+    def get_one(self, identifier: str) -> IEEEEntry | None:
         identifier = identifier.upper()
         return self.cid.get(identifier) or self.opid.get(identifier) or self.manid.get(identifier)
 
@@ -136,7 +144,7 @@ class IEEEIndex:
                     index.mac_index.insert(registry, entries)
 
                 case RegCategory.PROTOCOL:
-                    index.protocol_index.insert(registry, entries)
+                    index.protocol_index.insert(entries)
 
                 case RegCategory.IDENTIFIER:
                     index.identifier_index.insert(registry, entries)
@@ -157,17 +165,20 @@ class IEEEIndex:
         return index
 
     def get_from_mac_index(self, mac: str) -> IEEEEntry | None:
-        return self.mac_index.lookup(mac)
+        return self.mac_index.get_one(mac)
 
     def get_from_ethertype_index(self, ethertype: str) -> EtherTypeEntry | None:
-        return self.protocol_index.lookup(ethertype)
+        ret = self.protocol_index.get_one(ethertype)
+        if not isinstance(ret, EtherTypeEntry):
+            raise RuntimeError()
+        return ret
 
     def get_identifier(self, identifier: str) -> IEEEEntry | None:
-        return self.identifier_index.lookup(identifier)
+        return self.identifier_index.get_one(identifier)
 
     @staticmethod
-    def get_bulk(
-        ieee_index: MACAllocationIndex | IdentifierIndex | ProtocolIndex,
+    def get_many(
+        ieee_index: MACAllocationIndex | IdentifierIndex | ProtocolIndex | VendorIndex,
         path_or_text: Path | str | list[str],
     ) -> list[IEEEEntry]:
         # Pass a list[str] from interactive or pass a Path or str (path)
@@ -179,7 +190,7 @@ class IEEEIndex:
         else:
             text_data = path_or_text
         for line in text_data:
-            ieee_entry = ieee_index.lookup(line)
+            ieee_entry = ieee_index.get_one(line)
             if ieee_entry:
                 ieee_entries_as_set.add(ieee_entry)
 
@@ -194,7 +205,7 @@ class IEEEIndex:
     def get_single(
         indextype: VendorIndex | MACAllocationIndex | IdentifierIndex | ProtocolIndex, mac: str
     ) -> IEEEEntry | list[IEEEEntry] | None:
-        ieee_entry = indextype.lookup(mac)
+        ieee_entry = indextype.get_one(mac)
         if ieee_entry:
             return ieee_entry
         else:

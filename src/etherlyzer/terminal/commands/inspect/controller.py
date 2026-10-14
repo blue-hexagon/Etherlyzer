@@ -40,9 +40,11 @@ def run(args: argparse.Namespace) -> int:
             inspect_ethertype(args, entry, index)
         case RegCategory.IDENTIFIER.value:
             entry = index.get_single(index.identifier_index, args.value)
-            show_cid_registration(
-                index, MACFormatter.normalize(args.value), classify_mac(args.value)
-            )
+            norm = MACFormatter.normalize(args.value)
+            slap = classify_mac(args.value).slap_quadrant
+            if slap is None:
+                return 2
+            show_cid_registration(index, norm, slap)
         case _:
             print(f"No valid type ({args.type}) selected.")
             return 1

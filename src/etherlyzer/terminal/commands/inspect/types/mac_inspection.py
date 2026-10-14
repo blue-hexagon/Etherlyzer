@@ -45,7 +45,7 @@ def inspect_universal_individual(
 
         if eval_flags.show_vendor_stats or eval_flags.show_vendor_blocks:
             # vendor_index: VendorIndex = index.vendor_index
-            vendor_correlated_entries = index.vendor_index.lookup(entry.organization_name)
+            vendor_correlated_entries = index.vendor_index.get_many(entry.organization_name)
 
             if vendor_correlated_entries:
                 if eval_flags.show_vendor_stats:

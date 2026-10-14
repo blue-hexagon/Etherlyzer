@@ -25,12 +25,12 @@ def run(args: argparse.Namespace) -> int:
 
     elif args.interactive:
         data = read_multiline()
-        entries = IEEEIndex.get_bulk(
+        entries = IEEEIndex.get_many(
             ieee_index=index.mac_index,
             path_or_text=data,
         )
     elif args.file:
-        entries = IEEEIndex.get_bulk(
+        entries = IEEEIndex.get_many(
             ieee_index=index.mac_index,
             path_or_text=args.file,
         )
