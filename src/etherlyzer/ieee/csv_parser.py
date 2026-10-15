@@ -50,6 +50,8 @@ class IEEERegistryReader:
             for row in reader:
                 kwargs = {}
                 for header, value in row.items():
+                    if header is None:
+                        raise ValueError(f"Malformed CSV row: more values than headers: {row!r}")
                     field_name = cls.normalize(header)
                     field = model_fields.get(field_name)
 

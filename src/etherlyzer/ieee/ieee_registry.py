@@ -2,6 +2,7 @@ import datetime
 import re
 from dataclasses import astuple, dataclass, field, fields
 from enum import StrEnum
+from http import HTTPStatus
 from pathlib import Path
 from typing import Any
 
@@ -61,7 +62,19 @@ class EtherTypeEntry(IEEEEntry):
     protocol: str
 
 
-@dataclass(slots=True)
+RETRYABLE_STATUS_CODES = {
+    HTTPStatus.REQUEST_TIMEOUT,
+    HTTPStatus.MISDIRECTED_REQUEST,
+    HTTPStatus.TOO_EARLY,
+    HTTPStatus.TOO_MANY_REQUESTS,
+    HTTPStatus.INTERNAL_SERVER_ERROR,
+    HTTPStatus.BAD_GATEWAY,
+    HTTPStatus.SERVICE_UNAVAILABLE,
+    HTTPStatus.GATEWAY_TIMEOUT,
+}
+
+
+@dataclass
 class IEEERegistry:
     """
     Metadata describing an IEEE Registration Authority registry.
@@ -111,10 +124,6 @@ class IEEERegistry:
         return self.category is RegCategory.IDENTIFIER
 
     @property
-    def filepath(self) -> Path:
-        return DATA_PLATFORM_DIR / Path("".join([self.name, ".csv"]))
-
-    @property
     def assignment_length(self) -> int:
         return self.prefix_bits // 4 if self.prefix_bits else 0
 
@@ -128,9 +137,13 @@ class IEEERegistry:
             )
         }
 
+    @property
+    def filepath(self) -> Path:
+        return DATA_PLATFORM_DIR / Path("".join([self.name, ".csv"]))
+
     def load(self) -> list[Any]:
         if not self.filepath.exists():
-            self.save()
+            self.fetch_online()
         return IEEERegistryReader.load_file(self.filepath, self.model)
 
     def need_updates(self, inform_if_synced_about_expiration: bool = False) -> bool:
@@ -149,20 +162,17 @@ class IEEERegistry:
 
         return f_not_exists or expires <= now
 
-    def save(self) -> bool | None:
+    def fetch_online(self) -> bool:
         attempts = 1
         max_attempts = 3
 
         while attempts <= max_attempts:
             try:
                 if etherlyzer_knobs.show_sync_messages:
-                    print(f"Saving Registry: {self.name}")
+                    print(f"Fetching Registry: {self.name}")
 
                 res = requests.get(
-                    headers=self.req_headers(),
-                    url=self.url,
-                    timeout=20,
-                    stream=True,
+                    headers=self.req_headers(), url=self.url, timeout=20, stream=True
                 )
                 res.raise_for_status()
 
@@ -175,7 +185,7 @@ class IEEERegistry:
                         unit="B",
                         unit_scale=True,
                         unit_divisor=1024,
-                        desc=f"Saving {self.name}",
+                        desc=f"Fetching {self.name}",
                         disable=not etherlyzer_knobs.show_sync_messages,
                     ) as progress,
                 ):
@@ -184,13 +194,29 @@ class IEEERegistry:
                             f.write(chunk)
                             progress.update(len(chunk))
 
-                return None
+                return True
+            except requests.exceptions.HTTPError as exc:
+                status_code = exc.response.status_code if exc.response is not None else None
 
-            except RequestException:
+                if status_code not in RETRYABLE_STATUS_CODES:
+                    print(f"Non-retryable HTTP error: {status_code}")
+                    return False
+
+                if etherlyzer_knobs.show_sync_messages:
+                    print(
+                        f"HTTP {status_code}: retryable failure (attempt {attempts}/{max_attempts})"
+                    )
+                attempts += 1
+            except (
+                requests.exceptions.Timeout,
+                requests.exceptions.ConnectionError,
+            ):
                 if etherlyzer_knobs.show_sync_messages:
                     print(f"Request timed out on attempt {attempts} of {max_attempts}.")
 
                 attempts += 1
+            except RequestException as exc:
+                raise RuntimeError(f"Request failed due to {exc}") from exc
 
         print(
             f"Unable to retrieve the registry '{self.name}' "

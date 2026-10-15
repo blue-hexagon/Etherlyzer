@@ -127,7 +127,7 @@ class Catalog:
             if (
                 check_for_updates and registry.need_updates(inform_if_synced_about_expiration)
             ) or not self.db_is_initialized():
-                status = registry.save()
+                status = registry.fetch_online()
                 if status is False:
                     break
         return list(self.IEEE_REGISTRIES.values())
