@@ -1,6 +1,6 @@
 from etherlyzer.exporter import RegistryMatchExporter
-from etherlyzer.ieee.catalog import Catalog
-from etherlyzer.ieee.index import IEEEIndex
+from etherlyzer.ieee.registry.catalog import Catalog
+from etherlyzer.ieee.registry.index import IEEEIndex
 
 if __name__ == "__main__":
     import time

@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from etherlyzer.ieee.catalog import Catalog
-from etherlyzer.ieee.index import IEEEIndex
+from etherlyzer.ieee.registry.catalog import Catalog
+from etherlyzer.ieee.registry.index import IEEEIndex
 from etherlyzer.terminal.utility import read_multiline
 
 

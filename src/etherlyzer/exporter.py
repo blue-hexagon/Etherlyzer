@@ -1,13 +1,13 @@
 import contextlib
 
 from etherlyzer.formatters import MACFormatter
-from etherlyzer.ieee.ieee_registry import IEEEEntry
+from etherlyzer.ieee.entry.mac import MACAllocationEntry
 from etherlyzer.util.knobs import etherlyzer_knobs
 
 
 class RegistryMatchExporter:
     @staticmethod
-    def export_csv_to_console(entries: list[IEEEEntry]) -> None:
+    def export_csv_to_console(entries: list[MACAllocationEntry]) -> None:
         for entry in entries:
             with contextlib.suppress(AttributeError):
                 print(
@@ -19,7 +19,7 @@ class RegistryMatchExporter:
                 )
 
     @staticmethod
-    def export_humanized_to_console(entries: list[IEEEEntry]) -> None:
+    def export_humanized_to_console(entries: list[MACAllocationEntry]) -> None:
         for entry in entries:
             mac = MACFormatter.format_default(entry.assignment)
             with contextlib.suppress(AttributeError):

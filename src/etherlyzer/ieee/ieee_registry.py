@@ -1,7 +1,5 @@
 import datetime
-import re
-from dataclasses import astuple, dataclass, field, fields
-from enum import StrEnum
+from dataclasses import dataclass, field
 from http import HTTPStatus
 from pathlib import Path
 from typing import Any
@@ -10,57 +8,12 @@ import requests
 from requests import RequestException
 from tqdm import tqdm
 
-from etherlyzer.ieee.csv_parser import IEEERegistryReader
+from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
+from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.ieee.registry.category import RegistryCategory
+from etherlyzer.ieee.registry.parser import IEEERegistryReader
 from etherlyzer.util.dirs import DATA_PLATFORM_DIR
 from etherlyzer.util.knobs import etherlyzer_knobs
-
-
-class RegCategory(StrEnum):
-    MAC = "mac"  # IAB, MA-L, MA-M, MA-S
-    PROTOCOL = "protocol"  # Ethertype
-    IDENTIFIER = "identifier"  # CID
-
-
-@dataclass(frozen=True, slots=True)
-class BaseEntry:
-    @classmethod
-    def get_header(cls) -> list[str]:
-        return [f.name for f in fields(cls)]
-
-    def get_row(self) -> tuple[str, ...]:
-        return astuple(self)
-
-    def __hash__(self) -> int:
-        return hash(astuple(self))
-
-
-@dataclass(frozen=True, slots=True)
-class IEEEEntry(BaseEntry):
-    registry: str
-    assignment: str
-    organization_name: str
-    organization_address: str
-
-    def registry_short_str(self) -> str:
-        return self.registry.replace("-", "")[2:]
-
-    def short_name(self) -> str:
-        return re.sub(r"(,.*|Co.*)$", "", self.organization_name).strip()
-
-    def format_vendor_addr(self) -> list[str]:
-        addr_representation = []
-        for addr_outer in self.organization_address.split(","):
-            addr = addr_outer.split("  ")
-            for line in addr:
-                if line:
-                    addr_representation.append(line.strip())
-        return addr_representation
-
-
-@dataclass(frozen=True, slots=True)
-class EtherTypeEntry(IEEEEntry):
-    protocol: str
-
 
 RETRYABLE_STATUS_CODES = {
     HTTPStatus.REQUEST_TIMEOUT,
@@ -82,11 +35,11 @@ class IEEERegistry:
 
     enabled: bool
     name: str
-    model: type[IEEEEntry] | type[EtherTypeEntry]
+    model: type[MACAllocationEntry] | type[EtherTypeEntry]
     full_name: str
     url: str
 
-    category: RegCategory
+    category: RegistryCategory
 
     legacy: bool
 
@@ -113,15 +66,15 @@ class IEEERegistry:
 
     @property
     def is_mac_registry(self) -> bool:
-        return self.category is RegCategory.MAC
+        return self.category is RegistryCategory.MAC_REGISTRY
 
     @property
     def is_protocol_registry(self) -> bool:
-        return self.category is RegCategory.PROTOCOL
+        return self.category is RegistryCategory.PROTOCOL_REGISTRY
 
     @property
     def is_identifier_registry(self) -> bool:
-        return self.category is RegCategory.IDENTIFIER
+        return self.category is RegistryCategory.IDENTIFIER_REGISTRY
 
     @property
     def assignment_length(self) -> int:

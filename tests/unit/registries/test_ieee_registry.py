@@ -6,11 +6,11 @@ import pytest
 import requests
 
 import etherlyzer.ieee.ieee_registry as registry_module
+from etherlyzer.ieee.entry.mac import MACAllocationEntry
 from etherlyzer.ieee.ieee_registry import (
-    IEEEEntry,
     IEEERegistry,
-    RegCategory,
 )
+from etherlyzer.ieee.registry.category import RegistryCategory
 
 
 @pytest.fixture
@@ -27,10 +27,10 @@ def ieee_registry(
     return IEEERegistry(
         enabled=True,
         name="MA-L",
-        model=IEEEEntry,
+        model=MACAllocationEntry,
         full_name="Test IEEE Registry",
         url="https://example.com/registry.csv",
-        category=RegCategory.MAC,
+        category=RegistryCategory.MAC_REGISTRY,
         legacy=False,
         description="Testing Registry",
         update_interval=datetime.timedelta(days=28),
@@ -57,7 +57,7 @@ def test_database_automatically_synchronizes_if_one_file_is_not_found(
     mocked_save.assert_called_once_with()
     mocked_load.assert_called_once_with(
         ieee_registry.filepath,
-        IEEEEntry,
+        MACAllocationEntry,
     )
     assert result == []
 
@@ -99,7 +99,7 @@ MA-L,644C69,CONPROVE,"75, Visconde de Ouro Preto St. Uberlândia Minas Gerais BR
     mocked_fetch = Mock()
     monkeypatch.setattr(ieee_registry, "fetch_online", mocked_fetch)
 
-    entries: list[IEEEEntry] = ieee_registry.load()
+    entries: list[MACAllocationEntry] = ieee_registry.load()
 
     assert len(entries) == 11
     assert entries[4].assignment == "20F83B"

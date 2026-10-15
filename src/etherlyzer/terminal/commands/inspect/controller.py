@@ -4,10 +4,10 @@ import argparse
 from dataclasses import dataclass
 
 from etherlyzer.formatters import MACFormatter
-from etherlyzer.ieee.catalog import Catalog
-from etherlyzer.ieee.eui48_classifier import classify_mac
-from etherlyzer.ieee.ieee_registry import RegCategory
-from etherlyzer.ieee.index import IEEEIndex
+from etherlyzer.ieee.analytics.mac_classification import classify_mac
+from etherlyzer.ieee.registry.catalog import Catalog
+from etherlyzer.ieee.registry.category import RegistryCategory
+from etherlyzer.ieee.registry.index import IEEEIndex
 from etherlyzer.terminal.commands.inspect.types.display import show_cid_registration
 from etherlyzer.terminal.commands.inspect.types.ethertype_inspection import inspect_ethertype
 from etherlyzer.terminal.commands.inspect.types.mac_inspection import inspect_ieee_quadrants
@@ -33,12 +33,12 @@ def run(args: argparse.Namespace) -> int:
     )
 
     match args.type.lower():
-        case RegCategory.MAC.value:
+        case RegistryCategory.MAC_REGISTRY.value:
             return inspect_ieee_quadrants(args, index, eval_flags)
-        case RegCategory.PROTOCOL.value:
+        case RegistryCategory.PROTOCOL_REGISTRY.value:
             entry = index.get_single(index.protocol_index, args.value)
             inspect_ethertype(args, entry, index)
-        case RegCategory.IDENTIFIER.value:
+        case RegistryCategory.IDENTIFIER_REGISTRY.value:
             entry = index.get_single(index.identifier_index, args.value)
             norm = MACFormatter.normalize(args.value)
             slap = classify_mac(args.value).slap_quadrant
@@ -77,7 +77,7 @@ Examples:
         "-t",
         "--type",
         type=str,
-        choices=list(RegCategory),
+        choices=list(RegistryCategory),
         default="mac",
         metavar="{mac|protocol|identifier}",
         help="IEEE registry category to search (default: mac).",

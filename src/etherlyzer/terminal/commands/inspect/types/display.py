@@ -4,21 +4,22 @@ import argparse
 from typing import TYPE_CHECKING
 
 from etherlyzer.formatters import MACFormatter
-from etherlyzer.ieee.analytics import get_vendor_total_addr_space
-from etherlyzer.ieee.eui48_classifier import (
+from etherlyzer.ieee.analytics.allocations import get_vendor_total_addr_space
+from etherlyzer.ieee.analytics.mac_classification import (
     Administration,
     DeliveryType,
     MACClassification,
     SLAPQuadrant,
 )
-from etherlyzer.ieee.ieee_registry import IEEEEntry, IEEERegistry
-from etherlyzer.ieee.index import IEEEIndex
+from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.ieee.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.index import IEEEIndex
 
 if TYPE_CHECKING:
     from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags
 
 
-def display_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]) -> None:
+def display_associated_block_counts(vendor_correlated_entries: list[MACAllocationEntry]) -> None:
     tot_blocks, tot_addr, iab_alloc, mal_alloc, mam_alloc, mas_alloc = get_vendor_total_addr_space(
         vendor_correlated_entries
     )
@@ -41,7 +42,7 @@ def display_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]) 
 
 
 def display_all_vendor_blocks(
-    args: argparse.Namespace, vendor_correlated_entries: list[IEEEEntry]
+    args: argparse.Namespace, vendor_correlated_entries: list[MACAllocationEntry]
 ) -> None:
     if args.show_vendor_blocks:
         fmt_vendorblocks_width_count = 0
@@ -51,7 +52,7 @@ def display_all_vendor_blocks(
         for entry in vendor_correlated_entries:
             fmt_vendorblocks_width_count += fmt_vendorblocks_width_increment
             print(
-                f"      [{entry.registry_short_str()}] {MACFormatter.format_default(entry.assignment)}",
+                f"      [{entry.registry_id()}] {MACFormatter.format_default(entry.assignment)}",
                 end="",
             )
             if fmt_vendorblocks_width_count >= fmt_vendorblocks_max_width:  # max width
@@ -61,7 +62,7 @@ def display_all_vendor_blocks(
             print()  # Required exactly here.
 
 
-def display_registration(entry: IEEEEntry, reg: IEEERegistry) -> None:
+def display_registration(entry: MACAllocationEntry, reg: IEEERegistry) -> None:
     stuffed_input_0 = MACFormatter.format_with_stuffed_hex(entry.assignment, "0")
     sutffed_input_f = MACFormatter.format_with_stuffed_hex(entry.assignment, "f")
     print("\nIEEE Registry")
@@ -76,12 +77,12 @@ def display_registration(entry: IEEEEntry, reg: IEEERegistry) -> None:
         print(f"  Address Capacity    : {reg.address_count:,}")
 
 
-def display_organization(entry: IEEEEntry, short_orgname: str) -> None:
+def display_organization(entry: MACAllocationEntry, short_orgname: str) -> None:
     print("\nOrganization")
     print(f"  Name              : {short_orgname}")
     print(f"  Full Name         : {entry.organization_name}")
     print("  Address")
-    for addr_piece in entry.format_vendor_addr():
+    for addr_piece in entry.format_vendor_address():
         print(f"    {addr_piece}")
 
 
@@ -220,7 +221,7 @@ def show_cid_registration(index: IEEEIndex, normalized: str, slap: SLAPQuadrant)
         if cid_entry is not None:
             print(f"      Organization   : {cid_entry.organization_name}")
             print("      Address")
-            for address_piece in cid_entry.format_vendor_addr():
+            for address_piece in cid_entry.format_vendor_address():
                 print(f"        {address_piece}")
 
         else:

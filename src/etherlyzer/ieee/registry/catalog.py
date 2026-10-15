@@ -1,6 +1,9 @@
 from typing import ClassVar
 
-from etherlyzer.ieee.ieee_registry import EtherTypeEntry, IEEEEntry, IEEERegistry, RegCategory
+from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
+from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.ieee.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.category import RegistryCategory
 
 
 class Catalog:
@@ -8,10 +11,10 @@ class Catalog:
         "mal": IEEERegistry(
             enabled=True,
             name="MA-L",
-            model=IEEEEntry,
+            model=MACAllocationEntry,
             full_name="MAC Address Block Large",
             legacy_name="OUI",
-            category=RegCategory.MAC,
+            category=RegistryCategory.MAC_REGISTRY,
             prefix_bits=24,
             address_bits=24,
             address_count=16_777_216,
@@ -26,10 +29,10 @@ class Catalog:
         "mam": IEEERegistry(
             enabled=True,
             name="MA-M",
-            model=IEEEEntry,
+            model=MACAllocationEntry,
             full_name="MAC Address Block Medium",
             legacy_name="OUI-28",
-            category=RegCategory.MAC,
+            category=RegistryCategory.MAC_REGISTRY,
             prefix_bits=28,
             address_bits=20,
             address_count=1_048_576,
@@ -43,10 +46,10 @@ class Catalog:
         "mas": IEEERegistry(
             enabled=True,
             name="MA-S",
-            model=IEEEEntry,
+            model=MACAllocationEntry,
             full_name="MAC Address Block Small",
             legacy_name="OUI-36",
-            category=RegCategory.MAC,
+            category=RegistryCategory.MAC_REGISTRY,
             prefix_bits=36,
             address_bits=12,
             address_count=4_096,
@@ -60,10 +63,10 @@ class Catalog:
         "cid": IEEERegistry(
             enabled=True,
             name="CID",
-            model=IEEEEntry,
+            model=MACAllocationEntry,
             full_name="Company Identifier",
             legacy_name=None,
-            category=RegCategory.IDENTIFIER,
+            category=RegistryCategory.IDENTIFIER_REGISTRY,
             legacy=False,
             description=(
                 "Unique company identifiers assigned by IEEE. Identifies "
@@ -74,10 +77,10 @@ class Catalog:
         "iab": IEEERegistry(
             enabled=True,
             name="IAB",
-            model=IEEEEntry,
+            model=MACAllocationEntry,
             full_name="Individual Address Block",
             legacy_name=None,
-            category=RegCategory.MAC,
+            category=RegistryCategory.MAC_REGISTRY,
             prefix_bits=36,
             address_bits=12,
             address_count=4_096,
@@ -94,7 +97,7 @@ class Catalog:
             model=EtherTypeEntry,
             full_name="EtherType Registry",
             legacy_name=None,
-            category=RegCategory.PROTOCOL,
+            category=RegistryCategory.PROTOCOL_REGISTRY,
             legacy=False,
             description=(
                 "Registry mapping EtherType values to Ethernet protocols, "

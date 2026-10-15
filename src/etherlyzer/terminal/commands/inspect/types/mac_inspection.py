@@ -1,15 +1,15 @@
 import argparse
 from typing import TYPE_CHECKING, TypedDict
 
-from etherlyzer.ieee.catalog import Catalog
-from etherlyzer.ieee.eui48_classifier import (
+from etherlyzer.ieee.analytics.mac_classification import (
     Administration,
     DeliveryType,
     MACClassification,
     SLAPQuadrant,
     classify_mac,
 )
-from etherlyzer.ieee.index import IEEEIndex
+from etherlyzer.ieee.registry.catalog import Catalog
+from etherlyzer.ieee.registry.index import IEEEIndex
 
 if TYPE_CHECKING:
     from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags

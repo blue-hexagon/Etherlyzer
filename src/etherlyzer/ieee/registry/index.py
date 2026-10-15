@@ -4,7 +4,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol, TypeVar
 
-from etherlyzer.ieee.ieee_registry import EtherTypeEntry, IEEEEntry, IEEERegistry, RegCategory
+from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
+from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.ieee.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.category import RegistryCategory
 
 HEX_DIGITS = frozenset("0123456789ABCDEF")
 
@@ -12,17 +15,17 @@ T = TypeVar("T")
 
 
 class IEEEIndexProtocol(Protocol):
-    def get_many(self, identifier: str) -> list[IEEEEntry | EtherTypeEntry] | None: ...
-    def get_one(self, identifier: str) -> IEEEEntry | EtherTypeEntry | None: ...
+    def get_many(self, identifier: str) -> list[MACAllocationEntry | EtherTypeEntry] | None: ...
+    def get_one(self, identifier: str) -> MACAllocationEntry | EtherTypeEntry | None: ...
 
 
 @dataclass(slots=True)
 class MACAllocationIndex(IEEEIndexProtocol):
-    prefixes_36: dict[str, IEEEEntry] = field(default_factory=dict)
-    prefixes_28: dict[str, IEEEEntry] = field(default_factory=dict)
-    prefixes_24: dict[str, IEEEEntry] = field(default_factory=dict)
+    prefixes_36: dict[str, MACAllocationEntry] = field(default_factory=dict)
+    prefixes_28: dict[str, MACAllocationEntry] = field(default_factory=dict)
+    prefixes_24: dict[str, MACAllocationEntry] = field(default_factory=dict)
 
-    def insert(self, registry: IEEERegistry, entries: Iterable[IEEEEntry]) -> None:
+    def insert(self, registry: IEEERegistry, entries: Iterable[MACAllocationEntry]) -> None:
         match registry.prefix_bits:
             case 36:
                 target = self.prefixes_36
@@ -35,7 +38,7 @@ class MACAllocationIndex(IEEEIndexProtocol):
 
         target.update({entry.assignment.upper(): entry for entry in entries})
 
-    def get_one(self, identifier: str) -> IEEEEntry | None:
+    def get_one(self, identifier: str) -> MACAllocationEntry | None:
         mac = "".join(c for c in identifier.upper() if c in HEX_DIGITS)
 
         # Order is important - longest prefix match
@@ -53,7 +56,7 @@ class MACAllocationIndex(IEEEIndexProtocol):
 
 @dataclass(slots=True)
 class VendorIndex(IEEEIndexProtocol):
-    vendors: dict[str, list[IEEEEntry]] = field(default_factory=dict)
+    vendors: dict[str, list[MACAllocationEntry]] = field(default_factory=dict)
 
     @staticmethod
     def normalize_vendor_name(name: str) -> str:
@@ -62,13 +65,13 @@ class VendorIndex(IEEEIndexProtocol):
         name = re.sub(r"\s+", " ", name)
         return name.strip()
 
-    def insert(self, entry: IEEEEntry) -> None:
+    def insert(self, entry: MACAllocationEntry) -> None:
         key = self.normalize_vendor_name(
             entry.organization_name,
         )
         self.vendors.setdefault(key, []).append(entry)
 
-    def get_many(self, identifier: str) -> list[IEEEEntry] | None:
+    def get_many(self, identifier: str) -> list[MACAllocationEntry] | None:
         ieee_mac_entries = self.vendors.get(
             self.normalize_vendor_name(identifier),
         )
@@ -99,11 +102,11 @@ class ProtocolIndex(IEEEIndexProtocol):
 
 @dataclass(slots=True)
 class IdentifierIndex(IEEEIndexProtocol):
-    cid: dict[str, IEEEEntry] = field(default_factory=dict)
-    opid: dict[str, IEEEEntry] = field(default_factory=dict)
-    manid: dict[str, IEEEEntry] = field(default_factory=dict)
+    cid: dict[str, MACAllocationEntry] = field(default_factory=dict)
+    opid: dict[str, MACAllocationEntry] = field(default_factory=dict)
+    manid: dict[str, MACAllocationEntry] = field(default_factory=dict)
 
-    def insert(self, registry: IEEERegistry, entries: Iterable[IEEEEntry]) -> None:
+    def insert(self, registry: IEEERegistry, entries: Iterable[MACAllocationEntry]) -> None:
         match registry.name:
             case "CID":
                 target = self.cid
@@ -116,7 +119,7 @@ class IdentifierIndex(IEEEIndexProtocol):
 
         target.update({entry.assignment.upper(): entry for entry in entries})
 
-    def get_one(self, identifier: str) -> IEEEEntry | None:
+    def get_one(self, identifier: str) -> MACAllocationEntry | None:
         identifier = identifier.upper()
         return self.cid.get(identifier) or self.opid.get(identifier) or self.manid.get(identifier)
 
@@ -140,13 +143,13 @@ class IEEEIndex:
             entries = registry.load()
 
             match registry.category:
-                case RegCategory.MAC:
+                case RegistryCategory.MAC_REGISTRY:
                     index.mac_index.insert(registry, entries)
 
-                case RegCategory.PROTOCOL:
+                case RegistryCategory.PROTOCOL_REGISTRY:
                     index.protocol_index.insert(entries)
 
-                case RegCategory.IDENTIFIER:
+                case RegistryCategory.IDENTIFIER_REGISTRY:
                     index.identifier_index.insert(registry, entries)
 
                 case _:
@@ -164,7 +167,7 @@ class IEEEIndex:
         index.vendor_index = v_index
         return index
 
-    def get_from_mac_index(self, mac: str) -> IEEEEntry | None:
+    def get_from_mac_index(self, mac: str) -> MACAllocationEntry | None:
         return self.mac_index.get_one(mac)
 
     def get_from_ethertype_index(self, ethertype: str) -> EtherTypeEntry | None:
@@ -173,16 +176,16 @@ class IEEEIndex:
             raise RuntimeError()
         return ret
 
-    def get_identifier(self, identifier: str) -> IEEEEntry | None:
+    def get_identifier(self, identifier: str) -> MACAllocationEntry | None:
         return self.identifier_index.get_one(identifier)
 
     @staticmethod
     def get_many(
         ieee_index: MACAllocationIndex | IdentifierIndex | ProtocolIndex | VendorIndex,
         path_or_text: Path | str | list[str],
-    ) -> list[IEEEEntry]:
+    ) -> list[MACAllocationEntry]:
         # Pass a list[str] from interactive or pass a Path or str (path)
-        ieee_entries_as_set: set[IEEEEntry] = set()
+        ieee_entries_as_set: set[MACAllocationEntry] = set()
 
         if isinstance(path_or_text, Path):
             with open(path_or_text) as f:
@@ -194,7 +197,7 @@ class IEEEIndex:
             if ieee_entry:
                 ieee_entries_as_set.add(ieee_entry)
 
-        ieee_entries: list[IEEEEntry] = list(ieee_entries_as_set)
+        ieee_entries: list[MACAllocationEntry] = list(ieee_entries_as_set)
         # Sort by name, and then by registry-name reversed
         ieee_entries = sorted(ieee_entries, key=lambda e: e.organization_name)
         ieee_entries = sorted(ieee_entries, key=lambda e: e.registry, reverse=True)
@@ -204,7 +207,7 @@ class IEEEIndex:
     @staticmethod
     def get_single(
         indextype: VendorIndex | MACAllocationIndex | IdentifierIndex | ProtocolIndex, mac: str
-    ) -> IEEEEntry | list[IEEEEntry] | None:
+    ) -> MACAllocationEntry | list[MACAllocationEntry] | None:
         ieee_entry = indextype.get_one(mac)
         if ieee_entry:
             return ieee_entry

@@ -28,8 +28,6 @@ class MACClassification:
     is_broadcast: bool
     is_zero: bool
     slap_quadrant: SLAPQuadrant | None
-    normalized: str
-    normalized_pad0: str
 
 
 def classify_mac(mac: str) -> MACClassification:
@@ -62,6 +60,4 @@ def classify_mac(mac: str) -> MACClassification:
         is_broadcast=mac_int == 0xFFFFFFFFFFFF and len(normalized) == 12,
         is_zero=mac_int == 0 and len(normalized) == 12,
         slap_quadrant=quadrant,
-        normalized=normalized,
-        normalized_pad0=normalized_padded,
     )

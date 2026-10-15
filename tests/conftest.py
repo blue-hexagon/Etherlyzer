@@ -1,6 +1,6 @@
 import pytest
 
-from etherlyzer.ieee.catalog import Catalog
+from etherlyzer.ieee.registry.catalog import Catalog
 
 
 @pytest.fixture

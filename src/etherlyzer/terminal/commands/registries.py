@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 
 from etherlyzer import __version__
-from etherlyzer.ieee.catalog import Catalog
+from etherlyzer.ieee.registry.catalog import Catalog
 
 
 def run(args: argparse.Namespace) -> int:

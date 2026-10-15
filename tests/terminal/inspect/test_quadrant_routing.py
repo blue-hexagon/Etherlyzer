@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
-from etherlyzer.ieee.eui48_classifier import classify_mac
+from etherlyzer.ieee.analytics.mac_classification import classify_mac
 from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags
 from etherlyzer.terminal.commands.inspect.types import mac_inspection
 from etherlyzer.terminal.commands.inspect.types.mac_inspection import inspect_ieee_quadrants
