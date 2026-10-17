@@ -7,8 +7,26 @@ from etherlyzer.terminal.utility import read_multiline
 
 
 def run(args: argparse.Namespace) -> int:
-    macs = read_multiline(linetype="MAC addresses") if args.bulk else [args.mac]
+    if args.linenumbers and not args.bulk:
+        raise argparse.ArgumentError(None, "--linenumbers requires --bulk")
+    linenumber = 0
+
+    macs = (
+        read_multiline(linetype="MAC addresses", skip_empty_lines=False)
+        if args.bulk
+        else [args.mac]
+    )
+    padding = (
+        len(
+            str(len(macs)),
+        )
+        + 2
+    )  # Decimal count + spacing
+
     for mac in macs:
+        if args.linenumbers:
+            linenumber += 1
+            print(f"{linenumber}.".ljust(padding, " "), end="")
         print(
             MACFormatter.format_custom(
                 mac=mac,
@@ -56,6 +74,12 @@ Examples:
         "--bulk",
         action="store_true",
         help="Read multiple MAC addresses interactively.",
+    )
+    parser.add_argument(
+        "-l",
+        "--linenumbers",
+        action="store_true",
+        help="Prefix output lines with their corresponding input line number.",
     )
 
     parser.add_argument(

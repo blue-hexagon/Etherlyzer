@@ -42,6 +42,7 @@ class MACFormatter:
 
     @classmethod
     def format_default(cls, mac: str) -> str:
+        """Formats a MAC address according to how etherlyze_knobs is configured ."""
         mac = cls.normalize(mac)
         mac = etherlyzer_knobs.mac_separator.join(
             mac[i : i + etherlyzer_knobs.mac_block_size]
@@ -52,6 +53,7 @@ class MACFormatter:
 
     @classmethod
     def format_with_stuffed_hex(cls, mac: str, stuffed_hex: str) -> str:
+        """Pad with extra hex-decimals"""
         mac = (cls.normalize(mac) + 12 * stuffed_hex)[:12]
         return cls.format_default(mac)
 
@@ -64,6 +66,7 @@ class MACFormatter:
         case: Literal["upper", "lower"],
         fix_typos: bool = False,
     ) -> str:
+        """Custom MAC address formatting"""
         if fix_typos:
             mac = cls.fix_typos(mac)
         mac = cls.normalize(mac)
