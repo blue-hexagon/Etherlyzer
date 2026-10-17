@@ -1,6 +1,12 @@
-from etherlyzer.ieee.ieee_registry import EtherTypeEntry
+import argparse
+
+from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
+from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.ieee.registry.index import IEEEIndex
 
 
-def inspect_ethertype(args, entry, index):
+def inspect_ethertype(
+    args: argparse.Namespace, entry: MACAllocationEntry, index: IEEEIndex
+) -> None:
     if isinstance(entry, EtherTypeEntry):
         print(f"  Protocol    : {entry.protocol}")

@@ -1,6 +1,6 @@
 from enum import StrEnum
 from string import punctuation
-from typing import Literal
+from typing import ClassVar, Literal
 
 from etherlyzer.util.knobs import etherlyzer_knobs
 
@@ -21,7 +21,7 @@ class MacMaskLetter(StrEnum):
 class MACFormatter:
     HEX_DIGITS = frozenset("0123456789ABCDEFabcdef")
     VALID_SEPERATORS = frozenset(" -.:")
-    STRICT_TYPOS: dict[str, str] = {" ": "", "\t": ""}
+    STRICT_TYPOS: ClassVar[dict[str, str]] = {" ": "", "\t": ""}
     RELAXED_TYPOS: dict[str, str] = {  # noqa: RUF012
         **STRICT_TYPOS,
         "o": "0",
@@ -48,7 +48,7 @@ class MACFormatter:
             for i in range(0, len(mac), etherlyzer_knobs.mac_block_size)
         )
 
-        return getattr(mac, etherlyzer_knobs.mac_case.value)()
+        return str(getattr(mac, etherlyzer_knobs.mac_case.value)())
 
     @classmethod
     def format_with_stuffed_hex(cls, mac: str, stuffed_hex: str) -> str:
@@ -79,10 +79,10 @@ class MACFormatter:
         valid_letter_count = 0
         typo_count = 0
 
-        def valid_norm_mac_check():
+        def valid_norm_mac_check() -> bool:
             return valid_letter_count + typo_count < 12
 
-        for idx, ch in enumerate(in_addr):
+        for _, ch in enumerate(in_addr):
             if ch in cls.HEX_DIGITS:
                 if valid_norm_mac_check():
                     normalized_mac += ch.lower()
@@ -122,7 +122,7 @@ class MACFormatter:
 
     @classmethod
     def mask_is_valid(cls, mask: str) -> bool:
-        return len(mask) == 12 and all([ch == "v" for ch in mask])
+        return len(mask) == 12 and all([ch == "v" for ch in mask])  # noqa
 
     @classmethod
     def normalize(cls, mac: str) -> str:

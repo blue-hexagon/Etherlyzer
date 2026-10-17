@@ -493,6 +493,7 @@ license-expression = ">=30,<31"
 packageurl-python = ">=0.11,<2"
 py-serializable = ">=2.1.0,<3.0.0"
 sortedcontainers = ">=2.4.0,<3.0.0"
+typing_extensions = {version = ">=4.6,<5.0", markers = "python_version < \"3.13\""}
 
 [package.extras]
 json-validation = ["jsonschema[format-nongpl] (>=4.25,<5.0)", "referencing (>=0.28.4)"]
@@ -1420,7 +1421,10 @@ files = [
 ]
 
 [package.dependencies]
-numpy = {version = ">=2.3.3", markers = "python_version >= \"3.14\""}
+numpy = [
+    {version = ">=1.26.0", markers = "python_version < \"3.14\""},
+    {version = ">=2.3.3", markers = "python_version >= \"3.14\""},
+]
 python-dateutil = ">=2.8.2"
 tzdata = {version = "*", markers = "sys_platform == \"win32\" or sys_platform == \"emscripten\""}
 
@@ -2235,6 +2239,7 @@ files = [
 
 [package.dependencies]
 anyio = ">=4.0.0,<5"
+typing-extensions = {version = ">=4.10.0", markers = "python_version < \"3.13\""}
 
 [package.extras]
 full = ["httpx (>=0.27.0,<0.29.0)", "httpx2 (>=2.0.0)", "itsdangerous", "jinja2", "opentelemetry-api", "python-multipart (>=0.0.18)", "pyyaml"]
@@ -2652,5 +2657,5 @@ files = [
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.14,<4"
-content-hash = "e55ca9cbc70d9cd9a287df3a35efde4436ed63ee7f476bcf802425cec8d86047"
+python-versions = ">=3.12,<4"
+content-hash = "85028dae96de7a940e2ffd6c18533a9768716fd4ca6246e32af5a612e179225e"

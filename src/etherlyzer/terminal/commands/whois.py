@@ -3,12 +3,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from etherlyzer.ieee.catalog import Catalog
-from etherlyzer.ieee.index import IEEEIndex
+from etherlyzer.ieee.registry.catalog import Catalog
+from etherlyzer.ieee.registry.index import IEEEIndex
 from etherlyzer.terminal.utility import read_multiline
 
 
-def run(args):
+def run(args: argparse.Namespace) -> int:
     index = IEEEIndex.from_registries(Catalog().get_all_registries())
     if args.mac:
         entry = index.get_single(indextype=index.mac_index, mac=args.mac)
@@ -25,12 +25,12 @@ def run(args):
 
     elif args.interactive:
         data = read_multiline()
-        entries = IEEEIndex.get_bulk(
+        entries = IEEEIndex.get_many(
             ieee_index=index.mac_index,
             path_or_text=data,
         )
     elif args.file:
-        entries = IEEEIndex.get_bulk(
+        entries = IEEEIndex.get_many(
             ieee_index=index.mac_index,
             path_or_text=args.file,
         )
@@ -50,7 +50,7 @@ def run(args):
     return 0
 
 
-def register(subparsers):
+def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser(
         "whois",
         help="Identify IEEE vendors and organizations for MAC addresses.",

@@ -1,9 +1,15 @@
+import argparse
 from types import SimpleNamespace
+from typing import cast
 from unittest.mock import Mock
 
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
 
-from etherlyzer.terminal.commands.inspect.types import mac_inspection as mac_inspection_module
+from etherlyzer.ieee.analytics.mac_classification import classify_mac
+from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags
+from etherlyzer.terminal.commands.inspect.types import mac_inspection
+from etherlyzer.terminal.commands.inspect.types.mac_inspection import inspect_ieee_quadrants
 
 
 @pytest.mark.parametrize(
@@ -20,7 +26,7 @@ from etherlyzer.terminal.commands.inspect.types import mac_inspection as mac_ins
         ("3333ff1", "inspect_local_group"),
     ],
 )
-def test_all_major_branches(monkeypatch, value, destination):
+def test_all_major_branches(monkeypatch: MonkeyPatch, value: str, destination: str) -> None:
     """
     Verify that each valid MAC classification (U/L + I/G) is routed to its
     expected inspection handler without executing that handler.
@@ -32,16 +38,16 @@ def test_all_major_branches(monkeypatch, value, destination):
     mocked_handler = Mock()
 
     monkeypatch.setattr(
-        mac_inspection_module,
+        mac_inspection,
         destination,
         mocked_handler,
     )  # Temporarily replace inspect_universal_individual with a Mock (mocked_handler)
 
     # Run the actual dispatch with `inspect_universal_individual` being temorarily replaced by mocked_handler
-    result = mac_inspection_module.inspect_ieee_quadrants(
-        args,
+    result = inspect_ieee_quadrants(
+        cast(argparse.Namespace, cast(object, args)),
         index,
-        flags,
+        cast(EvaluatedFlags, cast(object, flags)),
     )
     # Should exit with code 0
     assert result == 0
@@ -51,5 +57,5 @@ def test_all_major_branches(monkeypatch, value, destination):
         args=args,
         index=index,
         eval_flags=flags,
-        classified_mac=mac_inspection_module.classify_mac(args.value),
+        classified_mac=classify_mac(args.value),
     )

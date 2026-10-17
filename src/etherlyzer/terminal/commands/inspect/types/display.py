@@ -1,13 +1,25 @@
-from typing import Any
+from __future__ import annotations
+
+import argparse
+from typing import TYPE_CHECKING
 
 from etherlyzer.formatters import MACFormatter
-from etherlyzer.ieee.analytics import get_vendor_total_addr_space
-from etherlyzer.ieee.eui48_classifier import Administration, DeliveryType, SLAPQuadrant
-from etherlyzer.ieee.ieee_registry import IEEEEntry, IEEERegistry
-from etherlyzer.ieee.index import IEEEIndex
+from etherlyzer.ieee.analytics.allocations import get_vendor_total_addr_space
+from etherlyzer.ieee.analytics.mac_classification import (
+    Administration,
+    DeliveryType,
+    MACClassification,
+    SLAPQuadrant,
+)
+from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.index import IEEEIndex
+
+if TYPE_CHECKING:
+    from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags
 
 
-def display_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]):
+def display_associated_block_counts(vendor_correlated_entries: list[MACAllocationEntry]) -> None:
     tot_blocks, tot_addr, iab_alloc, mal_alloc, mam_alloc, mas_alloc = get_vendor_total_addr_space(
         vendor_correlated_entries
     )
@@ -29,7 +41,9 @@ def display_associated_block_counts(vendor_correlated_entries: list[IEEEEntry]):
     print(f"    Capacity         : {iab_alloc.total_addresses:,}")
 
 
-def display_all_vendor_blocks(args, vendor_correlated_entries: list[IEEEEntry]):
+def display_all_vendor_blocks(
+    args: argparse.Namespace, vendor_correlated_entries: list[MACAllocationEntry]
+) -> None:
     if args.show_vendor_blocks:
         fmt_vendorblocks_width_count = 0
         fmt_vendorblocks_max_width = 45
@@ -38,7 +52,7 @@ def display_all_vendor_blocks(args, vendor_correlated_entries: list[IEEEEntry]):
         for entry in vendor_correlated_entries:
             fmt_vendorblocks_width_count += fmt_vendorblocks_width_increment
             print(
-                f"      [{entry.registry_short_str()}] {MACFormatter.format_default(entry.assignment)}",
+                f"      [{entry.registry_id()}] {MACFormatter.format_default(entry.assignment)}",
                 end="",
             )
             if fmt_vendorblocks_width_count >= fmt_vendorblocks_max_width:  # max width
@@ -48,7 +62,7 @@ def display_all_vendor_blocks(args, vendor_correlated_entries: list[IEEEEntry]):
             print()  # Required exactly here.
 
 
-def display_registration(entry, reg: IEEERegistry):
+def display_registration(entry: MACAllocationEntry, reg: IEEERegistry) -> None:
     stuffed_input_0 = MACFormatter.format_with_stuffed_hex(entry.assignment, "0")
     sutffed_input_f = MACFormatter.format_with_stuffed_hex(entry.assignment, "f")
     print("\nIEEE Registry")
@@ -63,16 +77,21 @@ def display_registration(entry, reg: IEEERegistry):
         print(f"  Address Capacity    : {reg.address_count:,}")
 
 
-def display_organization(entry, short_orgname):
+def display_organization(entry: MACAllocationEntry, short_orgname: str) -> None:
     print("\nOrganization")
     print(f"  Name              : {short_orgname}")
     print(f"  Full Name         : {entry.organization_name}")
     print("  Address")
-    for addr_piece in entry.format_vendor_addr():
+    for addr_piece in entry.format_vendor_address():
         print(f"    {addr_piece}")
 
 
-def display_ieee_identifier(args, index: IEEEIndex, eval_flags, classified_mac):
+def display_ieee_identifier(
+    args: argparse.Namespace,
+    index: IEEEIndex,
+    eval_flags: EvaluatedFlags,
+    classified_mac: MACClassification,
+) -> None:
     normalized = MACFormatter.normalize(args.value)
     is_complete = len(normalized) == 12
     mac_entry = None
@@ -82,12 +101,11 @@ def display_ieee_identifier(args, index: IEEEIndex, eval_flags, classified_mac):
         if classified_mac.delivery == DeliveryType.INDIVIDUAL:
             mac_entry = index.get_single(index.mac_index, normalized)
 
-    elif classified_mac.slap_quadrant == SLAPQuadrant.ELI:
-        if len(normalized) >= 6:
-            cid_entry = index.get_single(
-                index.identifier_index,
-                normalized[:6],
-            )
+    elif classified_mac.slap_quadrant == SLAPQuadrant.ELI and len(normalized) >= 6:
+        cid_entry = index.get_single(
+            index.identifier_index,
+            normalized[:6],
+        )
     if classified_mac.is_zero and is_complete:
         assignment = "Not Applicable (Zero Address)"
 
@@ -145,8 +163,13 @@ def display_ieee_identifier(args, index: IEEEIndex, eval_flags, classified_mac):
     print(f"  SLAP Quadrant       : {classified_mac.slap_quadrant}")
 
 
-def display_mac_autopsy(args, index, eval_flags, classified_mac):
-    cid_length = 6
+def display_mac_autopsy(
+    args: argparse.Namespace,
+    index: IEEEIndex,
+    eval_flags: EvaluatedFlags,
+    classified_mac: MACClassification,
+) -> None:
+    cid_length = 6  # noqa: F841 ; TODO
     normalized = MACFormatter.normalize(args.value)
     canonical_mac = MACFormatter.format_custom(
         args.value, block_size=2, separator="-", case="upper"
@@ -158,6 +181,8 @@ def display_mac_autopsy(args, index, eval_flags, classified_mac):
 
     mac_int = int(normalized, 16)
     mac_int_padded = int(normalized.ljust(12, "0"), 16)
+    mac_decimals = list(bytes.fromhex(normalized.replace(":", "")))
+
     first_octet = mac_int_padded >> 40
     ul_bit = (first_octet >> 1) & 1
     ul_bit_addon = (
@@ -178,7 +203,8 @@ def display_mac_autopsy(args, index, eval_flags, classified_mac):
     print(f"    Canonical         : {canonical_mac}")
     print(f"    Bit-Reversed      : {bit_reversed_mac}")
     print(f"    To Hex            : {mac_int:0{len(normalized)}X}")
-    print(f"    To Decimal        : {mac_int:,}")
+    print(f"    To Integer        : {mac_int:,}")
+    print(f"    To Decimals       : {' '.join(map(str, mac_decimals))}")
     print(f"    To Octal          : {mac_int:0{octal_width}o}")
     print(f"    To Binary         : {binary}")
     print(f"    To Bytes          : {mac_int.to_bytes(bit_width // 8, 'big').hex(' ').upper()}")
@@ -188,10 +214,9 @@ def display_mac_autopsy(args, index, eval_flags, classified_mac):
     print("    Special Bits")
     print(f"      U/L             : {ul_bit} {ul_bit_addon}")
     print(f"      I/G             : {ig_bit} {ig_bit_addon}")
-    return 0
 
 
-def show_cid_registration(index, normalized: str, slap: str | Any):
+def show_cid_registration(index: IEEEIndex, normalized: str, slap: SLAPQuadrant) -> None:
     cid_length = 6
     if slap == SLAPQuadrant.ELI:
         cid_entry = index.get_single(indextype=index.identifier_index, mac=normalized[:cid_length])
@@ -199,7 +224,7 @@ def show_cid_registration(index, normalized: str, slap: str | Any):
         if cid_entry is not None:
             print(f"      Organization   : {cid_entry.organization_name}")
             print("      Address")
-            for address_piece in cid_entry.format_vendor_addr():
+            for address_piece in cid_entry.format_vendor_address():
                 print(f"        {address_piece}")
 
         else:

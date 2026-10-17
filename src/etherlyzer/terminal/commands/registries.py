@@ -3,10 +3,10 @@ from __future__ import annotations
 import argparse
 
 from etherlyzer import __version__
-from etherlyzer.ieee.catalog import Catalog
+from etherlyzer.ieee.registry.catalog import Catalog
 
 
-def run(args):
+def run(args: argparse.Namespace) -> int:
     manager = Catalog()
 
     print()
@@ -23,11 +23,11 @@ def run(args):
             f"\nCategory        : {registry.category}"
             f"\nDescription     : {registry.description}"
             f"\nLegacy          : {registry.legacy}"
-            f"\nFile            : {registry.filepath}"
+            f"\nFile            : {registry.registry_cache.filepath}"
             f"\nSource URL      : {registry.url}"
             f"\nPrefix Bits     : {registry.prefix_bits}"
-            f"\nLast Retrieved  : {registry.last_retrieved}"
-            f"\nUpdate Interval : {registry.update_interval}"
+            f"\nLast Retrieved  : {registry.registry_cache.last_retrieved}"
+            f"\nUpdate Interval : {registry.registry_cache.update_interval}"
         )
         print()
 
@@ -36,7 +36,7 @@ def run(args):
     return 0
 
 
-def register(subparsers):
+def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser(
         "registries",
         help="Show local IEEE registry metadata and synchronization status.",

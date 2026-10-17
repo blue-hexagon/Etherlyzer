@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from etherlyzer.ieee.ieee_registry import IEEEEntry
+from etherlyzer.ieee.entry.mac import MACAllocationEntry
 
 
 @dataclass
@@ -9,15 +9,15 @@ class IEEEAllocation:
     total_addresses: int = 0
     total_blocks: int = 0
 
-    def add_addresses(self, added: int):
+    def add_addresses(self, added: int) -> None:
         self.total_addresses += added
 
-    def increment_blocks(self):
+    def increment_blocks(self) -> None:
         self.total_blocks += 1
 
 
 def get_vendor_total_addr_space(
-    vendors_other_blocks: list[IEEEEntry],
+    vendors_other_blocks: list[MACAllocationEntry],
 ) -> tuple[int, int, IEEEAllocation, IEEEAllocation, IEEEAllocation, IEEEAllocation]:
     mal = IEEEAllocation("MA-L")
     mam = IEEEAllocation("MA-M")

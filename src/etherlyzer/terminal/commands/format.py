@@ -6,11 +6,8 @@ from etherlyzer.formatters import MACFormatter
 from etherlyzer.terminal.utility import read_multiline
 
 
-def run(args) -> int:
-    if args.bulk:
-        macs = read_multiline(linetype="MAC addresses")
-    else:
-        macs = [args.mac]
+def run(args: argparse.Namespace) -> int:
+    macs = read_multiline(linetype="MAC addresses") if args.bulk else [args.mac]
     for mac in macs:
         print(
             MACFormatter.format_custom(
@@ -25,7 +22,7 @@ def run(args) -> int:
     return 0
 
 
-def register(subparsers):
+def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser(
         "format",
         help="Correct and normalize MAC address formatting.",

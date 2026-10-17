@@ -63,7 +63,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        return args.func(args)
+        exit_code: int = int(args.func(args))
+        return exit_code
 
     except KeyboardInterrupt:
         print("\nInterrupted.")

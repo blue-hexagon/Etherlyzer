@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 import argparse
 from dataclasses import dataclass
 
 from etherlyzer.formatters import MACFormatter
-from etherlyzer.ieee.catalog import Catalog
-from etherlyzer.ieee.eui48_classifier import classify_mac
-from etherlyzer.ieee.ieee_registry import RegCategory
-from etherlyzer.ieee.index import IEEEIndex
+from etherlyzer.ieee.analytics.mac_classification import classify_mac
+from etherlyzer.ieee.registry.catalog import Catalog
+from etherlyzer.ieee.registry.category import RegistryCategory
+from etherlyzer.ieee.registry.index import IEEEIndex
 from etherlyzer.terminal.commands.inspect.types.display import show_cid_registration
 from etherlyzer.terminal.commands.inspect.types.ethertype_inspection import inspect_ethertype
 from etherlyzer.terminal.commands.inspect.types.mac_inspection import inspect_ieee_quadrants
@@ -19,7 +21,7 @@ class EvaluatedFlags:
     show_vendor_blocks: bool
 
 
-def run(args):
+def run(args: argparse.Namespace) -> int:
     validate_args(args)
 
     registry = Catalog()
@@ -31,16 +33,18 @@ def run(args):
     )
 
     match args.type.lower():
-        case RegCategory.MAC.value:
+        case RegistryCategory.MAC_REGISTRY.value:
             return inspect_ieee_quadrants(args, index, eval_flags)
-        case RegCategory.PROTOCOL.value:
+        case RegistryCategory.PROTOCOL_REGISTRY.value:
             entry = index.get_single(index.protocol_index, args.value)
             inspect_ethertype(args, entry, index)
-        case RegCategory.IDENTIFIER.value:
+        case RegistryCategory.IDENTIFIER_REGISTRY.value:
             entry = index.get_single(index.identifier_index, args.value)
-            show_cid_registration(
-                index, MACFormatter.normalize(args.value), classify_mac(args.value)
-            )
+            norm = MACFormatter.normalize(args.value)
+            slap = classify_mac(args.value).slap_quadrant
+            if slap is None:
+                return 2
+            show_cid_registration(index, norm, slap)
         case _:
             print(f"No valid type ({args.type}) selected.")
             return 1
@@ -50,7 +54,7 @@ def run(args):
     return 0
 
 
-def register(subparsers):
+def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser(
         "inspect",
         help="Inspect an IEEE assignment and display registry, organization, range, and allocation details.",
@@ -73,7 +77,7 @@ Examples:
         "-t",
         "--type",
         type=str,
-        choices=list(RegCategory),
+        choices=list(RegistryCategory),
         default="mac",
         metavar="{mac|protocol|identifier}",
         help="IEEE registry category to search (default: mac).",

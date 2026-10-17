@@ -1,14 +1,13 @@
+from __future__ import annotations
+
 import argparse
 
 from etherlyzer.formatters import MACFormatter
 from etherlyzer.terminal.utility import read_multiline
 
 
-def run(args):
-    if args.bulk:
-        macs = read_multiline(linetype="MAC addresses")
-    else:
-        macs = [args.mac]
+def run(args: argparse.Namespace) -> int:
+    macs = read_multiline(linetype="MAC addresses") if args.bulk else [args.mac]
 
     linenumber = 0
     padding = len(str(len(macs))) + 2
@@ -48,7 +47,7 @@ def run(args):
     return 0
 
 
-def register(subparsers):
+def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser(
         "validate",
         help="Validate and normalize MAC addresses with optional diagnostics and filtering.",

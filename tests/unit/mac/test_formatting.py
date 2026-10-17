@@ -12,7 +12,7 @@ from etherlyzer.formatters import MACFormatter
         ("00 11 22 33 44 55", "00:11:22:33:44:55"),
     ],
 )
-def test_normalizes_mac_formats(value, expected):
+def test_normalizes_mac_formats(value: str, expected: str) -> None:
     assert (
         MACFormatter.format_custom(
             mac=value, block_size=2, separator=":", case="lower", fix_typos=False
