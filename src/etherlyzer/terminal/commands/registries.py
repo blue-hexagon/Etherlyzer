@@ -23,11 +23,11 @@ def run(args: argparse.Namespace) -> int:
             f"\nCategory        : {registry.category}"
             f"\nDescription     : {registry.description}"
             f"\nLegacy          : {registry.legacy}"
-            f"\nFile            : {registry.filepath}"
+            f"\nFile            : {registry.registry_cache.filepath}"
             f"\nSource URL      : {registry.url}"
             f"\nPrefix Bits     : {registry.prefix_bits}"
-            f"\nLast Retrieved  : {registry.last_retrieved}"
-            f"\nUpdate Interval : {registry.update_interval}"
+            f"\nLast Retrieved  : {registry.registry_cache.last_retrieved}"
+            f"\nUpdate Interval : {registry.registry_cache.update_interval}"
         )
         print()
 

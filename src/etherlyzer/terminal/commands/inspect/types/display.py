@@ -12,7 +12,7 @@ from etherlyzer.ieee.analytics.mac_classification import (
     SLAPQuadrant,
 )
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 from etherlyzer.ieee.registry.index import IEEEIndex
 
 if TYPE_CHECKING:
@@ -181,6 +181,8 @@ def display_mac_autopsy(
 
     mac_int = int(normalized, 16)
     mac_int_padded = int(normalized.ljust(12, "0"), 16)
+    mac_decimals = list(bytes.fromhex(normalized.replace(":", "")))
+
     first_octet = mac_int_padded >> 40
     ul_bit = (first_octet >> 1) & 1
     ul_bit_addon = (
@@ -201,7 +203,8 @@ def display_mac_autopsy(
     print(f"    Canonical         : {canonical_mac}")
     print(f"    Bit-Reversed      : {bit_reversed_mac}")
     print(f"    To Hex            : {mac_int:0{len(normalized)}X}")
-    print(f"    To Decimal        : {mac_int:,}")
+    print(f"    To Integer        : {mac_int:,}")
+    print(f"    To Decimals       : {' '.join(map(str, mac_decimals))}")
     print(f"    To Octal          : {mac_int:0{octal_width}o}")
     print(f"    To Binary         : {binary}")
     print(f"    To Bytes          : {mac_int.to_bytes(bit_width // 8, 'big').hex(' ').upper()}")

@@ -2,8 +2,8 @@ from typing import ClassVar
 
 from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.ieee_registry import IEEERegistry
 from etherlyzer.ieee.registry.category import RegistryCategory
+from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 
 
 class Catalog:
@@ -112,7 +112,7 @@ class Catalog:
     def db_is_initialized(cls) -> bool:
         db_init_checks: list[bool] = []
         for registry in cls.IEEE_REGISTRIES.values():
-            db_init_checks.append(registry.filepath.exists())
+            db_init_checks.append(registry.registry_cache.filepath.exists())
         return all(list(db_init_checks))
 
     @staticmethod
@@ -128,9 +128,10 @@ class Catalog:
         for registry in self.IEEE_REGISTRIES.values():
             # If not checking for updates, we still need a present dataset.
             if (
-                check_for_updates and registry.need_updates(inform_if_synced_about_expiration)
+                check_for_updates
+                and registry.registry_cache.need_updates(inform_if_synced_about_expiration)
             ) or not self.db_is_initialized():
-                status = registry.fetch_online()
+                status = registry.registry_downloader.fetch_online()
                 if status is False:
                     break
         return list(self.IEEE_REGISTRIES.values())

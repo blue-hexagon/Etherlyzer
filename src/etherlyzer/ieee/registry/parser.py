@@ -8,7 +8,7 @@ from typing import Any, TypeVar
 T = TypeVar("T")
 
 
-class IEEERegistryReader:
+class RegistryParser:
     """Parses all the IEEE CSV files"""
 
     @staticmethod

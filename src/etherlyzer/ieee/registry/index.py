@@ -6,8 +6,8 @@ from typing import Protocol, TypeVar
 
 from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.ieee_registry import IEEERegistry
 from etherlyzer.ieee.registry.category import RegistryCategory
+from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 
 HEX_DIGITS = frozenset("0123456789ABCDEF")
 

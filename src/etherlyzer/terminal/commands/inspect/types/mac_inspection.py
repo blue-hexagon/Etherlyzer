@@ -150,7 +150,7 @@ def inspect_local_group(
 
 
 def inspect_zero_address(
-    args, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
+    args:argparse.Namespace, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
 ) -> None:
     print("Zero")
 
