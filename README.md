@@ -10,24 +10,31 @@
   <strong>Lightweight Ethernet Address Intelligence Engine</strong>
 </p>
 
-<p>
+<p align="center">
+
+  <!-- Compatibility -->
   <a href="https://pypi.org/project/etherlyzer/">
-    <img src="https://img.shields.io/pypi/v/etherlyzer?label=PyPI" alt="PyPI">
+    <img src="https://img.shields.io/pypi/pyversions/etherlyzer" alt="Python Versions">
   </a>
+
+  <!-- Distribution -->
   <a href="https://pypi.org/project/etherlyzer/">
-    <img src="https://img.shields.io/pypi/pyversions/etherlyzer" alt="Python">
+    <img src="https://img.shields.io/pypi/v/etherlyzer?label=PyPI" alt="PyPI Version">
   </a>
-  <a href="https://github.com/blue-hexagon/etherlyzer/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/blue-hexagon/etherlyzer/tests.yml?branch=main&label=build" alt="Build">
+
+  <!-- Quality -->
+  <a href="https://github.com/blue-hexagon/Etherlyzer/actions/workflows/tests.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/blue-hexagon/Etherlyzer/tests.yml?branch=master&label=tests" alt="Tests">
   </a>
+
+  <!-- Project -->
   <a href="https://etherlyzer.docs.manjana.dev/">
     <img src="https://img.shields.io/badge/docs-online-6f42c1" alt="Documentation">
   </a>
-  <a href="LICENSE">
-    <img src="https://img.shields.io/github/license/blue-hexagon/etherlyzer" alt="License">
+  <a href="https://github.com/blue-hexagon/Etherlyzer/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/blue-hexagon/Etherlyzer" alt="License">
   </a>
 </p>
-
 <p>
   <a href="https://etherlyzer.docs.manjana.dev/"><strong>Documentation</strong></a>
   ·
@@ -42,11 +49,16 @@
 
 A lightweight, offline-first Python toolkit for analyzing Ethernet identifiers and IEEE EUI-48 address allocations.
 
-Etherlyzer goes beyond conventional MAC vendor lookups by combining IEEE registry data, address classification, allocation analysis, and organizational correlation into a unified command-line interface and Python API.
+Etherlyzer goes beyond conventional MAC vendor lookups by combining IEEE registry data, address classification,
+allocation analysis, and organizational correlation into a unified command-line interface and Python API.
 
-Identify the organization behind a MAC address, determine its IEEE-registered allocation, inspect address ranges and allocation capacities, correlate related vendor blocks, resolve EtherTypes, and validate or normalize MAC addresses — all locally, without relying on third-party lookup APIs.
+Identify the organization behind a MAC address, determine its IEEE-registered allocation, inspect address ranges and
+allocation capacities, correlate related vendor blocks, resolve EtherTypes, and validate or normalize MAC addresses —
+all locally, without relying on third-party lookup APIs.
 
-Built for network engineers, security researchers, and developers who need fast, reliable, standards-aware insight into Ethernet addressing.
+Built for network engineers, security researchers, and developers who need fast, reliable, standards-aware insight into
+Ethernet addressing.
+
 ## Why Etherlyzer?
 
 Most MAC lookup tools stop at:
@@ -102,24 +114,68 @@ etherlyzer --version
 ## See what a MAC address really belongs to
 
 ```console
-etherlyzer inspect 00:00:0c:12:34:56
+etherlyzer inspect -xsb 00000f
 ```
 
 ```text
-Organization
-  Name            : Cisco Systems
-  Full Name       : Cisco Systems, Inc
-  Address
-    170 WEST TASMAN DRIVE SAN JOSE CA US 95134-1706
+MAC Address Autopsy
+  Input
+    Value             : 00000f
+    Length            : 24 bits
+  Representations
+    Canonical         : 00-00-0F
+    Bit-Reversed      : 00:00:F0
+    To Hex            : 00000F
+    To Integer        : 15
+    To Decimals       : 0 0 15
+    To Octal          : 00000017
+    To Binary         : 0000.0000.0000.0000.0000.1111
+    To Bytes          : 00 00 0F
+  Address Properties
+    Null Address      : False
+    Broadcast         : False
+    Special Bits
+      U/L             : 0 Universal / Universally Administered
+      I/G             : 0 Individual / Unicast
 
-Registry
-  IEEE Type       : MA-L [MAC Address Block Large]
-  Assignment      : 00-00-0c
-  Range           : 00-00-0c-00-00-00 - 00-00-0c-ff-ff-ff
-  Legacy          : False
-  Prefix Bits     : 24 bits
-  Address Bits    : 24 bits
-  Addresses       : 16,777,216
+IEEE Identifier
+  Type                : Universal Individual Prefix (Registered Block)
+  SLAP Quadrant       : None
+
+IEEE Registry
+  IEEE Type           : MA-L [MAC Address Block Large]
+  Assignment          : 00-00-0f
+  Range               : 00-00-0f-00-00-00 - 00-00-0f-ff-ff-ff
+  Prefix Bits         : 24 bits
+  Address Bits        : 24 bits
+  Legacy              : False
+  Legacy Name         : OUI
+  Address Capacity    : 16,777,216
+
+Associated Allocations
+  Total
+    Blocks           : 1
+    Capacity         : 16,777,216
+  MA-L
+    Blocks           : 1
+    Capacity         : 16,777,216
+  MA-M
+    Blocks           : 0
+    Capacity         : 0
+  MA-S
+    Blocks           : 0
+    Capacity         : 0
+  IAB
+    Blocks           : 0
+    Capacity         : 0
+  Registered Blocks (B=IAB, S=MA-S, M=MA-M, L=MA-L)
+      [L] 00-00-0f
+
+Organization
+  Name              : NEXT
+  Full Name         : NEXT, INC.
+  Address
+    3475 DEER CREEK ROAD PALO ALTO CA US 94304
 ```
 
 Etherlyzer can also correlate the organization against its other known IEEE MAC allocations.
@@ -160,7 +216,8 @@ etherlyzer sync
 
 Etherlyzer maintains synchronized copies of the supported IEEE datasets on the local system.
 
-That means routine lookups do **not** require sending MAC addresses or internal asset data to an external lookup service.
+That means routine lookups do **not** require sending MAC addresses or internal asset data to an external lookup
+service.
 
 This makes Etherlyzer particularly useful for:
 
@@ -177,7 +234,8 @@ Internet access is only required when the IEEE registry datasets need to be refr
 
 The command-line interface is built on the same underlying Python library.
 
-Use Etherlyzer interactively from a terminal, compose it into shell workflows, or integrate its registry, lookup, validation, and formatting capabilities directly into Python applications.
+Use Etherlyzer interactively from a terminal, compose it into shell workflows, or integrate its registry, lookup,
+validation, and formatting capabilities directly into Python applications.
 
 ## Documentation
 
