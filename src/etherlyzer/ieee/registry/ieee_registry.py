@@ -50,7 +50,7 @@ class IEEERegistry[T]:
 
     @property
     def is_protocol_registry(self) -> bool:
-        return self.category is RegistryCategory.PROTOCOL_REGISTRY
+        return self.category is RegistryCategory.ETHERTYPE_REGISTRY
 
     @property
     def is_identifier_registry(self) -> bool:

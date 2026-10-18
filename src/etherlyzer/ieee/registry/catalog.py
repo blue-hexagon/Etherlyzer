@@ -97,7 +97,7 @@ class Catalog:
             model=EtherTypeEntry,
             full_name="EtherType Registry",
             legacy_name=None,
-            category=RegistryCategory.PROTOCOL_REGISTRY,
+            category=RegistryCategory.ETHERTYPE_REGISTRY,
             legacy=False,
             description=(
                 "Registry mapping EtherType values to Ethernet protocols, "

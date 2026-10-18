@@ -13,7 +13,7 @@ from etherlyzer.ieee.analytics.mac_classification import (
 )
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
-from etherlyzer.ieee.registry.index import IEEEIndex
+from etherlyzer.ieee.index.ieee_index import IEEEIndex
 
 if TYPE_CHECKING:
     from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags
