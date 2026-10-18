@@ -1,18 +1,3 @@
-testdata = [
-    "001a2b3c4d5e",
-    "001A2B3C4D5E",
-    "aabbccddeeff",
-    "AABBCCDDEEFF",
-    "000000000000",
-    "ffffffffffff",
-    "FFFFFFFFFFFF",
-    "123456789abc",
-    "ABCDEF123456",
-    "abcdef123456",
-    "020000000001",
-]
-
-
 def read_multiline(
     linetype: str = "text",
     prompt: str = "Paste $1. Type $2 and press <Enter> when done:",
@@ -24,7 +9,7 @@ def read_multiline(
 
     lines = []
 
-    while False:
+    while True:
         line = input()
 
         if line.strip() == delimiter:
@@ -33,7 +18,7 @@ def read_multiline(
             continue
         lines.append(line)
 
-    return testdata
+    return lines
 
 
 def print_table(
