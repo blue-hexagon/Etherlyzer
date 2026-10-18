@@ -63,7 +63,7 @@ myst_substitutions = {
     "project": project,
     "version": version,
     "release": release,
-    "version_badge": f"{{bdg-primary}}`v{version}`",
+    "version_badge": f"{{bdg-light}}`v{version}`",
 }
 pygments_style = "friendly"
 pygments_dark_style = "dracula"
