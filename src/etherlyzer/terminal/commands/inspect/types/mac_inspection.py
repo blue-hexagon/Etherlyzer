@@ -10,8 +10,8 @@ from etherlyzer.ieee.analytics.mac_classification import (
     SLAPQuadrant,
     classify_mac,
 )
+from etherlyzer.ieee.index.ieee_index import IEEEIndexCatalog
 from etherlyzer.ieee.registry.catalog import Catalog
-from etherlyzer.ieee.index.ieee_index import IEEEIndex
 
 if TYPE_CHECKING:
     from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags
@@ -27,14 +27,14 @@ from etherlyzer.terminal.commands.inspect.types.display import (
 
 class InspectionParams(TypedDict):
     args: argparse.Namespace
-    index: IEEEIndex
+    index: IEEEIndexCatalog
     eval_flags: EvaluatedFlags
     classified_mac: MACClassification
 
 
 def inspect_universal_individual(
     args: argparse.Namespace,
-    index: IEEEIndex,
+    index: IEEEIndexCatalog,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
 ) -> bool | None:
@@ -68,7 +68,7 @@ def inspect_universal_individual(
 
 def inspect_universal_group(
     args: argparse.Namespace,
-    index: IEEEIndex,
+    index: IEEEIndexCatalog,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
 ) -> None:
@@ -77,7 +77,7 @@ def inspect_universal_group(
 
 def inspect_local_individual(
     args: argparse.Namespace,
-    index: IEEEIndex,
+    index: IEEEIndexCatalog,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
 ) -> None:
@@ -108,7 +108,7 @@ def inspect_local_individual(
 
 def inspect_local_individual_eli(
     args: argparse.Namespace,
-    index: IEEEIndex,
+    index: IEEEIndexCatalog,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
 ) -> None:
@@ -117,7 +117,7 @@ def inspect_local_individual_eli(
 
 def inspect_local_individual_reserved(
     args: argparse.Namespace,
-    index: IEEEIndex,
+    index: IEEEIndexCatalog,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
 ) -> None:
@@ -126,7 +126,7 @@ def inspect_local_individual_reserved(
 
 def inspect_local_individual_sai(
     args: argparse.Namespace,
-    index: IEEEIndex,
+    index: IEEEIndexCatalog,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
 ) -> None:
@@ -135,7 +135,7 @@ def inspect_local_individual_sai(
 
 def inspect_local_individual_aai(
     args: argparse.Namespace,
-    index: IEEEIndex,
+    index: IEEEIndexCatalog,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
 ) -> None:
@@ -144,7 +144,7 @@ def inspect_local_individual_aai(
 
 def inspect_local_group(
     args: argparse.Namespace,
-    index: IEEEIndex,
+    index: IEEEIndexCatalog,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
 ) -> None:
@@ -152,14 +152,17 @@ def inspect_local_group(
 
 
 def inspect_zero_address(
-    args:argparse.Namespace, index: IEEEIndex, eval_flags: EvaluatedFlags, classified_mac: MACClassification
+    args: argparse.Namespace,
+    index: IEEEIndexCatalog,
+    eval_flags: EvaluatedFlags,
+    classified_mac: MACClassification,
 ) -> None:
     print("Zero")
 
 
 def inspect_broadcast_address(
     args: argparse.Namespace,
-    index: IEEEIndex,
+    index: IEEEIndexCatalog,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
 ) -> None:
@@ -167,7 +170,7 @@ def inspect_broadcast_address(
 
 
 def inspect_ieee_quadrants(
-    args: argparse.Namespace, index: IEEEIndex, eval_flags: EvaluatedFlags
+    args: argparse.Namespace, index: IEEEIndexCatalog, eval_flags: EvaluatedFlags
 ) -> int:
     classified_mac = classify_mac(args.value)
     params: InspectionParams = {

@@ -12,8 +12,8 @@ from etherlyzer.ieee.analytics.mac_classification import (
     SLAPQuadrant,
 )
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.ieee.index.ieee_index import IEEEIndexCatalog
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
-from etherlyzer.ieee.index.ieee_index import IEEEIndex
 
 if TYPE_CHECKING:
     from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags
@@ -88,7 +88,7 @@ def display_organization(entry: MACAllocationEntry, short_orgname: str) -> None:
 
 def display_ieee_identifier(
     args: argparse.Namespace,
-    index: IEEEIndex,
+    index: IEEEIndexCatalog,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
 ) -> None:
@@ -165,7 +165,7 @@ def display_ieee_identifier(
 
 def display_mac_autopsy(
     args: argparse.Namespace,
-    index: IEEEIndex,
+    index: IEEEIndexCatalog,
     eval_flags: EvaluatedFlags,
     classified_mac: MACClassification,
 ) -> None:
@@ -216,7 +216,7 @@ def display_mac_autopsy(
     print(f"      I/G             : {ig_bit} {ig_bit_addon}")
 
 
-def show_cid_registration(index: IEEEIndex, normalized: str, slap: SLAPQuadrant) -> None:
+def show_cid_registration(index: IEEEIndexCatalog, normalized: str, slap: SLAPQuadrant) -> None:
     cid_length = 6
     if slap == SLAPQuadrant.ELI:
         cid_entry = index.get_single(indextype=index.identifier_index, mac=normalized[:cid_length])

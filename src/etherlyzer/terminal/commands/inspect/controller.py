@@ -5,9 +5,9 @@ from dataclasses import dataclass
 
 from etherlyzer.formatters import MACFormatter
 from etherlyzer.ieee.analytics.mac_classification import classify_mac
+from etherlyzer.ieee.index.ieee_index import IEEEIndexCatalog
 from etherlyzer.ieee.registry.catalog import Catalog
 from etherlyzer.ieee.registry.category import RegistryCategory
-from etherlyzer.ieee.index.ieee_index import IEEEIndex
 from etherlyzer.terminal.commands.inspect.types.display import show_cid_registration
 from etherlyzer.terminal.commands.inspect.types.ethertype_inspection import inspect_ethertype
 from etherlyzer.terminal.commands.inspect.types.mac_inspection import inspect_ieee_quadrants
@@ -25,7 +25,9 @@ def run(args: argparse.Namespace) -> int:
     validate_args(args)
 
     registry = Catalog()
-    index = IEEEIndex.from_registries(registry.get_all_registries(check_for_updates=False))
+    index = IEEEIndexCatalog.build(
+        registry.get_all_registries_and_ensure_cache_is_synced(check_for_updates=False)
+    )
     eval_flags = EvaluatedFlags(
         show_mac_autopsy=args.all or args.show_mac_autopsy,
         show_vendor_stats=(args.all or args.show_vendor_stats or args.show_vendor_blocks),

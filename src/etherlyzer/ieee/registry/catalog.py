@@ -122,7 +122,7 @@ class Catalog:
             raise RuntimeError(f"Unknown registry {registry_name}")
         return reg
 
-    def get_all_registries(
+    def get_all_registries_and_ensure_cache_is_synced(
         self, check_for_updates: bool = True, inform_if_synced_about_expiration: bool = False
     ) -> list[IEEERegistry]:
         for registry in self.IEEE_REGISTRIES.values():
@@ -134,6 +134,9 @@ class Catalog:
                 status = registry.registry_downloader.fetch_online()
                 if status is False:
                     break
+        return list(self.IEEE_REGISTRIES.values())
+
+    def get_registries(self) -> list[IEEERegistry]:
         return list(self.IEEE_REGISTRIES.values())
 
     def __getitem__(self, key: str) -> IEEERegistry:

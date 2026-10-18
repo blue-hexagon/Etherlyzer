@@ -3,13 +3,13 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from etherlyzer.ieee.index.ieee_index import IEEEIndexCatalog
 from etherlyzer.ieee.registry.catalog import Catalog
-from etherlyzer.ieee.index.ieee_index import IEEEIndex
 from etherlyzer.terminal.utility import read_multiline
 
 
 def run(args: argparse.Namespace) -> int:
-    index = IEEEIndex.from_registries(Catalog().get_all_registries())
+    index = IEEEIndexCatalog.build(Catalog().get_all_registries_and_ensure_cache_is_synced())
     if args.mac:
         entry = index.get_single(indextype=index.mac_index, mac=args.mac)
         if entry is None:
@@ -25,12 +25,12 @@ def run(args: argparse.Namespace) -> int:
 
     elif args.interactive:
         data = read_multiline()
-        entries = IEEEIndex.get_many(
+        entries = IEEEIndexCatalog.get_many(
             ieee_index=index.mac_index,
             path_or_text=data,
         )
     elif args.file:
-        entries = IEEEIndex.get_many(
+        entries = IEEEIndexCatalog.get_many(
             ieee_index=index.mac_index,
             path_or_text=args.file,
         )
