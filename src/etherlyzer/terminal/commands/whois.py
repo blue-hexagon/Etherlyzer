@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 
 from etherlyzer.ieee.registry.catalog import Catalog
-from etherlyzer.ieee.registry.index import IEEEIndex
+from etherlyzer.ieee.index.ieee_index import IEEEIndex
 from etherlyzer.terminal.utility import read_multiline
 
 

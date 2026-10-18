@@ -7,7 +7,7 @@ from etherlyzer.formatters import MACFormatter
 from etherlyzer.ieee.analytics.mac_classification import classify_mac
 from etherlyzer.ieee.registry.catalog import Catalog
 from etherlyzer.ieee.registry.category import RegistryCategory
-from etherlyzer.ieee.registry.index import IEEEIndex
+from etherlyzer.ieee.index.ieee_index import IEEEIndex
 from etherlyzer.terminal.commands.inspect.types.display import show_cid_registration
 from etherlyzer.terminal.commands.inspect.types.ethertype_inspection import inspect_ethertype
 from etherlyzer.terminal.commands.inspect.types.mac_inspection import inspect_ieee_quadrants
@@ -35,7 +35,7 @@ def run(args: argparse.Namespace) -> int:
     match args.type.lower():
         case RegistryCategory.MAC_REGISTRY.value:
             return inspect_ieee_quadrants(args, index, eval_flags)
-        case RegistryCategory.PROTOCOL_REGISTRY.value:
+        case RegistryCategory.ETHERTYPE_REGISTRY.value:
             entry = index.get_single(index.protocol_index, args.value)
             inspect_ethertype(args, entry, index)
         case RegistryCategory.IDENTIFIER_REGISTRY.value:
