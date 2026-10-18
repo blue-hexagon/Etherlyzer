@@ -16,7 +16,7 @@ def run(args: argparse.Namespace) -> int:
 
     print("Registries")
 
-    for registry in manager.get_all_registries(check_for_updates=False):
+    for registry in manager.get_all_registries_and_ensure_cache_is_synced(check_for_updates=False):
         print(
             f"Name            : {registry.name} ({registry.full_name})"
             f"\nLegacy Name     : {registry.legacy_name}"

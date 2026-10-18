@@ -40,6 +40,7 @@ class IEEERegistry[T]:
         )
 
     def load(self) -> list[T]:
+        """Fetch if self.filepath not exists, else parse and build self.filepath into self.model objects."""
         if not self.registry_cache.filepath.exists():
             self.registry_downloader.fetch_online()
         return self.registry_parser.load_file(self.registry_cache.filepath, self.model)

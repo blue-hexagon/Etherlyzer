@@ -15,54 +15,47 @@ from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 
 
 @dataclass(slots=True)
-class IEEEIndex:
+class IEEEIndexCatalog:
     mac_index: MACAllocationIndex = field(default_factory=MACAllocationIndex)
-    protocol_index: EthertypeIndex = field(default_factory=EthertypeIndex)
+    ethertype_index: EthertypeIndex = field(default_factory=EthertypeIndex)
     identifier_index: IdentifierIndex = field(default_factory=IdentifierIndex)
     vendor_index: VendorIndex = field(default_factory=VendorIndex)
 
     @classmethod
-    def from_registries(
-        cls,
-        registries: Iterable[IEEERegistry],
-    ) -> IEEEIndex:
-
+    def build(cls, registries: Iterable[IEEERegistry]) -> IEEEIndexCatalog:
         index = cls()
 
         for registry in registries:
-            entries = registry.load()
+            index._ingest(registry)
 
-            match registry.category:
-                case RegistryCategory.MAC_REGISTRY:
-                    index.mac_index.insert(registry, entries)
-
-                case RegistryCategory.ETHERTYPE_REGISTRY:
-                    index.protocol_index.insert(entries)
-
-                case RegistryCategory.IDENTIFIER_REGISTRY:
-                    index.identifier_index.insert(registry, entries)
-
-                case _:
-                    raise ValueError(f"Unsupported registry category: {registry.category}")
-        mac_walker = index.mac_index.walk()
-        v_index = VendorIndex()
-
-        while True:
-            try:
-                entry = index.get_from_mac_index(next(mac_walker))
-                if entry is not None:
-                    v_index.insert(entry)
-            except StopIteration:
-                break
-        index.vendor_index = v_index
+        index._build_vendor_index()
         return index
+
+    def _ingest(self, registry: IEEERegistry) -> None:
+        entries = registry.load()
+
+        match registry.category:
+            case RegistryCategory.MAC_REGISTRY:
+                self.mac_index.insert(registry, entries)
+            case RegistryCategory.ETHERTYPE_REGISTRY:
+                self.ethertype_index.insert(entries)
+            case RegistryCategory.IDENTIFIER_REGISTRY:
+                self.identifier_index.insert(registry, entries)
+            case _:
+                raise ValueError(f"Unsupported registry category: {registry.category}")
+
+    def _build_vendor_index(self) -> None:
+        for mac in self.mac_index.walk():
+            entry = self.mac_index.get_one(mac)
+            if entry is not None:
+                self.vendor_index.insert(entry)
 
     def get_from_mac_index(self, mac: str) -> MACAllocationEntry | None:
         return self.mac_index.get_one(mac)
 
     def get_from_ethertype_index(self, ethertype: str) -> EtherTypeEntry | None:
-        ret = self.protocol_index.get_one(ethertype)
-        if not isinstance(ret, EtherTypeEntry):
+        ret = self.ethertype_index.get_one(ethertype)
+        if not isinstance(ret, EtherTypeEntry) and not isinstance(ret, type(None)):
             raise RuntimeError()
         return ret
 
