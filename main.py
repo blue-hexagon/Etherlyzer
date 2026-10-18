@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     t3 = time.perf_counter()
     index.mac_index.get_one("C8-95-CE-A0-3B-A6")
-    macs = IEEEIndexCatalog.get_many(
+    macs = IEEEIndexCatalog.get_bulk(
         ieee_index=index.mac_index, path_or_text="src/etherlyzer/in2.txt"
     )
     for mac in macs:
@@ -31,6 +31,6 @@ if __name__ == "__main__":
     exit(0)
     registry = Catalog()
     index = IEEEIndexCatalog.build(registry.get_all_registries_and_ensure_cache_is_synced())
-    retrieved_vendors = index.get_many(ieee_index=index.mac_index, infile="src/etherlyzer/in2.txt")
+    retrieved_vendors = index.get_bulk(ieee_index=index.mac_index, infile="src/etherlyzer/in2.txt")
     RegistryMatchExporter().export_csv_to_console(retrieved_vendors)
     print(f"{len(retrieved_vendors)} vendors found")
