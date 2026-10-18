@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass, field
-from pathlib import Path
 
 from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
-from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.ieee.entry.mac import MACAllocationEntry, MACLookupResult, classify_mac
 from etherlyzer.ieee.index.ethertype import EthertypeIndex
 from etherlyzer.ieee.index.identifier import IdentifierIndex
 from etherlyzer.ieee.index.mac_allocation import MACAllocationIndex
@@ -63,29 +62,37 @@ class IEEEIndexCatalog:
         return self.identifier_index.get_one(identifier)
 
     @staticmethod
-    def get_many(
-        ieee_index: MACAllocationIndex | IdentifierIndex | EthertypeIndex | VendorIndex,
-        path_or_text: Path | str | list[str],
-    ) -> list[MACAllocationEntry]:
-        # Pass a list[str] from interactive or pass a Path or str (path)
-        ieee_entries_as_set: set[MACAllocationEntry] = set()
+    def get_bulk(
+        ieee_index: MACAllocationIndex,
+        values: Iterable[str],
+        include_unsuccessful: bool = False,
+    ) -> list[MACLookupResult]:
+        results = []
 
-        if isinstance(path_or_text, Path):
-            with open(path_or_text) as f:
-                text_data = f.readlines()
-        else:
-            text_data = path_or_text
-        for line in text_data:
-            ieee_entry = ieee_index.get_one(line)
-            if ieee_entry:
-                ieee_entries_as_set.add(ieee_entry)
+        for line_number, mac in enumerate(values, start=1):
+            mac = mac.strip()
+            reason = classify_mac(mac)
 
-        ieee_entries: list[MACAllocationEntry] = list(ieee_entries_as_set)
-        # Sort by name, and then by registry-name reversed
-        ieee_entries = sorted(ieee_entries, key=lambda e: e.organization_name)
-        ieee_entries = sorted(ieee_entries, key=lambda e: e.registry, reverse=True)
+            if reason is not None:
+                result = MACLookupResult(
+                    line_number=line_number,
+                    mac=mac,
+                    reason=reason,
+                )
+            else:
+                entry = ieee_index.get_one(mac)
 
-        return ieee_entries
+                result = MACLookupResult(
+                    line_number=line_number,
+                    mac=mac,
+                    entry=entry,
+                    reason=None if entry is not None else "Not found",
+                )
+
+            if result.entry is not None or include_unsuccessful:
+                results.append(result)
+
+        return results
 
     @staticmethod
     def get_single(

@@ -1,3 +1,18 @@
+testdata = [
+    "001a2b3c4d5e",
+    "001A2B3C4D5E",
+    "aabbccddeeff",
+    "AABBCCDDEEFF",
+    "000000000000",
+    "ffffffffffff",
+    "FFFFFFFFFFFF",
+    "123456789abc",
+    "ABCDEF123456",
+    "abcdef123456",
+    "020000000001",
+]
+
+
 def read_multiline(
     linetype: str = "text",
     prompt: str = "Paste $1. Type $2 and press <Enter> when done:",
@@ -9,7 +24,7 @@ def read_multiline(
 
     lines = []
 
-    while True:
+    while False:
         line = input()
 
         if line.strip() == delimiter:
@@ -18,4 +33,26 @@ def read_multiline(
             continue
         lines.append(line)
 
-    return lines
+    return testdata
+
+
+def print_table(
+    rows: list[tuple[str, ...]],
+    headers: tuple[str, ...] | None = None,
+    delimiter: str | None = None,
+) -> None:
+    if headers:
+        rows = [headers, *rows]
+
+    if not rows:
+        return
+
+    if delimiter is not None:
+        for row in rows:
+            print(delimiter.join(row))
+        return
+
+    widths = [max(len(row[i]) for row in rows) for i in range(len(rows[0]))]
+
+    for row in rows:
+        print("  ".join(value.ljust(width) for value, width in zip(row, widths)).rstrip())
