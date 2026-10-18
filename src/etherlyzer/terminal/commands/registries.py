@@ -16,20 +16,32 @@ def run(args: argparse.Namespace) -> int:
 
     print("Registries")
 
-    for registry in manager.get_all_registries_and_ensure_cache_is_synced(check_for_updates=False):
-        print(
-            f"Name            : {registry.name} ({registry.full_name})"
-            f"\nLegacy Name     : {registry.legacy_name}"
-            f"\nCategory        : {registry.category}"
-            f"\nDescription     : {registry.description}"
-            f"\nLegacy          : {registry.legacy}"
-            f"\nFile            : {registry.registry_cache.filepath}"
-            f"\nSource URL      : {registry.url}"
-            f"\nPrefix Bits     : {registry.prefix_bits}"
-            f"\nLast Retrieved  : {registry.registry_cache.last_retrieved}"
-            f"\nUpdate Interval : {registry.registry_cache.update_interval}"
-        )
-        print()
+    if not args.verbose:
+        for registry in manager.get_all_registries_and_ensure_cache_is_synced(check_for_updates=False):
+            print(
+                f"Name            : {registry.name} ({registry.full_name})"
+                f"\nCategory        : {registry.category}"
+                f"\nDescription     : {registry.description}"
+                f"\nFile            : {registry.registry_cache.filepath}"
+                f"\nSource URL      : {registry.url}"
+                f"\nLast Retrieved  : {registry.registry_cache.last_retrieved}"
+            )
+            print()
+    else:
+        for registry in manager.get_all_registries_and_ensure_cache_is_synced(check_for_updates=False):
+            print(
+                f"Name            : {registry.name} ({registry.full_name})"
+                f"\nLegacy Name     : {registry.legacy_name}"
+                f"\nCategory        : {registry.category}"
+                f"\nDescription     : {registry.description}"
+                f"\nLegacy          : {registry.legacy}"
+                f"\nFile            : {registry.registry_cache.filepath}"
+                f"\nSource URL      : {registry.url}"
+                f"\nPrefix Bits     : {registry.prefix_bits}"
+                f"\nLast Retrieved  : {registry.registry_cache.last_retrieved}"
+                f"\nUpdate Interval : {registry.registry_cache.update_interval}"
+            )
+            print()
 
     print()
 
@@ -51,5 +63,12 @@ Example:
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Print verbose output",
+    )
+
 
     parser.set_defaults(func=run)
