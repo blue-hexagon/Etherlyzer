@@ -7,9 +7,14 @@ from etherlyzer.terminal.utility import read_multiline
 
 
 def run(args: argparse.Namespace) -> int:
-    macs = read_multiline(linetype="MAC addresses") if args.bulk else [args.mac]
+    macs = (
+        read_multiline(linetype="MAC addresses", skip_empty_lines=False)
+        if args.bulk
+        else [args.mac]
+    )
 
     linenumber = 0
+    invalid_lines: list[int] = []
     padding = len(str(len(macs))) + 2
     normalized_count = 0
     invalid_count = 0
@@ -19,7 +24,8 @@ def run(args: argparse.Namespace) -> int:
             linenumber += 1
             if MACFormatter.mask_is_valid(validation_mask) or not args.strict:
                 print(f"{linenumber}.".ljust(padding, " "), end="")
-
+        if not MACFormatter.mask_is_valid(validation_mask):
+            invalid_lines.append(linenumber)
         if not args.strict and not MACFormatter.mask_is_valid(validation_mask):
             if args.show_info is True:
                 print("ERR".ljust(4, " "), end="")
@@ -41,8 +47,9 @@ def run(args: argparse.Namespace) -> int:
             normalized_count += 1
 
     print()
+    print(f"Normalized {normalized_count}/{len(macs)} MAC addresses.")
     print(
-        f"Normalized {normalized_count}/{len(macs)} MAC addresses. Invalid MAC addresses identified: {invalid_count}/{len(macs)}"
+        f"{len(invalid_lines)} invalid lines{':' if len(invalid_lines) > 0 else '!'} {', '.join([str(linum) for linum in invalid_lines])}"
     )
     return 0
 

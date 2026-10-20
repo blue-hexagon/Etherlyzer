@@ -133,6 +133,17 @@ class MACFormatter:
         return mac
 
     @classmethod
+    def normalize_semi_strict(cls, mac: str) -> str:
+        normalized = cls.normalize(mac)
+
+        if len(normalized) != 12 or any(
+            c.lower() not in cls.HEX_DIGITS and c not in cls.VALID_SEPERATORS for c in mac
+        ):
+            raise ValueError(f"Invalid MAC address: {mac!r}")
+
+        return normalized
+
+    @classmethod
     def fix_typos(cls, mac: str) -> str:
         for c in mac:
             if c in cls.LENIENT_TYPOS:
