@@ -104,11 +104,29 @@ Etherlyzer is useful anywhere Ethernet identifiers become data rather than somet
 
 ## Install
 
-Requires Python 3.14+.
+Requires Python 3.12+.
 
 ```console
 pip install etherlyzer
 etherlyzer --version
+```
+
+## Extract unique MAC addresses from binaries, text-files or packet-captures
+```text
+etherlyzer extract -f c04-wap-r1.pcap -ul
+Packet 1  00:20:af:1b:07:fa
+Packet 1  00:e0:29:68:8b:fb
+```
+## See what they belong to
+```text
+etherlyzer whois -blcp
+Paste text. Type ;;; and press <Enter> when done:
+00:20:af:1b:07:fa
+00:e0:29:68:8b:fb
+;;;
+Line  Result  Registry  Assignment  Organization
+1.    MATCH   MA-L      0020AF      3COM
+2.    MATCH   MA-L      00E029      STANDARD MICROSYSTEMS CORP.
 ```
 
 ## See what a MAC address really belongs to

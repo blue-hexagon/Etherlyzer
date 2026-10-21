@@ -40,7 +40,7 @@ def translate_to_all_representations(mac: str) -> tuple[dict[str, str], Status]:
             "canonical": pt.to_canonical(normalized),
             "bit_reversed": pt.to_bit_reversed(normalized),
             "decimal": pt.to_decimal(normalized),
-            "decimal_bytes": pt.to_decimal_bytes(normalized),
+            "decimal_bytes": pt.to_decimal_bytes(normalized, padding=True),
             "binary": pt.to_binary(normalized),
             "binary_raw": pt.to_binary_raw(normalized),
             "hex": pt.to_hex(normalized),

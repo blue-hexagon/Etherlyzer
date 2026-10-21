@@ -24,6 +24,7 @@ source_suffix = {
 }
 extensions = [
     "myst_parser",
+    "sphinxext.opengraph",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
@@ -36,11 +37,21 @@ extensions = [
     "sphinx_autodoc_typehints",
     "sphinx_sitemap",
 ]
+
+
 # MERMAID
 # mermaid_version = "11.9.0"
 html_baseurl = "https://etherlyzer.docs.manjana.dev/"
 mermaid_light_theme = "default"
 mermaid_dark_theme = "dark"
+
+ogp_site_url = html_baseurl
+ogp_site_name = "EtherLyzer"
+ogp_description_length = 200
+ogp_enable_meta_description = True
+
+sitemap_show_lastmod = True
+sitemap_indent = 2
 
 todo_include_todos = False
 nitpicky = True
@@ -65,8 +76,10 @@ myst_substitutions = {
     "release": release,
     "version_badge": f"{{bdg-light}}`v{version}`",
 }
-pygments_style = "friendly"
-pygments_dark_style = "dracula"
+# pygments_style = "friendly"
+# pygments_dark_style = "dracula"
+pygments_style = "sphinx"
+pygments_dark_style = "monokai"
 highlight_options = {
     "python": {
         "stripnl": False,
@@ -82,14 +95,29 @@ intersphinx_mapping = {
 # html_title = f"{project} Docs"
 
 html_theme_options = {
-    "source_repository": "https://github.com/blue-hexagon/etherlyzer/",
+    # GitHub integration
+    "source_repository": "https://github.com/blue-hexagon/EtherLyzer/",
     "source_branch": "main",
     "source_directory": "docs/source/",
+    # Navigation
     "navigation_with_keys": True,
-    "light_logo": "logo_light.png",
-    "dark_logo": "logo_dark.png",
     "sidebar_hide_name": True,
     "top_of_page_buttons": ["view", "edit"],
+    # Branding
+    "light_logo": "logo_light.png",
+    "dark_logo": "logo_dark.png",
+    # Light mode
+    "light_css_variables": {
+        "color-brand-primary": "#008FA3",
+        "color-brand-content": "#007F99",
+    },
+    # Dark mode
+    "dark_css_variables": {
+        "color-brand-primary": "#00D5E8",
+        "color-brand-content": "#25DCEB",
+    },
+    # Optional announcement banner
+    # "announcement": "EtherLyzer documentation — v0.10.0",
 }
 html_title = project
 autosummary_generate = True

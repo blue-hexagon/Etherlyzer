@@ -31,7 +31,7 @@ class PresentationTranslator:
     @classmethod
     def to_decimal_bytes(cls, normalized: str, padding: bool = False) -> str:
         return (
-            " ".join(f"{byte:>3}" for byte in cls._raw(normalized))
+            " ".join(f"{str(byte).ljust(3, ' ')}" for byte in cls._raw(normalized))
             if padding
             else " ".join(str(byte) for byte in cls._raw(normalized))
         )

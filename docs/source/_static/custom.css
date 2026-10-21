@@ -213,3 +213,30 @@ body:not([data-theme="light"]) .highlight span.linenos {
 .toctree-wrapper.compound .toctree-l3 > a:hover {
     color: var(--color-brand-primary);
 }
+
+
+/* Give wide documentation pages more room. */
+/*@media (min-width: 82em) {*/
+/*    .main .content {*/
+/*        width: 100%;*/
+/*        max-width: 1150px;*/
+/*    }*/
+/*}*/
+
+/* Make wide tables horizontally scrollable. */
+.content .table-wrapper {
+    overflow-x: auto;
+}
+
+/* Improve readability of table cells. */
+.content table.docutils td,
+.content table.docutils th {
+    vertical-align: top;
+    line-height: 1.55;
+}
+
+/* Slightly soften inline code styling. */
+.content code.literal {
+    border-radius: 4px;
+    padding: 0.1em 0.25em;
+}

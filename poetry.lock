@@ -2243,6 +2243,25 @@ standalone = ["Sphinx (>=5)"]
 test = ["pytest"]
 
 [[package]]
+name = "sphinxext-opengraph"
+version = "0.13.0"
+description = "Sphinx Extension to enable OGP support"
+optional = false
+python-versions = ">=3.9"
+groups = ["docs"]
+files = [
+    {file = "sphinxext_opengraph-0.13.0-py3-none-any.whl", hash = "sha256:936c07828edc9ad9a7b07908b29596dc84ed0b3ceaa77acdf51282d232d4d80e"},
+    {file = "sphinxext_opengraph-0.13.0.tar.gz", hash = "sha256:103335d08567ad8468faf1425f575e3b698e9621f9323949a6c8b96d9793e80b"},
+]
+
+[package.dependencies]
+Sphinx = ">=6.0"
+
+[package.extras]
+rtd = ["furo (>=2024)", "sphinx (>=8.1.0,<8.2.0)", "sphinx-design"]
+social-cards = ["matplotlib (>=3)"]
+
+[[package]]
 name = "starlette"
 version = "1.7.0"
 description = "The little ASGI library that shines."
