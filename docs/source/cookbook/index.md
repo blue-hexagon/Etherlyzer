@@ -1,4 +1,4 @@
-# Getting Started
+# Cookbook
 
 This section covers installation and the basic EtherLyzer workflows.
 
