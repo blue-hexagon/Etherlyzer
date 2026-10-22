@@ -4,9 +4,11 @@ import argparse
 
 from etherlyzer import __version__
 from etherlyzer.terminal.commands import (
+    extract,
     format,
     registries,
     sync,
+    translate,
     validate,
     whois,
 )
@@ -54,6 +56,8 @@ Run `etherlyzer <command> --help` for command-specific options and examples.
     controller.register(subparsers)
     registries.register(subparsers)
     sync.register(subparsers)
+    extract.register(subparsers)
+    translate.register(subparsers)
 
     return parser
 

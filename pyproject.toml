@@ -45,6 +45,7 @@ dependencies = [
     "platformdirs>=4.12.2,<5.0.0",
     "pandas>=3.0.6,<4.0.0",
     "tqdm>=4.70.1,<5.0.0",
+    "scapy (>=2.8.0,<3.0.0)",
 ]
 
 [project.urls]
@@ -86,7 +87,8 @@ docs = [
     "sphinx-design (>=0.7.0,<0.8.0)",
     "sphinxcontrib-mermaid (>=2.1.0,<3.0.0)",
     "sphinx-autodoc-typehints (>=3.13.0,<4.0.0)",
-    "sphinx-sitemap (>=2.9.0,<3.0.0)"
+    "sphinx-sitemap (>=2.9.0,<3.0.0)",
+    "sphinxext-opengraph (>=0.13.0,<0.14.0)"
 ]
 
 

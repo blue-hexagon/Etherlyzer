@@ -1,45 +1,51 @@
+---
+hide-toc: true
+---
+
 # EtherLyzer
 
-EtherLyzer is a Python library and command-line toolkit for identifying, classifying, validating, formatting, and inspecting Ethernet-related identifiers.
+**Ethernet address intelligence, analysis, and forensics.**
 
-{{ version_badge }} {bdg-light}`Python 3.12+` {bdg-light}`MIT`
+{{ version_badge }} {bdg-light}`Python 3.12+` {bdg-light}`MIT License` {bdg-light}`CLI & Python API`
 
-::::{grid} 2
+EtherLyzer is an open-source Python toolkit for Ethernet address intelligence and analysis. It combines offline IEEE registry lookups with tools for investigating MAC address structure, extracting addresses from packet captures, and examining their underlying representations.
+
+::::{grid} 1 1 2 2
 :gutter: 3
 
-:::{grid-item-card} Getting Started
+:::{grid-item-card} {octicon}`rocket;1em` Getting Started
 :link: getting-started/index
 :link-type: doc
 
-Install EtherLyzer and get started with the command-line interface.
+Installation, setup, and first steps.
 :::
 
-:::{grid-item-card} Concepts
+:::{grid-item-card} {octicon}`book;1em` Concepts
 :link: concepts/index
 :link-type: doc
 
-Learn about MAC addresses, IEEE registries, assignments, and validation.
+The fundamentals of MAC addressing and IEEE registries.
 :::
 
-:::{grid-item-card} Guides
+:::{grid-item-card} {octicon}`tools;1em` Guides
 :link: guides/index
 :link-type: doc
 
-Use EtherLyzer to identify, inspect, validate, format, and process Ethernet identifiers.
+Detailed command usage and behavior.
 :::
 
-:::{grid-item-card} Examples
-:link: examples/index
+:::{grid-item-card} {octicon}`terminal;1em` Cookbook
+:link: cookbook/index
 :link-type: doc
 
-Explore practical EtherLyzer workflows and usage examples.
+Practical examples and investigative workflows.
 :::
 
-:::{grid-item-card} API Reference
+:::{grid-item-card} {octicon}`code;1em` API Reference
 :link: api/index
 :link-type: doc
 
-Use EtherLyzer programmatically from Python.
+Python modules, classes, and functions.
 :::
 
 ::::
@@ -52,6 +58,6 @@ Use EtherLyzer programmatically from Python.
 getting-started/index
 concepts/index
 guides/index
-examples/index
+cookbook/index
 api/index
 ```
