@@ -43,7 +43,8 @@ jobs:
             sphinx-design \
             sphinxcontrib-mermaid \
             sphinx-autodoc-typehints \
-            sphinx-sitemap
+            sphinx-sitemap \
+            sphinxext-opengraph
 
       - name: Build documentation
         run: python -m sphinx -W --keep-going -b html docs/source docs/build/html
