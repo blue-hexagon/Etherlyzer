@@ -6,10 +6,10 @@ from unittest.mock import Mock
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
-from etherlyzer.ieee.analytics.mac_classification import classify_mac
-from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags
-from etherlyzer.terminal.commands.inspect.types import mac_inspection
-from etherlyzer.terminal.commands.inspect.types.mac_inspection import inspect_ieee_quadrants
+from etherlyzer.lib.analytics.analyze_mac import analyze_mac_address
+from etherlyzer.terminal.commands.inspect.branches.mac import router
+from etherlyzer.terminal.commands.inspect.branches.mac.router import inspect_ieee_quadrants
+from etherlyzer.terminal.commands.inspect.common import TerminalInspectFlags
 
 
 @pytest.mark.parametrize(
@@ -38,7 +38,7 @@ def test_all_major_branches(monkeypatch: MonkeyPatch, value: str, destination: s
     mocked_handler = Mock()
 
     monkeypatch.setattr(
-        mac_inspection,
+        router,
         destination,
         mocked_handler,
     )  # Temporarily replace inspect_universal_individual with a Mock (mocked_handler)
@@ -47,7 +47,7 @@ def test_all_major_branches(monkeypatch: MonkeyPatch, value: str, destination: s
     result = inspect_ieee_quadrants(
         cast(argparse.Namespace, cast(object, args)),
         index,
-        cast(EvaluatedFlags, cast(object, flags)),
+        cast(TerminalInspectFlags, cast(object, flags)),
     )
     # Should exit with code 0
     assert result == 0
@@ -57,5 +57,5 @@ def test_all_major_branches(monkeypatch: MonkeyPatch, value: str, destination: s
         args=args,
         index=index,
         eval_flags=flags,
-        classified_mac=classify_mac(args.value),
+        classified_mac=analyze_mac_address(args.value),
     )

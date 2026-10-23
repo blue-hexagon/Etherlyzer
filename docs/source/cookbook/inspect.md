@@ -294,7 +294,7 @@ One representative address was:
 40:06:AF:F1:08:08
 ```
 
-Its decimal octets can be obtained using [`translate`](translate.md):
+Its decimal octets can be obtained using [`translation.py`](translate.md):
 
 ```text
 etherlyzer translate 40:06:AF:F1:08:08 -t decimal_bytes

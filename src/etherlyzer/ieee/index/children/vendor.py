@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass, field
 
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.index.base import IEEEIndexProtocol
+from etherlyzer.ieee.index.children.proto import IndexService
 
 
 def normalize_vendor_name(name: str) -> str:
@@ -15,7 +15,7 @@ def normalize_vendor_name(name: str) -> str:
 
 
 @dataclass(slots=True)
-class VendorIndex(IEEEIndexProtocol):
+class VendorIndex(IndexService):
     vendors: dict[str, list[MACAllocationEntry]] = field(default_factory=dict)
 
     def insert(self, entry: MACAllocationEntry) -> None:
@@ -24,7 +24,7 @@ class VendorIndex(IEEEIndexProtocol):
         )
         self.vendors.setdefault(key, []).append(entry)
 
-    def get_many(self, identifier: str) -> list[MACAllocationEntry] | None:
+    def lookup_many(self, identifier: str) -> list[MACAllocationEntry] | None:
         ieee_mac_entries = self.vendors.get(
             normalize_vendor_name(identifier),
         )

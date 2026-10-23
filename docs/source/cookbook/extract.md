@@ -1,10 +1,10 @@
 # Extract MAC Addresses
 
-The `extract` command discovers MAC address candidates in text, binary files, and network packet captures.
+The `extraction.py` command discovers MAC address candidates in text, binary files, and network packet captures.
 
 It supports protocol-aware extraction from PCAP and PCAPNG files, hexadecimal text scanning, duplicate filtering, location tracking, and customizable output formatting.
 
-Unlike [`format`](format.md), which reformats known addresses, `extract` identifies addresses embedded in existing data.
+Unlike [`format`](format.md), which reformats known addresses, `extraction.py` identifies addresses embedded in existing data.
 
 ## Basic usage
 
@@ -300,7 +300,7 @@ An extracted address is a candidate, not necessarily a legitimate or registered 
 Packet capture extraction is more specific than textual scanning because addresses are retrieved from Ethernet fields. However, this does not establish vendor identity, IEEE registration, or legitimate use.
 
 :::{warning}
-The `extract` command does not validate the legitimacy or IEEE registration of extracted addresses.
+The `extraction.py` command does not validate the legitimacy or IEEE registration of extracted addresses.
 
 Use [`validate`](validate.md) for input validation, [`inspect`](inspect.md) for address-property analysis, and [`whois`](whois.md) for IEEE registry lookups.
 :::

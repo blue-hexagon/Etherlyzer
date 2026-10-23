@@ -6,8 +6,8 @@ from etherlyzer.ieee.registry.category import RegistryCategory
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 
 
-class Catalog:
-    IEEE_REGISTRIES: ClassVar[dict[str, IEEERegistry]] = {
+class RegistryProvider:
+    REGISTRIES: ClassVar[dict[str, IEEERegistry]] = {
         "mal": IEEERegistry(
             enabled=True,
             name="MA-L",
@@ -109,35 +109,42 @@ class Catalog:
     }
 
     @classmethod
-    def db_is_initialized(cls) -> bool:
-        db_init_checks: list[bool] = []
-        for registry in cls.IEEE_REGISTRIES.values():
-            db_init_checks.append(registry.registry_cache.filepath.exists())
-        return all(list(db_init_checks))
+    def get(cls, registry_name: str, require_cache: bool = False) -> IEEERegistry:
+        registry = cls.REGISTRIES.get(registry_name)
 
-    @staticmethod
-    def get_registry(registry_name: str) -> IEEERegistry:
-        reg = Catalog.IEEE_REGISTRIES.get(registry_name, None)
-        if reg is None:
-            raise RuntimeError(f"Unknown registry {registry_name}")
-        return reg
+        if registry is None:
+            raise KeyError(f"Unknown registry: {registry_name!r}. Choices: {list(cls.REGISTRIES)}")
 
-    def get_all_registries_and_ensure_cache_is_synced(
-        self, check_for_updates: bool = True, inform_if_synced_about_expiration: bool = False
-    ) -> list[IEEERegistry]:
-        for registry in self.IEEE_REGISTRIES.values():
-            # If not checking for updates, we still need a present dataset.
-            if (
-                check_for_updates
-                and registry.registry_cache.need_updates(inform_if_synced_about_expiration)
-            ) or not self.db_is_initialized():
-                status = registry.registry_downloader.fetch_online()
-                if status is False:
-                    break
-        return list(self.IEEE_REGISTRIES.values())
+        if require_cache:
+            cls.ensure_cache_exists(registry_name)
 
-    def get_registries(self) -> list[IEEERegistry]:
-        return list(self.IEEE_REGISTRIES.values())
+        return registry
+
+    @classmethod
+    def get_all(cls, require_cache: bool = False) -> list[IEEERegistry]:
+        if require_cache:
+            cls.ensure_all_caches_exist()
+
+        return list(cls.REGISTRIES.values())
+
+    @classmethod
+    def cache_exists(cls, registry_name: str) -> bool:
+        registry = cls.get(registry_name)
+        return registry.registry_cache.filepath.exists()
+
+    @classmethod
+    def all_caches_exist(cls) -> bool:
+        return all(cls.cache_exists(name) for name in cls.REGISTRIES)
+
+    @classmethod
+    def ensure_cache_exists(cls, registry_name: str) -> None:
+        if not cls.cache_exists(registry_name):
+            raise RuntimeError(f"Registry cache for {registry_name!r} is missing.")
+
+    @classmethod
+    def ensure_all_caches_exist(cls) -> None:
+        if not cls.all_caches_exist():
+            raise RuntimeError("One or more registry caches are missing.")
 
     def __getitem__(self, key: str) -> IEEERegistry:
-        return self.IEEE_REGISTRIES[key]
+        return self.REGISTRIES[key]

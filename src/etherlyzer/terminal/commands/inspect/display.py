@@ -1,32 +1,31 @@
 from __future__ import annotations
 
 import argparse
-from typing import TYPE_CHECKING
 
-from etherlyzer.formatters import MACFormatter
-from etherlyzer.ieee.analytics.allocations import get_vendor_total_addr_space
-from etherlyzer.ieee.analytics.mac_classification import (
+from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.ieee.index.store import IndexStore
+from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.lib.analytics.allocations import summarize_vendor_allocations
+from etherlyzer.lib.analytics.analyze_mac import (
     Administration,
     DeliveryType,
     MACClassification,
     SLAPQuadrant,
 )
-from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.index.ieee_index import IEEEIndexCatalog
-from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
-
-if TYPE_CHECKING:
-    from etherlyzer.terminal.commands.inspect.controller import EvaluatedFlags
+from etherlyzer.lib.formatting import MACFormatter
+from etherlyzer.lib.normalization import normalize
+from etherlyzer.lib.translation import PresentationTranslator
+from etherlyzer.terminal.commands.inspect.common import TerminalInspectFlags
 
 
 def display_associated_block_counts(vendor_correlated_entries: list[MACAllocationEntry]) -> None:
-    tot_blocks, tot_addr, iab_alloc, mal_alloc, mam_alloc, mas_alloc = get_vendor_total_addr_space(
+    total_alloc, iab_alloc, mal_alloc, mam_alloc, mas_alloc = summarize_vendor_allocations(
         vendor_correlated_entries
     )
     print("\nAssociated Allocations")
     print("  Total")
-    print(f"    Blocks           : {tot_blocks:,}")
-    print(f"    Capacity         : {tot_addr:,}")
+    print(f"    Blocks           : {total_alloc.total_blocks:,}")
+    print(f"    Capacity         : {total_alloc.total_addresses:,}")
     print("  MA-L")
     print(f"    Blocks           : {mal_alloc.total_blocks:,}")
     print(f"    Capacity         : {mal_alloc.total_addresses:,}")
@@ -63,8 +62,8 @@ def display_all_vendor_blocks(
 
 
 def display_registration(entry: MACAllocationEntry, reg: IEEERegistry) -> None:
-    stuffed_input_0 = MACFormatter.format_with_stuffed_hex(entry.assignment, "0")
-    sutffed_input_f = MACFormatter.format_with_stuffed_hex(entry.assignment, "f")
+    stuffed_input_0 = MACFormatter.format_default(entry.assignment, "0")
+    sutffed_input_f = MACFormatter.format_default(entry.assignment, "f")
     print("\nIEEE Registry")
     print(f"  IEEE Type           : {entry.registry} [{reg.full_name}]")
     print(f"  Assignment          : {MACFormatter.format_default(entry.assignment)}")
@@ -88,22 +87,22 @@ def display_organization(entry: MACAllocationEntry, short_orgname: str) -> None:
 
 def display_ieee_identifier(
     args: argparse.Namespace,
-    index: IEEEIndexCatalog,
-    eval_flags: EvaluatedFlags,
+    index: IndexStore,
+    eval_flags: TerminalInspectFlags,
     classified_mac: MACClassification,
 ) -> None:
-    normalized = MACFormatter.normalize(args.value)
+    normalized = normalize(args.value)
     is_complete = len(normalized) == 12
     mac_entry = None
     cid_entry = None
 
     if classified_mac.administration == Administration.UNIVERSAL:
         if classified_mac.delivery == DeliveryType.INDIVIDUAL:
-            mac_entry = index.get_single(index.mac_index, normalized)
+            mac_entry = index.get_single(index.mac, normalized)
 
     elif classified_mac.slap_quadrant == SLAPQuadrant.ELI and len(normalized) >= 6:
         cid_entry = index.get_single(
-            index.identifier_index,
+            index.identifier,
             normalized[:6],
         )
     if classified_mac.is_zero and is_complete:
@@ -165,17 +164,15 @@ def display_ieee_identifier(
 
 def display_mac_autopsy(
     args: argparse.Namespace,
-    index: IEEEIndexCatalog,
-    eval_flags: EvaluatedFlags,
+    index: IndexStore,
+    eval_flags: TerminalInspectFlags,
     classified_mac: MACClassification,
 ) -> None:
     cid_length = 6  # noqa: F841 ; TODO
-    normalized = MACFormatter.normalize(args.value)
-    canonical_mac = MACFormatter.format_custom(
-        args.value, block_size=2, separator="-", case="upper"
-    )
+    normalized = normalize(args.value)
+    canonical_mac = MACFormatter.format(args.value, block_size=2, separator="-", case="upper")
     try:
-        bit_reversed_mac = MACFormatter.reverse_bits(normalized)
+        bit_reversed_mac = PresentationTranslator.to_bit_reversed(normalized)
     except ValueError:
         bit_reversed_mac = "NA"
 
@@ -216,10 +213,10 @@ def display_mac_autopsy(
     print(f"      I/G             : {ig_bit} {ig_bit_addon}")
 
 
-def show_cid_registration(index: IEEEIndexCatalog, normalized: str, slap: SLAPQuadrant) -> None:
+def show_cid_registration(index: IndexStore, normalized: str, slap: SLAPQuadrant) -> None:
     cid_length = 6
     if slap == SLAPQuadrant.ELI:
-        cid_entry = index.get_single(indextype=index.identifier_index, mac=normalized[:cid_length])
+        cid_entry = index.get_single(indextype=index.identifier, mac=normalized[:cid_length])
         print("    CID")
         if cid_entry is not None:
             print(f"      Organization   : {cid_entry.organization_name}")

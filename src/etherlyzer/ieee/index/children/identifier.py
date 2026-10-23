@@ -4,12 +4,12 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.index.base import IEEEIndexProtocol
+from etherlyzer.ieee.index.children.proto import IndexService
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 
 
 @dataclass(slots=True)
-class IdentifierIndex(IEEEIndexProtocol):
+class IdentifierIndex(IndexService):
     cid: dict[str, MACAllocationEntry] = field(default_factory=dict)
     opid: dict[str, MACAllocationEntry] = field(default_factory=dict)
     manid: dict[str, MACAllocationEntry] = field(default_factory=dict)
@@ -27,6 +27,6 @@ class IdentifierIndex(IEEEIndexProtocol):
 
         target.update({entry.assignment.upper(): entry for entry in entries})
 
-    def get_one(self, identifier: str) -> MACAllocationEntry | None:
+    def lookup(self, identifier: str) -> MACAllocationEntry | None:
         identifier = identifier.upper()
         return self.cid.get(identifier) or self.opid.get(identifier) or self.manid.get(identifier)

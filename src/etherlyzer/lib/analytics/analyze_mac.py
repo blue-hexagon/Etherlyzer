@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
-from etherlyzer.formatters import MACFormatter
+from etherlyzer.lib.normalization import normalize
 
 
 class Administration(StrEnum):
@@ -30,8 +30,8 @@ class MACClassification:
     slap_quadrant: SLAPQuadrant | None
 
 
-def classify_mac(mac: str) -> MACClassification:
-    normalized = MACFormatter.normalize(mac)
+def analyze_mac_address(mac: str) -> MACClassification:
+    normalized = normalize(mac)
 
     if not normalized or len(normalized) > 12 or len(normalized) < 6:
         raise ValueError("Expected a full or partial MAC address of 6-12 hexadecimal digits")

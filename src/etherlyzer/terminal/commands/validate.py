@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import argparse
 
-from etherlyzer.formatters import MACFormatter
+from etherlyzer.lib.normalization import normalize
+from etherlyzer.lib.validation import MACValidator
 from etherlyzer.terminal.utility import read_multiline
 
 
@@ -19,14 +20,14 @@ def run(args: argparse.Namespace) -> int:
     normalized_count = 0
     invalid_count = 0
     for mac in macs:
-        validated_mac, validation_mask = MACFormatter.validate(mac)
+        validated_mac, validation_mask = MACValidator.validate(mac)
         if args.linenumbers:
             linenumber += 1
-            if MACFormatter.mask_is_valid(validation_mask) or not args.strict:
+            if MACValidator.mask_is_valid(validation_mask) or not args.strict:
                 print(f"{linenumber}.".ljust(padding, " "), end="")
-        if not MACFormatter.mask_is_valid(validation_mask):
+        if not MACValidator.mask_is_valid(validation_mask):
             invalid_lines.append(linenumber)
-        if not args.strict and not MACFormatter.mask_is_valid(validation_mask):
+        if not args.strict and not MACValidator.mask_is_valid(validation_mask):
             if args.show_info is True:
                 print("ERR".ljust(4, " "), end="")
             if len(validated_mac) > 14:
@@ -36,8 +37,8 @@ def run(args: argparse.Namespace) -> int:
             invalid_count += 1
             continue
 
-        if MACFormatter.mask_is_valid(validation_mask):
-            normalized_mac = MACFormatter.normalize(mac)
+        if MACValidator.mask_is_valid(validation_mask):
+            normalized_mac = normalize(mac)
             if args.show_info is True:
                 print("OK".ljust(4, " "), end="")
             if args.show_originals:

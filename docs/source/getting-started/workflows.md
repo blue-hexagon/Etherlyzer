@@ -143,7 +143,7 @@ Use this table when you know what you want to accomplish but aren't sure which c
 
 | I want to...                                       | Command                                                      |
 |----------------------------------------------------|--------------------------------------------------------------|
-| Discover MAC addresses in logs or packet captures  | [`extract`](../cookbook/extract.md)                          |
+| Discover MAC addresses in logs or packet captures  | [`extraction.py`](../cookbook/extract.md)                          |
 | Remove duplicates from extracted addresses         | [`extract -u`](../cookbook/extract.md#duplicate-filtering)   |
 | Standardize address notation                       | [`format`](../cookbook/format.md)                            |
 | Correct supported typing mistakes                  | [`format -f`](../cookbook/format.md#typo-correction)         |
@@ -152,7 +152,7 @@ Use this table when you know what you want to accomplish but aren't sure which c
 | Identify an IEEE-registered organization           | [`whois`](../cookbook/whois.md)                              |
 | Examine address properties and IEEE classification | [`inspect`](../cookbook/inspect.md)                          |
 | Investigate related vendor allocations             | [`inspect -b`](../cookbook/inspect.md#related-vendor-blocks) |
-| Convert a MAC address to decimal                   | [`translate`](../cookbook/translate.md)                      |
+| Convert a MAC address to decimal                   | [`translation.py`](../cookbook/translate.md)                      |
 | Examine individual decimal octets                  | `translate -t decimal_bytes`                                 |
 | Examine address bits                               | `translate -t binary`                                        |
 | Reverse the bit order within each octet            | `translate -t bit_reversed`                                  |
@@ -168,21 +168,21 @@ EtherLyzer uses command-specific option names. Some short flags have different m
 
 | Option                              | Commands                                              | Purpose                  |
 |-------------------------------------|-------------------------------------------------------|--------------------------|
-| Positional MAC address              | `format`, `validate`, `translate`, `whois`            | Process one address      |
+| Positional MAC address              | `format`, `validate`, `translation.py`, `whois`            | Process one address      |
 | Positional assignment or identifier | `inspect`                                             | Inspect a registry entry |
-| `-b, --bulk`                        | `extract`, `format`, `validate`, `translate`, `whois` | Interactive input        |
-| `-f, --file`                        | `extract`, `whois`                                    | Read input from a file   |
+| `-b, --bulk`                        | `extraction.py`, `format`, `validate`, `translation.py`, `whois` | Interactive input        |
+| `-f, --file`                        | `extraction.py`, `whois`                                    | Read input from a file   |
 
 ### Formatting and output
 
 | Option                 | Commands                         | Purpose                                |
 |------------------------|----------------------------------|----------------------------------------|
-| `-l, --linenumbers`    | `validate`, `translate`, `whois` | Include original input line numbers    |
-| `-l, --offsets`        | `extract`                        | Include packet numbers or byte offsets |
-| `-u, --unique`         | `extract`                        | Remove duplicate addresses             |
-| `-p, --separator`      | `extract`, `format`              | Customize hexadecimal separators       |
-| `-s, --block-size`     | `extract`, `format`              | Set hexadecimal block sizes            |
-| `-c, --casing`         | `extract`, `format`              | Set hexadecimal casing                 |
+| `-l, --linenumbers`    | `validate`, `translation.py`, `whois` | Include original input line numbers    |
+| `-l, --offsets`        | `extraction.py`                        | Include packet numbers or byte offsets |
+| `-u, --unique`         | `extraction.py`                        | Remove duplicate addresses             |
+| `-p, --separator`      | `extraction.py`, `format`              | Customize hexadecimal separators       |
+| `-s, --block-size`     | `extraction.py`, `format`              | Set hexadecimal block sizes            |
+| `-c, --casing`         | `extraction.py`, `format`              | Set hexadecimal casing                 |
 | `-o, --show-originals` | `validate`                       | Include original input                 |
 | `-i, --show-info`      | `validate`                       | Include validation status              |
 | `-d, --delimiter`      | `whois`                          | Customize output field delimiters      |
@@ -194,7 +194,7 @@ EtherLyzer uses command-specific option names. Some short flags have different m
 |------------------------------|-------------|----------------------------------------------|
 | `-f, --fix-typos`            | `format`    | Enable supported typo correction             |
 | `-s, --strict`               | `validate`  | Suppress invalid results                     |
-| `-t, --to`                   | `translate` | Select a target representation               |
+| `-t, --to`                   | `translation.py` | Select a target representation               |
 | `-p, --preserve-bad-entries` | `whois`     | Preserve unsuccessful lookups                |
 | `-t, --type`                 | `inspect`   | Select an IEEE registry category             |
 | `-x, --show-mac-autopsy`     | `inspect`   | Display address structure and classification |

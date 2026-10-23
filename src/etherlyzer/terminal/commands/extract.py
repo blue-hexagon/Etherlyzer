@@ -1,83 +1,12 @@
 from __future__ import annotations
 
 import argparse
-from collections.abc import Iterator
 from pathlib import Path
 
-from scapy.layers.l2 import Ether
-from scapy.utils import PcapReader
-
-from etherlyzer.formatters import MACFormatter
+from etherlyzer.lib.extraction import MACExtractor
+from etherlyzer.lib.formatting import MACFormatter
+from etherlyzer.lib.normalization import normalize
 from etherlyzer.terminal.utility import read_multiline
-
-
-def extract_pcap_macs(path: Path) -> Iterator[tuple[int, str]]:
-    with PcapReader(str(path)) as capture:
-        for packet_number, packet in enumerate(capture, start=1):
-            if Ether not in packet:
-                continue
-
-            ethernet = packet[Ether]
-
-            yield packet_number, ethernet.src
-            yield packet_number, ethernet.dst
-
-
-def extract_file(path: Path) -> Iterator[tuple[int, str]]:
-    if path.suffix.lower() in {".pcap", ".pcapng"}:
-        yield from extract_pcap_macs(path)
-    else:
-        yield from extract_macs(path.read_bytes())
-
-
-def hex_value(byte: int) -> int:
-    if 48 <= byte <= 57:
-        return byte - 48
-    if 65 <= byte <= 70:
-        return byte - 55
-    if 97 <= byte <= 102:
-        return byte - 87
-    return -1
-
-
-def extract_macs(data: bytes) -> Iterator[tuple[int, str]]:
-    """Extract 48-bit MAC candidates from byte-oriented text."""
-
-    for start in range(len(data)):
-        if hex_value(data[start]) < 0:
-            continue
-
-        # Reject candidates embedded in longer hex sequences.
-        if start > 0 and hex_value(data[start - 1]) >= 0:
-            continue
-
-        digits: list[int] = []
-        pos = start
-
-        while pos < len(data) and len(digits) < 12:
-            value = hex_value(data[pos])
-
-            if value >= 0:
-                digits.append(value)
-                pos += 1
-                continue
-
-            # Skip at most one non-hexadecimal byte.
-            if digits and pos + 1 < len(data) and hex_value(data[pos + 1]) >= 0:
-                pos += 1
-                continue
-
-            break
-
-        if len(digits) != 12:
-            continue
-
-        # Reject candidates embedded in longer hex sequences.
-        if pos < len(data) and hex_value(data[pos]) >= 0:
-            continue
-
-        mac = "".join(f"{digit:X}" for digit in digits)
-        yield start, mac
 
 
 def run(args: argparse.Namespace) -> int:
@@ -89,22 +18,23 @@ def run(args: argparse.Namespace) -> int:
             skip_empty_lines=False,
         )
         data = "\n".join(lines).encode("utf-8")
-        matches = extract_macs(data)
+        matches = MACExtractor.extract_macs(data)
+
     else:
-        matches = extract_file(args.file)
+        matches = MACExtractor.extract_file(args.file)
 
     seen: set[str] = set()
     count = 0
 
     for position, mac in matches:
-        normalized = MACFormatter.normalize(mac)
+        normalized = normalize(mac)
 
         if args.unique:
             if normalized in seen:
                 continue
             seen.add(normalized)
 
-        formatted = MACFormatter.format_custom(
+        formatted = MACFormatter.format(
             mac=normalized,
             separator=args.separator,
             block_size=args.block_size,

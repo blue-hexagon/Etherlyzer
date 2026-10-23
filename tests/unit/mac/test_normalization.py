@@ -1,6 +1,6 @@
 import pytest
 
-from etherlyzer.formatters import MACFormatter
+from etherlyzer.lib.normalization import normalize
 
 
 @pytest.mark.parametrize(
@@ -23,4 +23,4 @@ from etherlyzer.formatters import MACFormatter
     ],
 )
 def test_normalizes_mac(value: str, expected: str) -> None:
-    assert MACFormatter.normalize(value) == expected
+    assert normalize(value) == expected

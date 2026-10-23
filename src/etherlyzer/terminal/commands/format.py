@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from etherlyzer.formatters import MACFormatter
+from etherlyzer.lib.formatting import MACFormatter
 from etherlyzer.terminal.utility import read_multiline
 
 
@@ -28,7 +28,7 @@ def run(args: argparse.Namespace) -> int:
             linenumber += 1
             print(f"{linenumber}.".ljust(padding, " "), end="")
         print(
-            MACFormatter.format_custom(
+            MACFormatter.format(
                 mac=mac,
                 separator=args.separator,
                 block_size=args.block_size,

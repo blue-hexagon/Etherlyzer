@@ -1,8 +1,8 @@
 # Translate MAC Addresses
 
-The `translate` command converts MAC addresses into numerical, binary, and byte-oriented representations.
+The `translation.py` command converts MAC addresses into numerical, binary, and byte-oriented representations.
 
-Unlike [`format`](format.md), which changes an address's notation, `translate` interprets its underlying 48-bit value in different forms.
+Unlike [`format`](format.md), which changes an address's notation, `translation.py` interprets its underlying 48-bit value in different forms.
 
 It supports individual and bulk input, semi-strict normalization, and reporting of invalid input lines.
 
@@ -26,7 +26,7 @@ Output:
 64 6 175 241 8 8
 ```
 
-By default, `translate` displays all supported representations.
+By default, `translation.py` displays all supported representations.
 
 ## Available representations
 
@@ -210,7 +210,7 @@ For address classification and IEEE allocation analysis, use [`inspect`](inspect
 
 ## Input validation
 
-The `translate` command uses semi-strict normalization.
+The `translation.py` command uses semi-strict normalization.
 
 Accepted input must contain exactly **12 hexadecimal digits**. Supported separators (`:`, `-`, `.`, and spaces) are permitted, including unconventional arrangements.
 

@@ -1,7 +1,7 @@
 import contextlib
 
-from etherlyzer.formatters import MACFormatter
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.lib.formatting import MACFormatter
 from etherlyzer.util.knobs import etherlyzer_knobs
 
 

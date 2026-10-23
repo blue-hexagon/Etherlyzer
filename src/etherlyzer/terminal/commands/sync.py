@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import time
 
-from etherlyzer.ieee.registry.catalog import Catalog
+from etherlyzer.ieee.registry.provider import RegistryProvider
 
 
 def normalize_name(name: str) -> str:
@@ -11,17 +11,16 @@ def normalize_name(name: str) -> str:
 
 
 def run(args: argparse.Namespace) -> int:
-    manager = Catalog()
+    provider = RegistryProvider()
     start = time.perf_counter()
+    registries = provider.get_all(require_cache=False)
 
     if args.status is None and args.force is None:
         print("Checking and managing IEEE registry synchronization state...\n")
-        manager.get_all_registries_and_ensure_cache_is_synced(
-            check_for_updates=True,
-            inform_if_synced_about_expiration=True,
-        )
+        for registry in registries:
+            if registry.registry_cache.need_updates(inform_if_synced_about_expiration=True):
+                registry.registry_downloader.fetch_online()
     else:
-        registries = manager.get_registries()
         requested = {
             normalize_name(name)
             for name in (args.status if args.status is not None else args.force)

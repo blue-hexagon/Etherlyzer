@@ -4,8 +4,8 @@ import argparse
 import sys
 from enum import StrEnum
 
-from etherlyzer.formatters import MACFormatter
-from etherlyzer.presentation.translate import PresentationTranslator, get_arrlen_chwidth
+from etherlyzer.lib.normalization import normalize_semi_strict
+from etherlyzer.lib.translation import PresentationTranslator, get_arrlen_chwidth
 from etherlyzer.terminal.utility import read_multiline
 
 
@@ -30,7 +30,7 @@ REPRESENTATIONS = (
 
 def translate_to_all_representations(mac: str) -> tuple[dict[str, str], Status]:
     try:
-        normalized = MACFormatter.normalize_semi_strict(mac).upper()
+        normalized = normalize_semi_strict(mac).upper()
     except ValueError:
         return {}, Status.INVALID
 

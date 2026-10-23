@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from etherlyzer.ieee.index.ieee_index import IEEEIndexCatalog
-from etherlyzer.ieee.registry.catalog import Catalog
+from etherlyzer.ieee.index.store import IndexStore
+from etherlyzer.ieee.registry.provider import RegistryProvider
 from etherlyzer.terminal.utility import print_table, read_multiline
 from etherlyzer.util.knobs import etherlyzer_knobs
 
@@ -16,7 +16,9 @@ def run(args: argparse.Namespace) -> int:
 
     separator = args.delimiter if args.delimiter is not None else etherlyzer_knobs.field_separator
 
-    index = IEEEIndexCatalog.build(Catalog().get_all_registries_and_ensure_cache_is_synced())
+    index = IndexStore.build(
+        RegistryProvider.get_all(require_cache=True)
+    )
 
     if args.mac:
         entry = index.get_from_mac_index(args.mac)
@@ -40,8 +42,8 @@ def run(args: argparse.Namespace) -> int:
     else:
         return 2
 
-    results = IEEEIndexCatalog.get_bulk(
-        ieee_index=index.mac_index,
+    results = IndexStore.get_bulk(
+        ieee_index=index.mac,
         values=source,
         include_unsuccessful=True,
     )

@@ -1,6 +1,6 @@
 import pytest
 
-from etherlyzer.formatters import MACFormatter
+from etherlyzer.lib.formatting import MACFormatter
 
 
 @pytest.mark.parametrize(
@@ -14,8 +14,6 @@ from etherlyzer.formatters import MACFormatter
 )
 def test_normalizes_mac_formats(value: str, expected: str) -> None:
     assert (
-        MACFormatter.format_custom(
-            mac=value, block_size=2, separator=":", case="lower", fix_typos=False
-        )
+        MACFormatter.format(mac=value, block_size=2, separator=":", case="lower", fix_typos=False)
         == expected
     )

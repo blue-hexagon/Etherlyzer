@@ -3,11 +3,11 @@ from __future__ import annotations
 import argparse
 
 from etherlyzer import __version__
-from etherlyzer.ieee.registry.catalog import Catalog
+from etherlyzer.ieee.registry.provider import RegistryProvider
 
 
 def run(args: argparse.Namespace) -> int:
-    manager = Catalog()
+    manager = RegistryProvider()
 
     print()
 
@@ -15,9 +15,9 @@ def run(args: argparse.Namespace) -> int:
     print()
 
     print("Registries")
-
+    registries = manager.get_all(require_cache=True)
     if not args.verbose:
-        for registry in manager.get_all_registries_and_ensure_cache_is_synced(check_for_updates=False):
+        for registry in registries:
             print(
                 f"Name            : {registry.name} ({registry.full_name})"
                 f"\nCategory        : {registry.category}"
@@ -28,7 +28,7 @@ def run(args: argparse.Namespace) -> int:
             )
             print()
     else:
-        for registry in manager.get_all_registries_and_ensure_cache_is_synced(check_for_updates=False):
+        for registry in manager.get_all(require_cache=True):
             print(
                 f"Name            : {registry.name} ({registry.full_name})"
                 f"\nLegacy Name     : {registry.legacy_name}"
@@ -69,6 +69,5 @@ Example:
         action="store_true",
         help="Print verbose output",
     )
-
 
     parser.set_defaults(func=run)

@@ -1,7 +1,7 @@
 import argparse
 
 
-def validate_args(args: argparse.Namespace) -> None:
+def validate_inspect_args(args: argparse.Namespace) -> None:
     if args.show_vendor_blocks and args.type != "mac":
         raise argparse.ArgumentError(
             None, "--show-vendor-blocks is only supported for MAC assignments."

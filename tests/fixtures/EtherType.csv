@@ -480,7 +480,7 @@ EtherType,FFFF,RFC1701,   US  ,Protocol unavailable.
 EtherType,888D,T11 Technical Committee,Sponsored by:  NCITS Secretariat Washington DC US 2005 ,"The ANSI FC-BB family of standards that have been developed, or are being developed within the INCITS T11 organization specify that all FC-BBW messages carry a fixed 8 byte Logical Link Control (LLC)/Sub Network Access Protocol (SNAP) field. The FC-BB-x LLC/SNAP header specifies an OUI of hex '00000' and requires a two byte PID that specifies Fibre Channel. This is really not something that should be assigned to a single company but instead be associated with the INCITS T11 organization or ANSI."
 EtherType,88B8,IEC TC57,"3, rue de Varembre Geneva 20  CH CH-1211 ","IEC 61850 is a global standard for the use in utility communication, in particular for the information exchange between IED's in a power transmission or distribution substation.
 
-There are three types of application services that use a specific EtherType. GOOSE uses EtherType field 88b8, GSE management services uses EtherType field 88b9. These two protocols are defined in IEC 61850-8-1. SV (Sampled Value Transmission) uses EtherType field 88ba; the protocol is defined in IEC 61850-9-1 and IEC 61850-9-2."
+There are three branches of application services that use a specific EtherType. GOOSE uses EtherType field 88b8, GSE management services uses EtherType field 88b9. These two protocols are defined in IEC 61850-8-1. SV (Sampled Value Transmission) uses EtherType field 88ba; the protocol is defined in IEC 61850-9-1 and IEC 61850-9-2."
 EtherType,8017,Able Computers,   US  ,Protocol unavailable.
 EtherType,8018,Able Computers,   US  ,Protocol unavailable.
 EtherType,8146,Vrije Universiteit,De Boelelaan 1081 Amsterdam  NL  ,EtherType used by the Amoeba Distributed Operating System protocols
@@ -1765,7 +1765,7 @@ EtherType,B382,"Cisco Systems, Inc.",3850 Zanker Rd. San Jose CA US 95134 ,Priva
 EtherType,884D,"Klos Technologies, Inc.",604 Daniel Webster Highway Merrimack NH US 03054 ,Protocol unavailable.
 EtherType,88B9,IEC TC57,"3, rue de Varembre Geneva 20  CH CH-1211 ","IEC 61850 is a global standard for the use in utility communication, in particular for the information exchange between IED's in a power transmission or distribution substation.
 
-There are three types of application services that use a specific EtherType. GOOSE uses EtherType field 88b8, GSE management services uses EtherType field 88b9. These two protocols are defined in IEC 61850-8-1. SV (Sampled Value Transmission) uses EtherType field 88ba; the protocol is defined in IEC 61850-9-1 and IEC 61850-9-2."
+There are three branches of application services that use a specific EtherType. GOOSE uses EtherType field 88b8, GSE management services uses EtherType field 88b9. These two protocols are defined in IEC 61850-8-1. SV (Sampled Value Transmission) uses EtherType field 88ba; the protocol is defined in IEC 61850-9-1 and IEC 61850-9-2."
 EtherType,C111,"Soraa, Inc.",6500 Kaiser Dr Suite 110 Fremont CA US 94555 ,A simple protocol will be used to manage and monitor a device or group of devices.
 EtherType,FC0F,Senetas Corporation Ltd,Level 1 / 11 Queens Road Melbourne VICTORIA AU 3004 ,Proprietary protocol.
 EtherType,DDB3,"Schweitzer Engineering Laboratories, Inc.",2350 NE Hopkins Court Pullman WA US 99163 ,"This Ethertype enables high-speed deterministic transport of OT communications through corporate IT Ethernet. For VLAN tagged frames, the Ethertype appears after the VLAN tag header, and is followed by an SEL-managed sub-type field."
@@ -2551,7 +2551,7 @@ EtherType,DC94,Kone Corporation,Kartanontie 1 Helsinki  FI 00330 ,"Requirements:
 EtherType,9433,O-RAN Alliance e.V.,Buschkauler Weg 27 Alfter  DE 53347 ,"The protocol for this Ethertype is specified by O-RAN Alliance and is found on https://www.o-ran.org/
 "
 EtherType,81DF,Hewlett Packard,1501 Page Mill Road Palo Alto CA US 94304 ,Protocol unavailable.
-EtherType,B6FE,EtherCAT Technology Group,Ostendstr. 196 NUremberg  DE 90482 ,"Routing functionality through branch controllers is added to the EtherCAT technology by the new EtherCAT G enhancement. IP routing is not available and VLAN based routing does not meet the requirements, so we need an own Ethertype for that purpose."
+EtherType,B6FE,EtherCAT Technology Group,Ostendstr. 196 NUremberg  DE 90482 ,"Routing functionality through branches controllers is added to the EtherCAT technology by the new EtherCAT G enhancement. IP routing is not available and VLAN based routing does not meet the requirements, so we need an own Ethertype for that purpose."
 EtherType,8746,Siemens  AG,Otto-Han-Ring-6 Munich  DE D-81739 ,Protocol unavailable.
 EtherType,8747,Hybrid,20863 Stevens Creek Blvd. Cupertino CA US 95014-8750 ,Protocol unavailable.
 EtherType,874A,Hybrid,20863 Stevens Creek Blvd. Cupertino CA US 95014-8750 ,Protocol unavailable.
@@ -2785,7 +2785,7 @@ http://www.silex.jp"
 EtherType,8121,Philips International B.V.,"Building SFF-3.32, P.O Box 80002 NL-5600 JB EINDHOVEN  NL  ",Protocol unavailable.
 EtherType,88BA,IEC TC57,"3, rue de Varembre Geneva 20  CH CH-1211 ","IEC 61850 is a global standard for the use in utility communication, in particular for the information exchange between IED's in a power transmission or distribution substation.
 
-There are three types of application services that use a specific EtherType. GOOSE uses EtherType field 88b8, GSE management services uses EtherType field 88b9. These two protocols are defined in IEC 61850-8-1. SV (Sampled Value Transmission) uses EtherType field 88ba; the protocol is defined in IEC 61850-9-1 and IEC 61850-9-2."
+There are three branches of application services that use a specific EtherType. GOOSE uses EtherType field 88b8, GSE management services uses EtherType field 88b9. These two protocols are defined in IEC 61850-8-1. SV (Sampled Value Transmission) uses EtherType field 88ba; the protocol is defined in IEC 61850-9-1 and IEC 61850-9-2."
 EtherType,0BAD,Banyan VINES,   US  ,Protocol unavailable.
 EtherType,0BAF,Banyan VINES,   US  ,Protocol unavailable.
 EtherType,826D,Extra Document,   US  ,Protocol unavailable.
@@ -2876,7 +2876,7 @@ EtherType,"=""88E9""",Motorola,120 Turnpike Road Southborough MA US 02062 ,"Moto
 "
 EtherType,"=""88E8""",LVL7 Systems,"100 Perimeter Park Drive, Suite H Morrisville NC US 27560 ",LVL7 Systems Proprietary Protocol
 EtherType,88DE,"Akimbi Systems, Inc.", San Mateo CA US 94114-2060 ,"Akimbi does not currently wish to disclose it's protocols, but may desire to do so in the future."
-EtherType,88D7,Vienna University of Technology,Treitlstraße 3/3 Vienna  AT 1040 ,"The purpose of TT Ethernet is to provide a seamless communication system for different types of distributed non-real-time and real-time applications of different criticality, from very simple uncritical data acquisition tasks, to multimedia systems and up to safety-critical control applications, such as fly-by-wire or drive-by wire.
+EtherType,88D7,Vienna University of Technology,Treitlstraße 3/3 Vienna  AT 1040 ,"The purpose of TT Ethernet is to provide a seamless communication system for different branches of distributed non-real-time and real-time applications of different criticality, from very simple uncritical data acquisition tasks, to multimedia systems and up to safety-critical control applications, such as fly-by-wire or drive-by wire.
 
 The protocol details are currently under development - for details look at http://www.vmars.tuwien.ac.at
 "
@@ -3607,7 +3607,7 @@ contain a four octet packet header. First octet contains Protocol ID,
 third and fourth octet contain 11 bit packet length. Valid Protocol ID
 is 0 or 1. Valid length is between 4 and 1522 octets."
 EtherType,893D,Korea Electric Power Corporation,105 Munji-Ro Yuseong-Gu Daejeon KR 305-760 ," It is a general configuration that PLC modems in local areas are connected with WAN(wide area network) by one PLC gateway for the last mile of an access network. In this network structure, the communication should be preceded with authentication of devices, checking channel information and remote control of PLC modems for stable and reliable operation.
-  For reference, several ether types for the PLC network are currently operated by PLC chip manufacturers such as Mavell, Intellon, Xeline and so on. KEPCO, an utility company, plans to operate an independent ether type to achieve device-level interoperability."
+  For reference, several ether branches for the PLC network are currently operated by PLC chip manufacturers such as Mavell, Intellon, Xeline and so on. KEPCO, an utility company, plans to operate an independent ether type to achieve device-level interoperability."
 EtherType,893B,IETF TRILL Working Group,c/o Internet Society Reston VA US 20190-5108 ,"This EtherType is expected to be useful in a number of applications
 but this application is particularly motivated by standards use in an
 extension to the IETF TRILL protocol standard. This EtherType
@@ -3822,7 +3822,7 @@ EtherType,7000,Ungermann-Bass,   US  ,Protocol unavailable.
 EtherType,6000,DEC,1925 Andover St. Tewksbury MA US 01876 ,Protocol unavailable.
 EtherType,96B6,"Huawei Technologies Co., Ltd."," Bantian, Longgang District, Shenzhen, 518129, P.R.C Shenzhen GUANGDONG Province CN 518000 ","The industrial optical fieldbus is derived from ITU-T GPON standard and reformed for industrial control application to ensure low latency, deterministic and high reliability connection between the control device and field devices."
 EtherType,CCB1,"Huawei Technologies Co., Ltd."," Bantian, Longgang District, Shenzhen, 518129, P.R.C Shenzhen GUANGDONG Province CN 518000 ",A customer Tag. This tag carries information indicating the enabling and related operations for congestion control schemes.
-EtherType,CEB4,General Motors,3300 General Motors Rd Milford MI US 48380 ,"Various control, management, and transport protocols delineated by sub-types that are administered and managed by General Motors."
+EtherType,CEB4,General Motors,3300 General Motors Rd Milford MI US 48380 ,"Various control, management, and transport protocols delineated by sub-branches that are administered and managed by General Motors."
 EtherType,9913,"Schweitzer Engineering Laboratories, Inc.",2350 NE Hopkins Court Pullman WA US 99163 ,"This EtherType enables hardware control of SEL hardware devices over an Ethernet connection where resources are too constrained to support a full network stack implementation, or where reduced network burden is desired."
 EtherType,C35A,ETSI,650 Route des Lucioles Valbonne Alpes-Maritimes FR 06560 ,"The protocol subtype field set to one identifies the performance measurement function protocol specified in 3GPP TS 24.193.
 3GPP TS 24.193 enables assignment of further protocols to values of the protocol subtype field.
