@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import TypeVar
 
 from etherlyzer.ieee.index.store import IndexStore
 from etherlyzer.ieee.registry.family import RegistryFamily
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 
+T = TypeVar("T")
+
 
 class IndexBuilder:
     @staticmethod
-    def build(registries: Iterable[IEEERegistry]) -> IndexStore:
+    def build(registries: Iterable[IEEERegistry[T]]) -> IndexStore:
         indexes = IndexStore()
 
         for registry in registries:

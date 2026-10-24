@@ -2,8 +2,8 @@ import re
 import string
 from dataclasses import dataclass
 
+from etherlyzer.core.normalization import normalize
 from etherlyzer.ieee.entry.base import BaseEntry
-from etherlyzer.lib.normalization import normalize
 
 
 @dataclass(frozen=True, slots=True)

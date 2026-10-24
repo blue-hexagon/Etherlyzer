@@ -5,8 +5,8 @@ import requests
 from requests import RequestException
 from tqdm import tqdm
 
+from etherlyzer.config.knobs import etherlyzer_knobs
 from etherlyzer.ieee.registry.cache import RegistryCache
-from etherlyzer.util.knobs import etherlyzer_knobs
 
 
 class RegistryDownloader:

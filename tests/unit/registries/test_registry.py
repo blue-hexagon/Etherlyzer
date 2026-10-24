@@ -1,3 +1,4 @@
+from typing import TypeVar
 from unittest.mock import Mock
 
 import pytest
@@ -5,9 +6,11 @@ import pytest
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 
+T = TypeVar("T")
+
 
 def test_registry_loads(
-    ieee_registry: IEEERegistry,
+    ieee_registry: IEEERegistry[T],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Preconditions: cache not expired and cache available."""

@@ -3,10 +3,10 @@ from __future__ import annotations
 from collections.abc import Generator, Iterable
 from dataclasses import dataclass, field
 
+from etherlyzer.core.constants import HEX_DIGITS
 from etherlyzer.ieee.entry.mac import MACAllocationEntry, MACLookupResult, classify_mac
 from etherlyzer.ieee.index.children.proto import IndexService
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
-from etherlyzer.lib.common import HEX_DIGITS
 
 
 @dataclass(slots=True)

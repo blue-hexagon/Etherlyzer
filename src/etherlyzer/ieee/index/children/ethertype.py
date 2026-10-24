@@ -3,9 +3,9 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 
+from etherlyzer.core.constants import HEX_DIGITS
 from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
 from etherlyzer.ieee.index.children.proto import IndexService
-from etherlyzer.lib.common import HEX_DIGITS
 
 
 @dataclass(slots=True)

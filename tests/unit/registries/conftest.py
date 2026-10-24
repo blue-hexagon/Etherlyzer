@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import TypeVar
 
 import pytest
 
@@ -8,12 +9,14 @@ from etherlyzer.ieee.registry.downloader import RegistryDownloader
 from etherlyzer.ieee.registry.family import RegistryFamily
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 
+T = TypeVar("T")
+
 
 @pytest.fixture
 def ieee_registry(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-) -> IEEERegistry:
+) -> IEEERegistry[T]:
     # Redirect registry files to pytest's temporary directory.
     monkeypatch.setattr(
         "etherlyzer.ieee.registry.cache.DEFAULT_CACHE_DIR",

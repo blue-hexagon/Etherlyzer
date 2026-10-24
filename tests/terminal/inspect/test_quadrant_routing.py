@@ -6,10 +6,9 @@ from unittest.mock import Mock
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
-from etherlyzer.lib.analytics.mac_classifier import classify_mac
-from etherlyzer.terminal.commands.inspect.branches.mac import router
-from etherlyzer.terminal.commands.inspect.branches.mac.router import inspect_ieee_quadrants
-from etherlyzer.terminal.commands.inspect.common import TerminalInspectFlags
+from etherlyzer.core.analytics.mac_classifier import classify_mac
+from etherlyzer.presentation.terminal.commands.inspect.branches.mac import router
+from etherlyzer.presentation.terminal.commands.inspect.common import TerminalInspectFlags
 
 
 @pytest.mark.parametrize(
@@ -44,7 +43,7 @@ def test_all_major_branches(monkeypatch: MonkeyPatch, value: str, destination: s
     )  # Temporarily replace inspect_universal_individual with a Mock (mocked_handler)
 
     # Run the actual dispatch with `inspect_universal_individual` being temorarily replaced by mocked_handler
-    result = inspect_ieee_quadrants(
+    result = router.inspect_ieee_quadrants(
         cast(argparse.Namespace, cast(object, args)),
         index,
         cast(TerminalInspectFlags, cast(object, flags)),

@@ -11,8 +11,8 @@ T = TypeVar("T")
 
 class RegistryProvider:
     def __init__(self, cache_dir: Path | None = None):
-        self.cache_dir = cache_dir
-        self.registries = self._create_registries()
+        self.cache_dir: Path | None = cache_dir
+        self.registries: dict[str, IEEERegistry] = self._create_registries()
 
     def _create_registries(self) -> dict[str, IEEERegistry[T]]:
         return {

@@ -1,8 +1,8 @@
 import datetime
 from pathlib import Path
 
-from etherlyzer.util.dirs import DEFAULT_CACHE_DIR
-from etherlyzer.util.knobs import etherlyzer_knobs
+from etherlyzer.config.dirs import DEFAULT_CACHE_DIR
+from etherlyzer.config.knobs import etherlyzer_knobs
 
 
 class RegistryCache:
