@@ -1,4 +1,4 @@
-from etherlyzer.core.constants import HEX_DIGITS
+from etherlyzer.core.constants import HEX_DIGITS, VALID_SEPARATORS
 
 
 def normalize(mac: str) -> str:
@@ -10,7 +10,7 @@ def normalize_semi_strict(mac: str) -> str:
     normalized = normalize(mac)
 
     if len(normalized) != 12 or any(
-        c.lower() not in HEX_DIGITS and c not in VALID_SEPERATORS for c in mac
+        c.lower() not in HEX_DIGITS and c not in VALID_SEPARATORS for c in mac
     ):
         raise ValueError(f"Invalid MAC address: {mac!r}")
 

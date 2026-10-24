@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from etherlyzer.core.analytics.mac_classifier import MACClassification
 from etherlyzer.ieee.initialize import EtherlyzerContext
+from etherlyzer.presentation.reporting.model import Report
 
 
 @dataclass(frozen=True)
@@ -20,8 +21,11 @@ class InspectionParams:
     context: EtherlyzerContext
     inspect_flags: TerminalInspectFlags
     classified_mac: MACClassification
+    report: Report
 
     def to_vars(
         self,
-    ) -> tuple[argparse.Namespace, EtherlyzerContext, TerminalInspectFlags, MACClassification]:
-        return self.args, self.context, self.inspect_flags, self.classified_mac
+    ) -> tuple[
+        argparse.Namespace, EtherlyzerContext, TerminalInspectFlags, MACClassification, Report
+    ]:
+        return self.args, self.context, self.inspect_flags, self.classified_mac, self.report

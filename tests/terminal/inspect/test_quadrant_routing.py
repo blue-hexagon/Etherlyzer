@@ -43,7 +43,7 @@ def test_all_major_branches(monkeypatch: MonkeyPatch, value: str, destination: s
     )  # Temporarily replace inspect_universal_individual with a Mock (mocked_handler)
 
     # Run the actual dispatch with `inspect_universal_individual` being temorarily replaced by mocked_handler
-    result = router.inspect_ieee_quadrants(
+    result = router.inspect_mac_router(
         cast(argparse.Namespace, cast(object, args)),
         index,
         cast(TerminalInspectFlags, cast(object, flags)),

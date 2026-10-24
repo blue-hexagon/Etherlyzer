@@ -1,26 +1,25 @@
-from etherlyzer.core.reporting.model import Report
+from etherlyzer.presentation.reporting.renderers.text import TextRenderer
 from etherlyzer.presentation.terminal.commands.inspect.common import InspectionParams
-from etherlyzer.presentation.terminal.commands.inspect.presentation.display import (
+from etherlyzer.presentation.terminal.commands.inspect.presentation.sections import (
     build_associated_block_count_section,
-    display_all_vendor_blocks,
-    display_organization,
-    display_registration,
+    build_ieee_registration_section,
+    build_organization_section,
+    build_vendor_blocks_section,
 )
 
 
-def inspect_universal_individual(
-    params: InspectionParams,
-) -> bool | None:
-    args, context, inspect_flags, _ = params.to_vars()
+def inspect_universal_individual(params: InspectionParams) -> bool | None:
+    args, context, inspect_flags, _, report = params.to_vars()
     entry = context.indexes.mac.lookup(args.value)
-    report = Report()
     if entry is not None:
         short_orgname = entry.short_name()
         registry = context.provider.get_by_name(entry.registry)
-        display_registration(entry, registry)
+        if True:
+            report.sections.append(
+                build_ieee_registration_section(entry, registry),
+            )
 
         if params.inspect_flags.show_vendor_stats or inspect_flags.show_vendor_blocks:
-            # vendor_index: VendorIndex = index.vendor_index
             vendor_correlated_entries = context.indexes.vendor.lookup_many(entry.organization_name)
 
             if vendor_correlated_entries:
@@ -30,10 +29,14 @@ def inspect_universal_individual(
                     )
 
                 if inspect_flags.show_vendor_blocks:
-                    display_all_vendor_blocks(args, vendor_correlated_entries)
+                    report.sections.append(
+                        build_vendor_blocks_section(vendor_correlated_entries),
+                    )
 
-        display_organization(entry, short_orgname)
-        print()  # Required exactly here.
+        report.sections.append(
+            build_organization_section(entry, short_orgname),
+        )
+        print(TextRenderer().render(report))
         return True
     if entry is None:
         print("IEEE Registry")

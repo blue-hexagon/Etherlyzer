@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Protocol
+from typing import Literal, Protocol
 
 type ReportValue = str | int | float | bool | None
 
@@ -16,6 +16,7 @@ class Item:
 class Section:
     title: str
     items: list[Item | Section] = field(default_factory=list)
+    layout: Literal["default", "grid"] = "default"
 
 
 @dataclass(slots=True)

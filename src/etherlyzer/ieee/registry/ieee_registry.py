@@ -18,7 +18,7 @@ class IEEERegistry[T]:
 
     enabled: bool
     name: str
-    model: T
+    model: type[T]
     full_name: str
     url: str
 

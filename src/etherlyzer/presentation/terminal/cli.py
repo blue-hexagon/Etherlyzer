@@ -12,7 +12,7 @@ from etherlyzer.presentation.terminal.commands import (
     validate,
     whois,
 )
-from etherlyzer.presentation.terminal.commands.inspect import controller
+from etherlyzer.presentation.terminal.commands.inspect import dispatch
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -53,7 +53,7 @@ Run `etherlyzer <command> --help` for command-specific options and examples.
     whois.register(subparsers)
     validate.register(subparsers)
     format.register(subparsers)
-    controller.register(subparsers)
+    dispatch.register(subparsers)
     registries.register(subparsers)
     sync.register(subparsers)
     extract.register(subparsers)

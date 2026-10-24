@@ -21,20 +21,26 @@ from etherlyzer.presentation.terminal.commands.inspect.branches.mac.universal_in
 )
 from etherlyzer.presentation.terminal.commands.inspect.branches.mac.zero import inspect_zero_address
 from etherlyzer.presentation.terminal.commands.inspect.common import InspectionParams
-from etherlyzer.presentation.terminal.commands.inspect.presentation.display import (
-    display_ieee_identity,
-    display_mac_autopsy,
+from etherlyzer.presentation.terminal.commands.inspect.presentation.sections import (
+    build_ieee_identity_section,
+    build_mac_autopsy_section,
 )
 
 
-def inspect_ieee_quadrants(
+def inspect_mac_router(
     params: InspectionParams,
 ) -> int:
 
-    _, _, _, classified_mac = params.to_vars()
-    display_ieee_identity(params)
+    _, _, _, classified_mac, report = params.to_vars()
+
+    report.sections.append(
+        build_ieee_identity_section(params),
+    )
+
     if params.inspect_flags.show_mac_autopsy:
-        display_mac_autopsy(params)
+        report.sections.append(
+            build_mac_autopsy_section(params),
+        )
     if params.classified_mac.is_zero:
         inspect_zero_address(params)
     elif params.classified_mac.is_broadcast:

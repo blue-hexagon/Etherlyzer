@@ -7,18 +7,19 @@ from etherlyzer.ieee.initialize import (
     initialize_etherlyzer,
 )
 from etherlyzer.ieee.registry.family import RegistryFamily
+from etherlyzer.presentation.reporting.model import Report
 from etherlyzer.presentation.terminal.commands.inspect.branches.ethertype_branch import (
     inspect_ethertype,
 )
 from etherlyzer.presentation.terminal.commands.inspect.branches.mac.router import (
-    inspect_ieee_quadrants,
+    inspect_mac_router,
 )
 from etherlyzer.presentation.terminal.commands.inspect.common import (
     InspectionParams,
     TerminalInspectFlags,
 )
-from etherlyzer.presentation.terminal.commands.inspect.presentation.display import (
-    show_cid_registration,
+from etherlyzer.presentation.terminal.commands.inspect.presentation.sections import (
+    build_cid_registration_section,
 )
 
 
@@ -36,17 +37,18 @@ def run(args: argparse.Namespace) -> int:
         context=context,
         inspect_flags=inspect_flags,
         classified_mac=classify_mac(args.value),
+        report=Report(),
     )
     match args.type.lower():
         case RegistryFamily.MAC_REGISTRY.value:
-            return inspect_ieee_quadrants(params)
+            return inspect_mac_router(params)
         case RegistryFamily.ETHERTYPE_REGISTRY.value:
             return inspect_ethertype(params)
         case RegistryFamily.IDENTIFIER_REGISTRY.value:
             slap = classify_mac(args.value).slap_quadrant
             if slap is None:
                 return 2
-            show_cid_registration(params)
+            build_cid_registration_section(params)
         case _:
             print(f"No valid type ({args.type}) selected.")
             return 1

@@ -51,7 +51,7 @@ def select_registries(
     ]
 
 
-def initialize_registry_caches(registries: list[IEEERegistry[T]]) -> None:
+def initialize_registry_caches(registries: list[IEEERegistry]) -> None:
 
     for registry in registries:
         if registry.registry_cache.filepath.exists():
@@ -61,5 +61,5 @@ def initialize_registry_caches(registries: list[IEEERegistry[T]]) -> None:
             raise RuntimeError(f"Failed to synchronize registry cache: {registry.name}")
 
 
-def initialize_indexes(registries: Iterable[IEEERegistry[T]]) -> IndexStore:
+def initialize_indexes(registries: Iterable[IEEERegistry]) -> IndexStore:
     return IndexBuilder.build(registries)

@@ -53,7 +53,7 @@ class RegistryDownloader:
                 total_size = int(res.headers.get("content-length", 0)) or None
 
                 with (
-                    open(self.cache.filepath, "wb") as f,
+                    self.cache.filepath.open("wb") as f,
                     tqdm(
                         total=total_size or None,
                         unit="B",
