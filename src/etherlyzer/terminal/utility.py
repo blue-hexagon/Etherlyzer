@@ -40,4 +40,8 @@ def print_table(
     widths = [max(len(row[i]) for row in rows) for i in range(len(rows[0]))]
 
     for row in rows:
-        print("  ".join(value.ljust(width) for value, width in zip(row, widths)).rstrip())
+        print(
+            "  ".join(
+                value.ljust(width) for value, width in zip(row, widths, strict=False)
+            ).rstrip()
+        )

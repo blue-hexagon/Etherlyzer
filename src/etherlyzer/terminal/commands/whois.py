@@ -11,7 +11,7 @@ from etherlyzer.util.knobs import etherlyzer_knobs
 
 
 def run(args: argparse.Namespace) -> int:
-    indexes = initialize_etherlyzer()
+    context = initialize_etherlyzer()
     if args.linenumbers and not (args.bulk or args.file):
         print("error: --linenumbers requires --bulk or --file")
         return 2
@@ -19,7 +19,7 @@ def run(args: argparse.Namespace) -> int:
     separator = args.delimiter if args.delimiter is not None else etherlyzer_knobs.field_separator
 
     if args.mac:
-        entry = indexes.mac.lookup(args.mac)
+        entry = context.indexes.mac.lookup(args.mac)
 
         if entry is None:
             print("No entry found.")
@@ -40,8 +40,8 @@ def run(args: argparse.Namespace) -> int:
     else:
         return 2
 
-    results = indexes.mac.get_bulk(  # TODO: refactorize to get_many instead and remove get_bulk entirely. This is the only usage.
-        ieee_index=indexes.mac,
+    results = context.indexes.mac.get_bulk(  # TODO: refactorize to get_many instead and remove get_bulk entirely. This is the only usage.
+        ieee_index=context.indexes.mac,
         values=source,
         include_unsuccessful=True,
     )

@@ -1,9 +1,12 @@
 from pathlib import Path
+from typing import TypeVar
 
 from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.registry.category import RegistryCategory
+from etherlyzer.ieee.registry.family import RegistryFamily
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+
+T = TypeVar("T")
 
 
 class RegistryProvider:
@@ -11,7 +14,7 @@ class RegistryProvider:
         self.cache_dir = cache_dir
         self.registries = self._create_registries()
 
-    def _create_registries(self) -> dict[str, IEEERegistry]:
+    def _create_registries(self) -> dict[str, IEEERegistry[T]]:
         return {
             "mal": IEEERegistry(
                 enabled=True,
@@ -19,7 +22,7 @@ class RegistryProvider:
                 model=MACAllocationEntry,
                 full_name="MAC Address Block Large",
                 legacy_name="OUI",
-                category=RegistryCategory.MAC_REGISTRY,
+                family=RegistryFamily.MAC_REGISTRY,
                 prefix_bits=24,
                 address_bits=24,
                 address_count=16_777_216,
@@ -38,7 +41,7 @@ class RegistryProvider:
                 model=MACAllocationEntry,
                 full_name="MAC Address Block Medium",
                 legacy_name="OUI-28",
-                category=RegistryCategory.MAC_REGISTRY,
+                family=RegistryFamily.MAC_REGISTRY,
                 prefix_bits=28,
                 address_bits=20,
                 address_count=1_048_576,
@@ -56,7 +59,7 @@ class RegistryProvider:
                 model=MACAllocationEntry,
                 full_name="MAC Address Block Small",
                 legacy_name="OUI-36",
-                category=RegistryCategory.MAC_REGISTRY,
+                family=RegistryFamily.MAC_REGISTRY,
                 prefix_bits=36,
                 address_bits=12,
                 address_count=4_096,
@@ -74,7 +77,7 @@ class RegistryProvider:
                 model=MACAllocationEntry,
                 full_name="Company Identifier",
                 legacy_name=None,
-                category=RegistryCategory.IDENTIFIER_REGISTRY,
+                family=RegistryFamily.IDENTIFIER_REGISTRY,
                 legacy=False,
                 description=(
                     "Unique company identifiers assigned by IEEE. Identifies "
@@ -89,7 +92,7 @@ class RegistryProvider:
                 model=MACAllocationEntry,
                 full_name="Individual Address Block",
                 legacy_name=None,
-                category=RegistryCategory.MAC_REGISTRY,
+                family=RegistryFamily.MAC_REGISTRY,
                 prefix_bits=36,
                 address_bits=12,
                 address_count=4_096,
@@ -107,7 +110,7 @@ class RegistryProvider:
                 model=EtherTypeEntry,
                 full_name="EtherType Registry",
                 legacy_name=None,
-                category=RegistryCategory.ETHERTYPE_REGISTRY,
+                family=RegistryFamily.ETHERTYPE_REGISTRY,
                 legacy=False,
                 description=(
                     "Registry mapping EtherType values to Ethernet protocols, "
@@ -119,7 +122,7 @@ class RegistryProvider:
             ),
         }
 
-    def get(self, registry_name: str, require_cache: bool = False) -> IEEERegistry:
+    def get(self, registry_name: str, require_cache: bool = False) -> IEEERegistry[T]:
         registry = self.registries.get(registry_name)
 
         if registry is None:
@@ -130,7 +133,14 @@ class RegistryProvider:
 
         return registry
 
-    def get_all(self, require_cache: bool = False) -> list[IEEERegistry]:
+    def get_by_name(self, name: str) -> IEEERegistry[T]:
+        for registry in self.registries.values():
+            if registry.name.casefold() == name.casefold():
+                return registry
+
+        raise KeyError(f"Unknown registry: {name!r}")
+
+    def get_all(self, require_cache: bool = False) -> list[IEEERegistry[T]]:
         if require_cache:
             self.ensure_all_caches_exist()
 
@@ -151,5 +161,5 @@ class RegistryProvider:
         if not self.all_caches_exist():
             raise RuntimeError("One or more registry caches are missing.")
 
-    def __getitem__(self, key: str) -> IEEERegistry:
+    def __getitem__(self, key: str) -> IEEERegistry[T]:
         return self.registries[key]

@@ -1,3 +1,4 @@
+from typing import TypeVar
 from unittest.mock import Mock
 
 import pytest
@@ -5,6 +6,8 @@ import requests
 
 from etherlyzer.ieee.registry.downloader import RegistryDownloader
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+
+T = TypeVar("T")
 
 
 def mock_http_response(status_code: int) -> Mock:
@@ -39,7 +42,7 @@ def test_downloader_can_fetch(
 
     monkeypatch.setattr(
         requests,
-        "get",  # type: ignore
+        "get",
         mocked_get,
     )
 
@@ -96,7 +99,7 @@ def test_download_fails_after_maximum_retries(
 
     monkeypatch.setattr(
         requests,
-        "get",  # type: ignore
+        "get",
         mocked_get,
     )
 
@@ -134,8 +137,8 @@ def test_download_fails_after_maximum_retries(
 
 
 @pytest.mark.parametrize("status_code", [408, 421, 425, 429, 500, 502, 503, 504])
-def test_http_errors_trigger_retries(
-    ieee_registry: IEEERegistry,
+def test_http_errors_trigger_retries[T](
+    ieee_registry: IEEERegistry[T],
     monkeypatch: pytest.MonkeyPatch,
     status_code: int,
 ) -> None:
@@ -146,14 +149,14 @@ def test_http_errors_trigger_retries(
 
     monkeypatch.setattr(
         requests,
-        "get",  # type: ignore
+        "get",
         mocked_get,
     )
 
 
 @pytest.mark.parametrize("status_code", [400, 401, 403, 404, 405, 410, 422])
-def test_http_errors_does_not_trigger_retries(
-    ieee_registry: IEEERegistry,
+def test_http_errors_does_not_trigger_retries[T](
+    ieee_registry: IEEERegistry[T],
     monkeypatch: pytest.MonkeyPatch,
     status_code: int,
 ) -> None:
@@ -164,6 +167,6 @@ def test_http_errors_does_not_trigger_retries(
 
     monkeypatch.setattr(
         requests,
-        "get",  # type: ignore
+        "get",
         mocked_get,
     )

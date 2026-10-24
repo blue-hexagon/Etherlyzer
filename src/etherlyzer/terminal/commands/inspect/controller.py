@@ -5,40 +5,42 @@ import argparse
 from etherlyzer.ieee.initialize import (
     initialize_etherlyzer,
 )
-from etherlyzer.ieee.registry.category import RegistryCategory
-from etherlyzer.lib.analytics.analyze_mac import analyze_mac_address
-from etherlyzer.lib.normalization import normalize
-from etherlyzer.terminal.commands.inspect.arg_validation import validate_inspect_args
+from etherlyzer.ieee.registry.family import RegistryFamily
+from etherlyzer.lib.analytics.mac_classifier import classify_mac
 from etherlyzer.terminal.commands.inspect.branches.ethertype_branch import inspect_ethertype
 from etherlyzer.terminal.commands.inspect.branches.mac.router import inspect_ieee_quadrants
-from etherlyzer.terminal.commands.inspect.common import TerminalInspectFlags
+from etherlyzer.terminal.commands.inspect.common import (
+    InspectionParams,
+    TerminalInspectFlags,
+)
 from etherlyzer.terminal.commands.inspect.display import show_cid_registration
 
 
 def run(args: argparse.Namespace) -> int:
     validate_inspect_args(args)
-
-    indexes = initialize_etherlyzer()
-
+    context = initialize_etherlyzer()
     inspect_flags = TerminalInspectFlags(
-        show_mac_autopsy=args.all or args.show_mac_autopsy,
-        show_vendor_stats=(args.all or args.show_vendor_stats or args.show_vendor_blocks),
-        show_vendor_blocks=args.all or args.show_vendor_blocks,
+        show_mac_autopsy=(args.all or args.show_mac_autopsy),
+        show_vendor_stats=(args.all or args.show_vendor_stats),
+        show_vendor_blocks=(args.all or args.show_vendor_blocks),
     )
 
+    params = InspectionParams(
+        args=args,
+        context=context,
+        inspect_flags=inspect_flags,
+        classified_mac=classify_mac(args.value),
+    )
     match args.type.lower():
-        case RegistryCategory.MAC_REGISTRY.value:
-            return inspect_ieee_quadrants(args, indexes, inspect_flags)
-        case RegistryCategory.ETHERTYPE_REGISTRY.value:
-            entry = indexes.get_single(indexes.ethertype, args.value)
-            inspect_ethertype(args, entry, indexes)
-        case RegistryCategory.IDENTIFIER_REGISTRY.value:
-            entry = indexes.get_single(indexes.identifier, args.value)
-            norm = normalize(args.value)
-            slap = analyze_mac_address(args.value).slap_quadrant
+        case RegistryFamily.MAC_REGISTRY.value:
+            return inspect_ieee_quadrants(params)
+        case RegistryFamily.ETHERTYPE_REGISTRY.value:
+            return inspect_ethertype(params)
+        case RegistryFamily.IDENTIFIER_REGISTRY.value:
+            slap = classify_mac(args.value).slap_quadrant
             if slap is None:
                 return 2
-            show_cid_registration(indexes, norm, slap)
+            show_cid_registration(params)
         case _:
             print(f"No valid type ({args.type}) selected.")
             return 1
@@ -46,6 +48,23 @@ def run(args: argparse.Namespace) -> int:
     print()
 
     return 0
+
+
+def validate_inspect_args(args: argparse.Namespace) -> None:
+    if args.show_vendor_blocks and args.type != "mac":
+        raise argparse.ArgumentError(
+            None, "--show-vendor-blocks is only supported for MAC assignments."
+        )
+    elif args.show_vendor_stats and args.type != "mac":
+        raise argparse.ArgumentError(
+            None, "--show-vendor-stats is only supported for MAC assignments."
+        )
+    elif args.show_mac_autopsy and args.type != "mac":
+        raise argparse.ArgumentError(
+            None, "--show-mac-analysis is only supported for MAC assignments."
+        )
+    else:
+        pass
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -71,7 +90,7 @@ Examples:
         "-t",
         "--type",
         type=str,
-        choices=list(RegistryCategory),
+        choices=list(RegistryFamily),
         default="mac",
         metavar="{mac|protocol|identifier}",
         help="IEEE registry category to search (default: mac).",

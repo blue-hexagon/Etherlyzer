@@ -1,10 +1,10 @@
 import pytest
 
-from etherlyzer.lib.analytics.analyze_mac import (
+from etherlyzer.lib.analytics.mac_classifier import (
     Administration,
     DeliveryType,
     SLAPQuadrant,
-    analyze_mac_address,
+    classify_mac,
 )
 
 
@@ -20,7 +20,7 @@ from etherlyzer.lib.analytics.analyze_mac import (
 def test_mac_classification(
     value: str, administration: Administration, delivery: DeliveryType
 ) -> None:
-    result = analyze_mac_address(value)
+    result = classify_mac(value)
 
     assert result.administration == administration
     assert result.delivery == delivery
@@ -52,7 +52,7 @@ def test_mac_classification(
     ],
 )
 def test_mac_classification_slap_quadrant(value: str, slap_quadrant: SLAPQuadrant) -> None:
-    result = analyze_mac_address(value)
+    result = classify_mac(value)
 
     assert result.slap_quadrant == slap_quadrant
 
@@ -71,7 +71,7 @@ def test_mac_classification_slap_quadrant(value: str, slap_quadrant: SLAPQuadran
 )
 def test_mac_classification_slap_quadrant_fails(value: str) -> None:
     with pytest.raises(ValueError):
-        analyze_mac_address(value)
+        classify_mac(value)
 
 
 @pytest.mark.parametrize(
@@ -83,7 +83,7 @@ def test_mac_classification_slap_quadrant_fails(value: str) -> None:
     ],
 )
 def test_zero_address(value: str, expected: bool) -> None:
-    result = analyze_mac_address(value)
+    result = classify_mac(value)
 
     assert result.is_zero is expected
 
@@ -97,6 +97,6 @@ def test_zero_address(value: str, expected: bool) -> None:
     ],
 )
 def test_broadcast_address(value: str, expected: bool) -> None:
-    result = analyze_mac_address(value)
+    result = classify_mac(value)
 
     assert result.is_broadcast is expected

@@ -20,7 +20,7 @@ def run(args: argparse.Namespace) -> int:
         for registry in registries:
             print(
                 f"Name            : {registry.name} ({registry.full_name})"
-                f"\nCategory        : {registry.category}"
+                f"\nCategory        : {registry.family}"
                 f"\nDescription     : {registry.description}"
                 f"\nFile            : {registry.registry_cache.filepath}"
                 f"\nSource URL      : {registry.url}"
@@ -32,7 +32,7 @@ def run(args: argparse.Namespace) -> int:
             print(
                 f"Name            : {registry.name} ({registry.full_name})"
                 f"\nLegacy Name     : {registry.legacy_name}"
-                f"\nCategory        : {registry.category}"
+                f"\nCategory        : {registry.family}"
                 f"\nDescription     : {registry.description}"
                 f"\nLegacy          : {registry.legacy}"
                 f"\nFile            : {registry.registry_cache.filepath}"

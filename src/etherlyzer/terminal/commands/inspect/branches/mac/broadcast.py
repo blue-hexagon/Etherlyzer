@@ -1,14 +1,7 @@
-import argparse
-
-from etherlyzer.ieee.index.store import IndexStore
-from etherlyzer.lib.analytics.analyze_mac import MACClassification
-from etherlyzer.terminal.commands.inspect.common import TerminalInspectFlags
+from etherlyzer.terminal.commands.inspect.common import InspectionParams
 
 
 def inspect_broadcast_address(
-    args: argparse.Namespace,
-    index: IndexStore,
-    inspect_flags: TerminalInspectFlags,
-    classified_mac: MACClassification,
+    params: InspectionParams,
 ) -> None:
     print("Broadcast")

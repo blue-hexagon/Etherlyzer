@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
-from etherlyzer.lib.analytics.analyze_mac import analyze_mac_address
+from etherlyzer.lib.analytics.mac_classifier import classify_mac
 from etherlyzer.terminal.commands.inspect.branches.mac import router
 from etherlyzer.terminal.commands.inspect.branches.mac.router import inspect_ieee_quadrants
 from etherlyzer.terminal.commands.inspect.common import TerminalInspectFlags
@@ -57,5 +57,5 @@ def test_all_major_branches(monkeypatch: MonkeyPatch, value: str, destination: s
         args=args,
         index=index,
         inspect_flags=flags,
-        classified_mac=analyze_mac_address(args.value),
+        classified_mac=classify_mac(args.value),
     )

@@ -3,19 +3,16 @@ from __future__ import annotations
 import argparse
 
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.index.store import IndexStore
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
-from etherlyzer.lib.analytics.allocations import summarize_vendor_allocations
-from etherlyzer.lib.analytics.analyze_mac import (
+from etherlyzer.lib.analytics.allocation_stats import summarize_vendor_allocations
+from etherlyzer.lib.analytics.mac_classifier import (
     Administration,
     DeliveryType,
-    MACClassification,
     SLAPQuadrant,
 )
 from etherlyzer.lib.formatting import MACFormatter
-from etherlyzer.lib.normalization import normalize
 from etherlyzer.lib.translation import PresentationTranslator
-from etherlyzer.terminal.commands.inspect.common import TerminalInspectFlags
+from etherlyzer.terminal.commands.inspect.common import InspectionParams
 
 
 def display_associated_block_counts(vendor_correlated_entries: list[MACAllocationEntry]) -> None:
@@ -26,18 +23,22 @@ def display_associated_block_counts(vendor_correlated_entries: list[MACAllocatio
     print("  Total")
     print(f"    Blocks           : {total_alloc.total_blocks:,}")
     print(f"    Capacity         : {total_alloc.total_addresses:,}")
-    print("  MA-L")
-    print(f"    Blocks           : {mal_alloc.total_blocks:,}")
-    print(f"    Capacity         : {mal_alloc.total_addresses:,}")
-    print("  MA-M")
-    print(f"    Blocks           : {mam_alloc.total_blocks:,}")
-    print(f"    Capacity         : {mam_alloc.total_addresses:,}")
-    print("  MA-S")
-    print(f"    Blocks           : {mas_alloc.total_blocks:,}")
-    print(f"    Capacity         : {mas_alloc.total_addresses:,}")
-    print("  IAB")
-    print(f"    Blocks           : {iab_alloc.total_blocks:,}")
-    print(f"    Capacity         : {iab_alloc.total_addresses:,}")
+    if mal_alloc.total_blocks != 0:
+        print("  MA-L")
+        print(f"    Blocks           : {mal_alloc.total_blocks:,}")
+        print(f"    Capacity         : {mal_alloc.total_addresses:,}")
+    if mam_alloc.total_blocks != 0:
+        print("  MA-M")
+        print(f"    Blocks           : {mam_alloc.total_blocks:,}")
+        print(f"    Capacity         : {mam_alloc.total_addresses:,}")
+    if mas_alloc.total_blocks != 0:
+        print("  MA-S")
+        print(f"    Blocks           : {mas_alloc.total_blocks:,}")
+        print(f"    Capacity         : {mas_alloc.total_addresses:,}")
+    if iab_alloc.total_blocks != 0:
+        print("  IAB")
+        print(f"    Blocks           : {iab_alloc.total_blocks:,}")
+        print(f"    Capacity         : {iab_alloc.total_addresses:,}")
 
 
 def display_all_vendor_blocks(
@@ -85,37 +86,33 @@ def display_organization(entry: MACAllocationEntry, short_orgname: str) -> None:
         print(f"    {addr_piece}")
 
 
-def display_ieee_identifier(
-    args: argparse.Namespace,
-    index: IndexStore,
-    inspect_flags: TerminalInspectFlags,
-    classified_mac: MACClassification,
+def display_ieee_identity(
+    params: InspectionParams,
 ) -> None:
-    normalized = normalize(args.value)
-    is_complete = len(normalized) == 12
     mac_entry = None
     cid_entry = None
+    _, context, _, classified_mac = params.to_vars()
 
     if classified_mac.administration == Administration.UNIVERSAL:
         if classified_mac.delivery == DeliveryType.INDIVIDUAL:
-            mac_entry = index.get_single(index.mac, normalized)
+            mac_entry = context.indexes.get_single(context.indexes.mac, classified_mac.normalized)
 
-    elif classified_mac.slap_quadrant == SLAPQuadrant.ELI and len(normalized) >= 6:
-        cid_entry = index.get_single(
-            index.identifier,
-            normalized[:6],
+    elif classified_mac.slap_quadrant == SLAPQuadrant.ELI and len(classified_mac.normalized) >= 6:
+        cid_entry = context.indexes.get_single(
+            context.indexes.identifier,
+            classified_mac.normalized[:6],
         )
-    if classified_mac.is_zero and is_complete:
+    if classified_mac.is_zero and classified_mac.is_complete():
         assignment = "Not Applicable (Zero Address)"
 
-    elif classified_mac.is_broadcast and is_complete:
+    elif classified_mac.is_broadcast and classified_mac.is_complete():
         assignment = "Not Applicable (Broadcast Address)"
 
     elif classified_mac.delivery == DeliveryType.GROUP:
         assignment = "Not Applicable (Group Address)"
 
     elif classified_mac.administration == Administration.UNIVERSAL:
-        if is_complete:
+        if classified_mac.is_complete():
             assignment = (
                 "EUI-48 Candidate (Registered Block)"
                 if mac_entry is not None
@@ -129,12 +126,12 @@ def display_ieee_identifier(
             )
 
     elif classified_mac.slap_quadrant == SLAPQuadrant.ELI:
-        if is_complete:
+        if classified_mac.is_complete():
             assignment = (
                 "ELI-48 Candidate (Registered CID)"
                 if cid_entry is not None
-                else "ELI-48 Candidate (Unregistered CID)"
-                if len(normalized) >= 6
+                else "Not ELI-48 Candidate (Unregistered CID)"
+                if len(classified_mac.normalized) >= 6
                 else "ELI-48 Candidate (CID Not Evaluated)"
             )
         else:
@@ -142,7 +139,7 @@ def display_ieee_identifier(
                 "ELI Prefix (Registered CID)"
                 if cid_entry is not None
                 else "ELI Prefix (Unregistered CID)"
-                if len(normalized) >= 6
+                if len(classified_mac.normalized) >= 6
                 else "ELI Prefix (Incomplete CID)"
             )
 
@@ -157,28 +154,17 @@ def display_ieee_identifier(
 
     else:
         assignment = "Unknown"
-    print("\nIEEE Identifier")
+    print("\nIEEE Identity")
     print(f"  Type                : {assignment}")
     print(f"  SLAP Quadrant       : {classified_mac.slap_quadrant}")
 
 
 def display_mac_autopsy(
-    args: argparse.Namespace,
-    index: IndexStore,
-    inspect_flags: TerminalInspectFlags,
-    classified_mac: MACClassification,
+    params: InspectionParams,
 ) -> None:
-    cid_length = 6  # noqa: F841 ; TODO
-    normalized = normalize(args.value)
-    canonical_mac = MACFormatter.format(args.value, block_size=2, separator="-", case="upper")
-    try:
-        bit_reversed_mac = PresentationTranslator.to_bit_reversed(normalized)
-    except ValueError:
-        bit_reversed_mac = "NA"
-
-    mac_int = int(normalized, 16)
-    mac_int_padded = int(normalized.ljust(12, "0"), 16)
-    mac_decimals = list(bytes.fromhex(normalized.replace(":", "")))
+    args, _, _, classified_mac = params.to_vars()
+    normalized = classified_mac.normalized
+    mac_int_padded = int(classified_mac.normalized.ljust(12, "0"), 16)
 
     first_octet = mac_int_padded >> 40
     ul_bit = (first_octet >> 1) & 1
@@ -187,24 +173,19 @@ def display_mac_autopsy(
     )
     ig_bit = first_octet & 1
     ig_bit_addon = "Group / Multicast" if ig_bit else "Individual / Unicast"
-    bit_width = len(normalized) * 4
-    octal_width = (bit_width + 2) // 3
-    binary = f"{mac_int:0{bit_width}b}"
-    binary = ".".join(binary[i : i + 4] for i in range(0, len(binary), 4))
-
+    pt = PresentationTranslator
     print("MAC Address Autopsy")
     print("  Input")
     print(f"    Value             : {args.value}")
     print(f"    Length            : {len(normalized) * 4} bits")
     print("  Representations")
-    print(f"    Canonical         : {canonical_mac}")
-    print(f"    Bit-Reversed      : {bit_reversed_mac}")
-    print(f"    To Hex            : {mac_int:0{len(normalized)}X}")
-    print(f"    To Integer        : {mac_int:,}")
-    print(f"    To Decimals       : {' '.join(map(str, mac_decimals))}")
-    print(f"    To Octal          : {mac_int:0{octal_width}o}")
-    print(f"    To Binary         : {binary}")
-    print(f"    To Bytes          : {mac_int.to_bytes(bit_width // 8, 'big').hex(' ').upper()}")
+    print(f"    Canonical         : {pt.to_canonical(normalized)}")
+    print(f"    Bit-Reversed      : {pt.to_bit_reversed(normalized)}")
+    print(f"    To Hex            : {pt.to_hex(normalized)}")
+    print(f"    To Integer        : {pt.to_decimal(normalized)}")
+    print(f"    To Decimals       : {pt.to_decimal_bytes(normalized)}")
+    print(f"    To Binary         : {pt.to_binary(normalized)}")
+    print(f"    To Bytes          : {pt.to_bytes(normalized)}")
     print("  Address Properties")
     print(f"    Null Address      : {classified_mac.is_zero}")
     print(f"    Broadcast         : {classified_mac.is_broadcast}")
@@ -213,16 +194,21 @@ def display_mac_autopsy(
     print(f"      I/G             : {ig_bit} {ig_bit_addon}")
 
 
-def show_cid_registration(index: IndexStore, normalized: str, slap: SLAPQuadrant) -> None:
-    cid_length = 6
-    if slap == SLAPQuadrant.ELI:
-        cid_entry = index.get_single(indextype=index.identifier, mac=normalized[:cid_length])
-        print("    CID")
-        if cid_entry is not None:
-            print(f"      Organization   : {cid_entry.organization_name}")
-            print("      Address")
-            for address_piece in cid_entry.format_vendor_address():
-                print(f"        {address_piece}")
+def show_cid_registration(
+    params: InspectionParams,
+) -> bool:
+    CID_LENGTH = 6
+    _, context, _, classified_mac = params.to_vars()
+    cid_entry = context.indexes.get_single(
+        indextype=context.indexes.identifier, mac=classified_mac.normalized[:CID_LENGTH]
+    )
+    print("    CID")
+    if cid_entry is not None:
+        print(f"      Organization   : {cid_entry.organization_name}")
+        print("      Address")
+        for address_piece in cid_entry.format_vendor_address():
+            print(f"        {address_piece}")
 
-        else:
-            print("      Organization   : Not Registered")
+    else:
+        print("      Organization   : Not Registered")
+    return 0

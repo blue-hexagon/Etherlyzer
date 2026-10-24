@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 
 from etherlyzer.ieee.index.store import IndexStore
-from etherlyzer.ieee.registry.category import RegistryCategory
+from etherlyzer.ieee.registry.family import RegistryFamily
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 
 
@@ -15,18 +15,18 @@ class IndexBuilder:
         for registry in registries:
             entries = registry.load()
 
-            match registry.category:
-                case RegistryCategory.MAC_REGISTRY:
+            match registry.family:
+                case RegistryFamily.MAC_REGISTRY:
                     indexes.mac.insert(registry, entries)
 
-                case RegistryCategory.ETHERTYPE_REGISTRY:
+                case RegistryFamily.ETHERTYPE_REGISTRY:
                     indexes.ethertype.insert(entries)
 
-                case RegistryCategory.IDENTIFIER_REGISTRY:
+                case RegistryFamily.IDENTIFIER_REGISTRY:
                     indexes.identifier.insert(registry, entries)
 
                 case _:
-                    raise ValueError(f"Unsupported registry category: {registry.category}")
+                    raise ValueError(f"Unsupported registry category: {registry.family}")
 
         for mac in indexes.mac.walk():
             entry = indexes.mac.lookup(mac)

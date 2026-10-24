@@ -4,7 +4,7 @@ from etherlyzer.ieee.entry.mac import MACAllocationEntry
 
 
 @dataclass
-class VendorAllocation:
+class VendorAllocationStats:
     registry: str | None
     total_addresses: int = 0
     total_blocks: int = 0
@@ -17,7 +17,11 @@ class VendorAllocation:
 def summarize_vendor_allocations(
     vendors_other_blocks: list[MACAllocationEntry],
 ) -> tuple[
-    VendorAllocation, VendorAllocation, VendorAllocation, VendorAllocation, VendorAllocation
+    VendorAllocationStats,
+    VendorAllocationStats,
+    VendorAllocationStats,
+    VendorAllocationStats,
+    VendorAllocationStats,
 ]:
     capacities = {
         "MA-L": 2**24,
@@ -26,7 +30,7 @@ def summarize_vendor_allocations(
         "IAB": 2**12,
     }
 
-    allocations = {registry: VendorAllocation(registry) for registry in capacities}
+    allocations = {registry: VendorAllocationStats(registry) for registry in capacities}
 
     for entry in vendors_other_blocks:
         registry = entry.registry
@@ -36,7 +40,7 @@ def summarize_vendor_allocations(
 
         allocations[registry].add_block(capacities[registry])
 
-    total = VendorAllocation(
+    total = VendorAllocationStats(
         registry=None,
         total_addresses=sum(allocation.total_addresses for allocation in allocations.values()),
         total_blocks=sum(allocation.total_blocks for allocation in allocations.values()),

@@ -4,8 +4,8 @@ import pytest
 
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
 from etherlyzer.ieee.registry.cache import RegistryCache
-from etherlyzer.ieee.registry.category import RegistryCategory
 from etherlyzer.ieee.registry.downloader import RegistryDownloader
+from etherlyzer.ieee.registry.family import RegistryFamily
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 
 
@@ -26,7 +26,7 @@ def ieee_registry(
         model=MACAllocationEntry,
         full_name="Test IEEE Registry",
         url="https://example.com/registry.csv",
-        category=RegistryCategory.MAC_REGISTRY,
+        family=RegistryFamily.MAC_REGISTRY,
         legacy=False,
         description="Testing Registry",
     )
