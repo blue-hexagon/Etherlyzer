@@ -54,7 +54,7 @@ Repository = "https://github.com/blue-hexagon/EtherLyzer"
 Issues = "https://github.com/blue-hexagon/EtherLyzer/issues"
 
 [project.scripts]
-etherlyzer = "etherlyzer.terminal.cli:main"
+etherlyzer = "etherlyzer.presentation.terminal.cli:main"
 
 
 [tool.poetry]
@@ -153,6 +153,8 @@ select = [
     "SIM",
     "C4",
     "RUF",
+    "PERF",
+    "PTH"
 ]
 
 ignore = [

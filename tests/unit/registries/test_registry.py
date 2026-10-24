@@ -1,3 +1,4 @@
+from typing import TypeVar
 from unittest.mock import Mock
 
 import pytest
@@ -5,9 +6,11 @@ import pytest
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
 from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
 
+T = TypeVar("T")
+
 
 def test_registry_loads(
-    ieee_registry: IEEERegistry,
+    ieee_registry: IEEERegistry[T],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Preconditions: cache not expired and cache available."""
@@ -43,26 +46,20 @@ MA-L,644C69,CONPROVE,"75, Visconde de Ouro Preto St. Uberlândia Minas Gerais BR
     mocked_fetch.assert_not_called()
 
 
-def test_registry_downloads_if_one_file_is_missing_from_cache(
-    ieee_registry: IEEERegistry, monkeypatch: pytest.MonkeyPatch
+def test_registry_load_raises_when_cache_missing(
+    ieee_registry: IEEERegistry,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     assert not ieee_registry.registry_cache.filepath.exists()
 
-    mocked_save = Mock()
-    mocked_load = Mock(return_value=[])
-
-    monkeypatch.setattr(ieee_registry.registry_downloader, "fetch_online", mocked_save)
+    mocked_fetch = Mock()
     monkeypatch.setattr(
-        ieee_registry.registry_parser,
-        "load_file",
-        mocked_load,
+        ieee_registry.registry_downloader,
+        "fetch_online",
+        mocked_fetch,
     )
 
-    result = ieee_registry.load()
+    with pytest.raises(FileNotFoundError, match="Missing registry cache"):
+        ieee_registry.load()
 
-    mocked_save.assert_called_once_with()
-    mocked_load.assert_called_once_with(
-        ieee_registry.registry_cache.filepath,
-        MACAllocationEntry,
-    )
-    assert result == []
+    mocked_fetch.assert_not_called()

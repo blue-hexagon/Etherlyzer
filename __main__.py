@@ -1,4 +1,4 @@
-from etherlyzer.terminal.cli import main
+from etherlyzer.presentation.terminal.cli import main
 
 if __name__ == "__main__":
     raise SystemExit(main())

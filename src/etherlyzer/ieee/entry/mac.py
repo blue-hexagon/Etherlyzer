@@ -2,7 +2,7 @@ import re
 import string
 from dataclasses import dataclass
 
-from etherlyzer.formatters import MACFormatter
+from etherlyzer.core.normalization import normalize
 from etherlyzer.ieee.entry.base import BaseEntry
 
 
@@ -41,7 +41,7 @@ class MACLookupResult:
 
 
 def classify_mac(mac: str) -> str | None:
-    normalized = MACFormatter.normalize(mac)
+    normalized = normalize(mac)
 
     if len(normalized) != 12 or any(c not in string.hexdigits for c in normalized):
         return "Invalid format"

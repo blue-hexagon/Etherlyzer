@@ -1,10 +1,9 @@
 import pytest
 
-from etherlyzer.ieee.registry.catalog import Catalog
+from etherlyzer.ieee.registry.provider import RegistryProvider
 
 
 @pytest.fixture
-def registry() -> Catalog | None:
-    if Catalog.db_is_initialized():
-        return Catalog
-    return None
+def registry() -> RegistryProvider:
+    provider = RegistryProvider()
+    return provider

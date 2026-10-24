@@ -5,8 +5,8 @@ import requests
 from requests import RequestException
 from tqdm import tqdm
 
+from etherlyzer.config.knobs import etherlyzer_knobs
 from etherlyzer.ieee.registry.cache import RegistryCache
-from etherlyzer.util.knobs import etherlyzer_knobs
 
 
 class RegistryDownloader:
@@ -53,7 +53,7 @@ class RegistryDownloader:
                 total_size = int(res.headers.get("content-length", 0)) or None
 
                 with (
-                    open(self.cache.filepath, "wb") as f,
+                    self.cache.filepath.open("wb") as f,
                     tqdm(
                         total=total_size or None,
                         unit="B",
