@@ -8,7 +8,7 @@ from etherlyzer.terminal.commands.inspect.common import TerminalInspectFlags
 def inspect_universal_group(
     args: argparse.Namespace,
     index: IndexStore,
-    eval_flags: TerminalInspectFlags,
+    inspect_flags: TerminalInspectFlags,
     classified_mac: MACClassification,
 ) -> None:
     print("UG")

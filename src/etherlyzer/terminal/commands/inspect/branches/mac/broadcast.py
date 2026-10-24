@@ -8,7 +8,7 @@ from etherlyzer.terminal.commands.inspect.common import TerminalInspectFlags
 def inspect_broadcast_address(
     args: argparse.Namespace,
     index: IndexStore,
-    eval_flags: TerminalInspectFlags,
+    inspect_flags: TerminalInspectFlags,
     classified_mac: MACClassification,
 ) -> None:
     print("Broadcast")

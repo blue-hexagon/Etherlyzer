@@ -15,7 +15,7 @@ from etherlyzer.terminal.commands.inspect.display import (
 def inspect_universal_individual(
     args: argparse.Namespace,
     index: IndexStore,
-    eval_flags: TerminalInspectFlags,
+    inspect_flags: TerminalInspectFlags,
     classified_mac: MACClassification,
 ) -> bool | None:
     entry = index.get_single(index.mac, args.value)
@@ -25,15 +25,15 @@ def inspect_universal_individual(
         reg = RegistryProvider.get(str(entry.registry).lower().replace("-", ""))
         display_registration(entry, reg)
 
-        if eval_flags.show_vendor_stats or eval_flags.show_vendor_blocks:
+        if inspect_flags.show_vendor_stats or inspect_flags.show_vendor_blocks:
             # vendor_index: VendorIndex = index.vendor_index
             vendor_correlated_entries = index.vendor.lookup_many(entry.organization_name)
 
             if vendor_correlated_entries:
-                if eval_flags.show_vendor_stats:
+                if inspect_flags.show_vendor_stats:
                     display_associated_block_counts(vendor_correlated_entries)
 
-                if eval_flags.show_vendor_blocks:
+                if inspect_flags.show_vendor_blocks:
                     display_all_vendor_blocks(args, vendor_correlated_entries)
 
         display_organization(entry, short_orgname)

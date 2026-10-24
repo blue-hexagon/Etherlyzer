@@ -16,7 +16,7 @@ def run(args: argparse.Namespace) -> int:
     registries = provider.get_all(require_cache=False)
 
     if args.status is None and args.force is None:
-        print("Checking and managing IEEE registry synchronization state...\n")
+        print("Checking and handling IEEE registry synchronization state...\n")
         for registry in registries:
             if registry.registry_cache.need_updates(inform_if_synced_about_expiration=True):
                 registry.registry_downloader.fetch_online()

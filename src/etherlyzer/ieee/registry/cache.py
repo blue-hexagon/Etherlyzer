@@ -1,13 +1,14 @@
 import datetime
 from pathlib import Path
 
-from etherlyzer.util.dirs import DATA_PLATFORM_DIR
+from etherlyzer.util.dirs import DEFAULT_CACHE_DIR
 from etherlyzer.util.knobs import etherlyzer_knobs
 
 
 class RegistryCache:
-    def __init__(self, name: str):
+    def __init__(self, name: str, cache_dir: Path | None = None):
         self.name = name
+        self.cache_dir = cache_dir if cache_dir is not None else DEFAULT_CACHE_DIR
         # Check that filepath exists
         # Get file mod ts if, else set to 0.0 (epoch zero)
         # Modify stateful variable that is used later to ensure a (recent) copy exists.
@@ -22,7 +23,7 @@ class RegistryCache:
 
     @property
     def filepath(self) -> Path:
-        return DATA_PLATFORM_DIR / Path("".join([self.name, ".csv"]))
+        return self.cache_dir / Path("".join([self.name, ".csv"]))
 
     def need_updates(self, inform_if_synced_about_expiration: bool = False) -> bool:
         expires = self.last_retrieved + self.update_interval

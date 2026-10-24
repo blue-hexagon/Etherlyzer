@@ -8,7 +8,7 @@ from typing import get_type_hints
 
 from dotenv import load_dotenv
 
-from etherlyzer.util.dirs import DATA_PLATFORM_DIR
+from etherlyzer.util.dirs import DEFAULT_CACHE_DIR
 
 
 class MACCasing(StrEnum):
@@ -42,9 +42,9 @@ class EtherlyzerKnobs:
 
 
 def _load_environment() -> None:
-    DATA_PLATFORM_DIR.mkdir(parents=True, exist_ok=True)
+    DEFAULT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
-    destination_env = DATA_PLATFORM_DIR / "etherlyzer.env"
+    destination_env = DEFAULT_CACHE_DIR / "etherlyzer.env"
 
     if not destination_env.exists():
         template_env = files("etherlyzer").joinpath("etherlyzer.env")

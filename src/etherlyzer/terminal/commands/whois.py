@@ -3,25 +3,23 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from etherlyzer.ieee.index.store import IndexStore
-from etherlyzer.ieee.registry.provider import RegistryProvider
+from etherlyzer.ieee.initialize import (
+    initialize_etherlyzer,
+)
 from etherlyzer.terminal.utility import print_table, read_multiline
 from etherlyzer.util.knobs import etherlyzer_knobs
 
 
 def run(args: argparse.Namespace) -> int:
+    indexes = initialize_etherlyzer()
     if args.linenumbers and not (args.bulk or args.file):
         print("error: --linenumbers requires --bulk or --file")
         return 2
 
     separator = args.delimiter if args.delimiter is not None else etherlyzer_knobs.field_separator
 
-    index = IndexStore.build(
-        RegistryProvider.get_all(require_cache=True)
-    )
-
     if args.mac:
-        entry = index.get_from_mac_index(args.mac)
+        entry = indexes.mac.lookup(args.mac)
 
         if entry is None:
             print("No entry found.")
@@ -42,8 +40,8 @@ def run(args: argparse.Namespace) -> int:
     else:
         return 2
 
-    results = IndexStore.get_bulk(
-        ieee_index=index.mac,
+    results = indexes.mac.get_bulk(  # TODO: refactorize to get_many instead and remove get_bulk entirely. This is the only usage.
+        ieee_index=indexes.mac,
         values=source,
         include_unsuccessful=True,
     )

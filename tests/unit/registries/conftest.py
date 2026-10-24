@@ -16,7 +16,7 @@ def ieee_registry(
 ) -> IEEERegistry:
     # Redirect registry files to pytest's temporary directory.
     monkeypatch.setattr(
-        "etherlyzer.ieee.registry.cache.DATA_PLATFORM_DIR",
+        "etherlyzer.ieee.registry.cache.DEFAULT_CACHE_DIR",
         tmp_path,
     )
 
@@ -38,7 +38,7 @@ def registry_cache(
     monkeypatch: pytest.MonkeyPatch,
 ) -> RegistryCache:
     monkeypatch.setattr(
-        "etherlyzer.ieee.registry.cache.DATA_PLATFORM_DIR",
+        "etherlyzer.ieee.registry.cache.DEFAULT_CACHE_DIR",
         tmp_path,
     )
 

@@ -88,7 +88,7 @@ def display_organization(entry: MACAllocationEntry, short_orgname: str) -> None:
 def display_ieee_identifier(
     args: argparse.Namespace,
     index: IndexStore,
-    eval_flags: TerminalInspectFlags,
+    inspect_flags: TerminalInspectFlags,
     classified_mac: MACClassification,
 ) -> None:
     normalized = normalize(args.value)
@@ -165,7 +165,7 @@ def display_ieee_identifier(
 def display_mac_autopsy(
     args: argparse.Namespace,
     index: IndexStore,
-    eval_flags: TerminalInspectFlags,
+    inspect_flags: TerminalInspectFlags,
     classified_mac: MACClassification,
 ) -> None:
     cid_length = 6  # noqa: F841 ; TODO

@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import argparse
 
-from etherlyzer.ieee.index.store import IndexStore
-from etherlyzer.ieee.registry.provider import RegistryProvider
+from etherlyzer.ieee.initialize import (
+    initialize_etherlyzer,
+)
 from etherlyzer.ieee.registry.category import RegistryCategory
 from etherlyzer.lib.analytics.analyze_mac import analyze_mac_address
 from etherlyzer.lib.normalization import normalize
@@ -17,10 +18,8 @@ from etherlyzer.terminal.commands.inspect.display import show_cid_registration
 def run(args: argparse.Namespace) -> int:
     validate_inspect_args(args)
 
-    registry = RegistryProvider()
-    index = IndexStore.build(
-        registry.get_all(require_cache=True)
-    )
+    indexes = initialize_etherlyzer()
+
     inspect_flags = TerminalInspectFlags(
         show_mac_autopsy=args.all or args.show_mac_autopsy,
         show_vendor_stats=(args.all or args.show_vendor_stats or args.show_vendor_blocks),
@@ -29,17 +28,17 @@ def run(args: argparse.Namespace) -> int:
 
     match args.type.lower():
         case RegistryCategory.MAC_REGISTRY.value:
-            return inspect_ieee_quadrants(args, index, inspect_flags)
+            return inspect_ieee_quadrants(args, indexes, inspect_flags)
         case RegistryCategory.ETHERTYPE_REGISTRY.value:
-            entry = index.get_single(index.protocol_index, args.value)
-            inspect_ethertype(args, entry, index)
+            entry = indexes.get_single(indexes.ethertype, args.value)
+            inspect_ethertype(args, entry, indexes)
         case RegistryCategory.IDENTIFIER_REGISTRY.value:
-            entry = index.get_single(index.identifier, args.value)
+            entry = indexes.get_single(indexes.identifier, args.value)
             norm = normalize(args.value)
             slap = analyze_mac_address(args.value).slap_quadrant
             if slap is None:
                 return 2
-            show_cid_registration(index, norm, slap)
+            show_cid_registration(indexes, norm, slap)
         case _:
             print(f"No valid type ({args.type}) selected.")
             return 1

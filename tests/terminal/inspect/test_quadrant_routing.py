@@ -56,6 +56,6 @@ def test_all_major_branches(monkeypatch: MonkeyPatch, value: str, destination: s
     mocked_handler.assert_called_once_with(
         args=args,
         index=index,
-        eval_flags=flags,
+        inspect_flags=flags,
         classified_mac=analyze_mac_address(args.value),
     )
