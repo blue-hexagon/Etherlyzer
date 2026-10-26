@@ -5,13 +5,13 @@ from etherlyzer.core.normalization import normalize
 
 
 class Administration(StrEnum):
-    UNIVERSAL = "Universal"
-    LOCAL = "Local"
+    UNIVERSAL = "Universally Administered Address (UAA)"
+    LOCAL = "Locally Administered Address (LAA)"
 
 
 class DeliveryType(StrEnum):
-    INDIVIDUAL = "Individual"
-    GROUP = "Group"
+    INDIVIDUAL = "Individual Address"
+    GROUP = "Group Address"
 
 
 class SLAPQuadrant(StrEnum):

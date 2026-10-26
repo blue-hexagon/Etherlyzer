@@ -14,6 +14,7 @@ class MACAllocationIndex(IndexService):
     prefixes_36: dict[str, MACAllocationEntry] = field(default_factory=dict)
     prefixes_28: dict[str, MACAllocationEntry] = field(default_factory=dict)
     prefixes_24: dict[str, MACAllocationEntry] = field(default_factory=dict)
+    IAB_ENCLOSING_IEEE_RAS = frozenset({"0050C2", "40D855"})
 
     def insert(self, registry: IEEERegistry, entries: Iterable[MACAllocationEntry]) -> None:
         match registry.prefix_bits:
@@ -36,6 +37,27 @@ class MACAllocationIndex(IndexService):
             self.prefixes_36.get(mac[:9])
             or self.prefixes_28.get(mac[:7])
             or self.prefixes_24.get(mac[:6])
+        )
+
+    def lookup_group_allocation(self, identifier: str) -> MACAllocationEntry | None:
+        """This is a special lookup only used once in the entire program.
+        It fixes an edge-case where IAB will take precendence over the MAM and MAL registry
+        because it is more specific. But that is an error in this specific instance for the following reason:
+        MA-L, MA-M, MA-S (not IAB) can flip the I/G bit of an assignment to create a multicast address (per IEEE)
+        Hence IAB must be excluded in this very lookup."""
+
+        mac = "".join(c for c in identifier.upper() if c in HEX_DIGITS)
+
+        entry_36 = self.prefixes_36.get(mac[:9])
+        entry_24 = self.prefixes_24.get(mac[:6])
+        return (
+            (entry_36 if entry_36 is not None and entry_36.registry != "IAB" else None)
+            or self.prefixes_28.get(mac[:7])
+            or (
+                entry_24
+                if entry_24 is not None and entry_24.assignment not in self.IAB_ENCLOSING_IEEE_RAS
+                else None
+            )
         )
 
     def walk(self) -> Generator[str]:
