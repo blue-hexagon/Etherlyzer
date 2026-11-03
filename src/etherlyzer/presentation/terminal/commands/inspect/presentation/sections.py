@@ -16,6 +16,41 @@ def build_associated_block_count_section(
     total_alloc, iab_alloc, mal_alloc, mam_alloc, mas_alloc = summarize_vendor_allocations(
         vendor_correlated_entries
     )
+    mal, mam, mas, iab = None, None, None, None
+    if mal_alloc.total_blocks > 0:
+        mal = Section(
+            title="MA-L",
+            items=[
+                Item(key="Blocks", value=f"{mal_alloc.total_blocks:,}"),
+                Item(key="Capacity", value=f"{mal_alloc.total_addresses:,}"),
+            ],
+        )
+
+    if mam_alloc.total_blocks > 0:
+        mam = Section(
+            title="MA-M",
+            items=[
+                Item(key="Blocks", value=f"{mam_alloc.total_blocks:,}"),
+                Item(key="Capacity", value=f"{mam_alloc.total_addresses:,}"),
+            ],
+        )
+    if mas_alloc.total_blocks > 0:
+        mas = Section(
+            title="MA-S",
+            items=[
+                Item(key="Blocks", value=f"{mas_alloc.total_blocks:,}"),
+                Item(key="Capacity", value=f"{mas_alloc.total_addresses:,}"),
+            ],
+        )
+    if iab_alloc.total_blocks > 0:
+        iab = Section(
+            title="IAB",
+            items=[
+                Item(key="Blocks", value=f"{iab_alloc.total_blocks:,}"),
+                Item(key="Capacity", value=f"{iab_alloc.total_addresses:,}"),
+            ],
+        )
+    stats_for_each_registry = [s for s in [mal, mam, mas, iab] if s is not None]
     return Section(
         title="Associated Allocations",
         items=[
@@ -27,32 +62,8 @@ def build_associated_block_count_section(
                 ],
             ),
             Section(
-                title="MA-L",
-                items=[
-                    Item(key="Blocks", value=f"{mal_alloc.total_blocks:,}"),
-                    Item(key="Capacity", value=f"{mal_alloc.total_addresses:,}"),
-                ],
-            ),
-            Section(
-                title="MA-M",
-                items=[
-                    Item(key="Blocks", value=f"{mam_alloc.total_blocks:,}"),
-                    Item(key="Capacity", value=f"{mam_alloc.total_addresses:,}"),
-                ],
-            ),
-            Section(
-                title="MA-S",
-                items=[
-                    Item(key="Blocks", value=f"{mas_alloc.total_blocks:,}"),
-                    Item(key="Capacity", value=f"{mas_alloc.total_addresses:,}"),
-                ],
-            ),
-            Section(
-                title="IAB",
-                items=[
-                    Item(key="Blocks", value=f"{iab_alloc.total_blocks:,}"),
-                    Item(key="Capacity", value=f"{iab_alloc.total_addresses:,}"),
-                ],
+                title="By Registry",
+                items=stats_for_each_registry,
             ),
         ],
     )
@@ -62,7 +73,7 @@ def build_vendor_blocks_section(
     vendor_correlated_entries: list[MACAllocationEntry],
 ) -> Section:
     return Section(
-        title="Registered Blocks (B=IAB, S=MA-S, M=MA-M, L=MA-L)",
+        title="Registered Blocks",
         layout="grid",
         items=[
             Item(
@@ -71,96 +82,76 @@ def build_vendor_blocks_section(
             )
             for entry in vendor_correlated_entries
         ],
+        legend="B=IAB, S=MA-S, M=MA-M, L=MA-L",
     )
 
 
-def build_ieee_registration_section(entry: MACAllocationEntry, reg: IEEERegistry) -> Section:
-    stuffed_input_0 = MACFormatter.format_default(entry.assignment, "0")
-    sutffed_input_f = MACFormatter.format_default(entry.assignment, "f")
+def build_ieee_registration_section(
+    entry: MACAllocationEntry,
+    reg: IEEERegistry,
+) -> Section:
+    range_start = MACFormatter.format_default(entry.assignment, "0")
+    range_end = MACFormatter.format_default(entry.assignment, "f")
+    address = entry.format_vendor_address()
+
+    allocation_items = [
+        Item(
+            key="Registry",
+            value=f"{entry.registry} [{reg.full_name}]",
+        ),
+        Item(
+            key="Assignment",
+            value=MACFormatter.format_default(entry.assignment),
+        ),
+        Item(
+            key="Range",
+            value=f"{range_start} - {range_end}",
+        ),
+        Item(
+            key="Prefix Bits",
+            value=f"{reg.prefix_bits} bits",
+        ),
+        Item(
+            key="Address Bits",
+            value=f"{reg.address_bits} bits",
+        ),
+    ]
+
+    if reg.address_count is not None:
+        allocation_items.append(Item(key="Address Capacity", value=f"{reg.address_count:,}"))
+
+    allocation_items.append(Item(key="Legacy", value="Yes" if reg.legacy else "No"))
+
+    if reg.legacy and reg.legacy_name:
+        allocation_items.append(Item(key="Legacy Name", value=reg.legacy_name))
 
     return Section(
         title="IEEE Registry",
         layout="default",
         items=[
-            Item(
-                key="IEEE Type",
-                value=f"{entry.registry} [{reg.full_name}]",
+            Section(
+                title="Organization",
+                layout="default",
+                items=[
+                    Item(key="Name", value=entry.short_name()),
+                    Item(key="Full Name", value=entry.organization_name),
+                    Item(key="Address", value="".join(address)),
+                ],
             ),
-            Item(
-                key="Assignment",
-                value=f"{MACFormatter.format_default(entry.assignment)}",
-            ),
-            Item(
-                key="Range",
-                value=f"{stuffed_input_0} - {sutffed_input_f}",
-            ),
-            Item(
-                key="Prefix Bits",
-                value=f"{reg.prefix_bits} bits",
-            ),
-            Item(
-                key="Address Bits",
-                value=f"{reg.address_bits} bits",
-            ),
-            Item(
-                key="Legacy",
-                value=f"{reg.legacy}",
-            ),
-            Item(
-                key="Legacy Name",
-                value=f"{reg.legacy_name or 'NA'}",
-            ),
-            *(
-                [Item(key="Address Capacity", value=reg.address_count)]
-                if reg.address_count is not None
-                else []
-            ),
-        ],
-    )
-
-
-def build_organization_section(entry: MACAllocationEntry, short_orgname: str) -> Section:
-    address = entry.format_vendor_address()
-    return Section(
-        title="Organization",
-        layout="default",
-        items=[
-            Item(
-                key="Name",
-                value=f"{short_orgname}",
-            ),
-            Item(
-                key="Full Name",
-                value=f"{entry.organization_name}",
-            ),
-            Item(
-                key="Address",
-                value=f"{''.join(address)}",
-            ),
-        ],
-    )
-
-
-def build_ieee_identity_section(params: InspectionParams) -> Section:
-    _, context, _, mac, _ = params.to_vars()
-
-    identity, registration = analyze_mac_identity(mac, context)
-    return Section(
-        title="IEEE Identity",
-        items=[
-            Item("Type", identity),
-            Item("Registration", registration),
-            Item(
-                "SLAP Quadrant",
-                mac.slap_quadrant.value if mac.slap_quadrant is not None else "None",
+            Section(
+                title="Allocation",
+                layout="default",
+                items=allocation_items,
             ),
         ],
     )
 
 
 def build_mac_autopsy_section(params: InspectionParams) -> Section:
-    args, _, _, classified_mac, _ = params.to_vars()
+
+    args, context, _, classified_mac, _ = params.to_vars()
     normalized = classified_mac.normalized
+    identity, registration, kind = analyze_mac_identity(classified_mac, context)
     mac_int_padded = int(normalized.ljust(12, "0"), 16)
 
     first_octet = mac_int_padded >> 40
@@ -174,6 +165,7 @@ def build_mac_autopsy_section(params: InspectionParams) -> Section:
     ig_bit_addon = "Group / Multicast" if ig_bit else "Individual / Unicast"
 
     pt = PresentationTranslator
+    pt.strict = False
 
     return Section(
         title="MAC Address Autopsy",
@@ -183,6 +175,20 @@ def build_mac_autopsy_section(params: InspectionParams) -> Section:
                 items=[
                     Item(key="Value", value=args.value),
                     Item(key="Length", value=f"{len(normalized) * 4} bits"),
+                ],
+            ),
+            Section(
+                title="IEEE Identity",
+                items=[
+                    Item("Kind", kind),
+                    Item("Type", identity),
+                    Item("Registration", registration),
+                    Item(
+                        "SLAP Quadrant",
+                        classified_mac.slap_quadrant.value
+                        if classified_mac.slap_quadrant is not None
+                        else "None",
+                    ),
                 ],
             ),
             Section(

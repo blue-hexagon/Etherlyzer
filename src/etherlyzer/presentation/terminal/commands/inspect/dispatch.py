@@ -41,6 +41,7 @@ def run(args: argparse.Namespace) -> int:
     )
     match args.type.lower():
         case RegistryFamily.MAC_REGISTRY.value:
+
             return inspect_mac_router(params)
         case RegistryFamily.ETHERTYPE_REGISTRY.value:
             return inspect_ethertype(params)

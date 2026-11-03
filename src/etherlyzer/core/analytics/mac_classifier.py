@@ -33,6 +33,18 @@ class MACClassification:
     def is_complete(self) -> bool:
         return len(self.normalized) == 12
 
+    def is_all_zero(self) -> bool:
+        value = int(self.normalized, 16)
+        is_all_zeros = value == 0
+        return is_all_zeros
+
+    def is_all_ones(self) -> bool:
+        value = int(self.normalized, 16)
+        bits = len(self.normalized) * 4
+
+        is_all_ones = value == (1 << bits) - 1
+        return is_all_ones
+
 
 def classify_mac(mac: str) -> MACClassification:
     normalized = normalize(mac)

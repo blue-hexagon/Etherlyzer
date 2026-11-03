@@ -9,12 +9,9 @@ from etherlyzer.presentation.terminal.commands.inspect.presentation.sections imp
 def inspect_local_individual(params: InspectionParams) -> None:
     print("Local-Individual: SLAP branch")
     _, _, _, classified_mac, report = params.to_vars()
-    report.sections.append(
-        build_mac_autopsy_section(params),
-    )
     match classified_mac.slap_quadrant:
         case SLAPQuadrant.ELI:
-            report.sections.append(
+            report.previous_section.append(
                 build_cid_registration_section(params),
             )
 

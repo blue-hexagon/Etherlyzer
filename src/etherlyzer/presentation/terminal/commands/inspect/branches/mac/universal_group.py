@@ -2,4 +2,7 @@ from etherlyzer.presentation.terminal.commands.inspect.common import InspectionP
 
 
 def inspect_universal_group(params: InspectionParams) -> None:
-    pass
+    args, context, inspect_flags, _, report = params.to_vars()
+    print(context.indexes.ethertype.lookup(args.value))
+    print(context.indexes.ethertype.ethertype.items())
+    exit(0)
