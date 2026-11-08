@@ -16,16 +16,13 @@ class TerminalInspectFlags:
 
 
 @dataclass(slots=True, frozen=True)
-class InspectionParams:
+class CommonInspectionParams:
     args: argparse.Namespace
     context: EtherlyzerContext
     inspect_flags: TerminalInspectFlags
-    classified_mac: MACClassification
     report: Report
 
-    def to_vars(
-        self,
-    ) -> tuple[
-        argparse.Namespace, EtherlyzerContext, TerminalInspectFlags, MACClassification, Report
-    ]:
-        return self.args, self.context, self.inspect_flags, self.classified_mac, self.report
+
+@dataclass(frozen=True)
+class MacInspectionParams(CommonInspectionParams):
+    classified_mac: MACClassification

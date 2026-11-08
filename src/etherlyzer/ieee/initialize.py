@@ -5,7 +5,7 @@ from typing import TypeVar
 
 from etherlyzer.ieee.index.builder import IndexBuilder
 from etherlyzer.ieee.index.store import IndexStore
-from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.ieee_registry import RegistrySource
 from etherlyzer.ieee.registry.provider import RegistryProvider
 
 T = TypeVar("T")
@@ -39,7 +39,7 @@ def select_registries(
     provider: RegistryProvider,
     inclusions: list[str] | None = None,
     exemptions: list[str] | None = None,
-) -> list[IEEERegistry[T]]:
+) -> list[RegistrySource[T]]:
     included = {name.casefold() for name in (inclusions or [])}
     excluded = {name.casefold() for name in (exemptions or [])}
 
@@ -51,7 +51,7 @@ def select_registries(
     ]
 
 
-def initialize_registry_caches(registries: list[IEEERegistry]) -> None:
+def initialize_registry_caches(registries: list[RegistrySource]) -> None:
 
     for registry in registries:
         if registry.registry_cache.filepath.exists():
@@ -61,5 +61,5 @@ def initialize_registry_caches(registries: list[IEEERegistry]) -> None:
             raise RuntimeError(f"Failed to synchronize registry cache: {registry.name}")
 
 
-def initialize_indexes(registries: Iterable[IEEERegistry]) -> IndexStore:
+def initialize_indexes(registries: Iterable[RegistrySource]) -> IndexStore:
     return IndexBuilder.build(registries)

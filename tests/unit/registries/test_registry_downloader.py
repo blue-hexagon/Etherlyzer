@@ -5,7 +5,7 @@ import pytest
 import requests
 
 from etherlyzer.ieee.registry.downloader import RegistryDownloader
-from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.ieee_registry import RegistrySource
 
 T = TypeVar("T")
 
@@ -64,7 +64,7 @@ def test_downloader_can_fetch(
 
 
 def test_download_retries_after_request_failure(
-    ieee_registry: IEEERegistry,
+    ieee_registry: RegistrySource,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     response = Mock()
@@ -92,7 +92,7 @@ def test_download_retries_after_request_failure(
 
 
 def test_download_fails_after_maximum_retries(
-    ieee_registry: IEEERegistry,
+    ieee_registry: RegistrySource,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     mocked_get = Mock(side_effect=requests.exceptions.Timeout())
@@ -138,7 +138,7 @@ def test_download_fails_after_maximum_retries(
 
 @pytest.mark.parametrize("status_code", [408, 421, 425, 429, 500, 502, 503, 504])
 def test_http_errors_trigger_retries[T](
-    ieee_registry: IEEERegistry[T],
+    ieee_registry: RegistrySource[T],
     monkeypatch: pytest.MonkeyPatch,
     status_code: int,
 ) -> None:
@@ -156,7 +156,7 @@ def test_http_errors_trigger_retries[T](
 
 @pytest.mark.parametrize("status_code", [400, 401, 403, 404, 405, 410, 422])
 def test_http_errors_does_not_trigger_retries[T](
-    ieee_registry: IEEERegistry[T],
+    ieee_registry: RegistrySource[T],
     monkeypatch: pytest.MonkeyPatch,
     status_code: int,
 ) -> None:

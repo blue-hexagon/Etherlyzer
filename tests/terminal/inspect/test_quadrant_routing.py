@@ -7,9 +7,9 @@ import pytest
 from etherlyzer.core.analytics.mac_classifier import classify_mac
 from etherlyzer.ieee.initialize import EtherlyzerContext
 from etherlyzer.presentation.reporting.model import Report, Section
-from etherlyzer.presentation.terminal.commands.inspect.branches.mac import router
+from etherlyzer.presentation.terminal.commands.inspect import branch_macaddr
 from etherlyzer.presentation.terminal.commands.inspect.common import (
-    InspectionParams,
+    CommonInspectionParams,
     TerminalInspectFlags,
 )
 
@@ -37,7 +37,7 @@ def test_all_major_branches(
 ) -> None:
     report = Report()
 
-    params = InspectionParams(
+    params = CommonInspectionParams(
         args=argparse.Namespace(value=value),
         context=cast(EtherlyzerContext, Mock()),
         inspect_flags=TerminalInspectFlags(
@@ -53,15 +53,15 @@ def test_all_major_branches(
     identity_section = Section(title="IEEE Identity")
 
     monkeypatch.setattr(
-        router,
+        branch_macaddr,
         "build_ieee_identity_section",
         Mock(return_value=identity_section),
     )
 
     mocked_handler = Mock()
-    monkeypatch.setattr(router, destination, mocked_handler)
+    monkeypatch.setattr(branch_macaddr, destination, mocked_handler)
 
-    result = router.inspect_mac_router(params)
+    result = branch_macaddr.mac_inspection_router(params)
 
     assert result == 0
     mocked_handler.assert_called_once_with(params)

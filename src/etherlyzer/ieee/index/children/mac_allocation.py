@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from etherlyzer.core.constants import HEX_DIGITS
 from etherlyzer.ieee.entry.mac import MACAllocationEntry, MACLookupResult, classify_mac
 from etherlyzer.ieee.index.children.proto import IndexService
-from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.ieee_registry import RegistrySource
 
 
 @dataclass(slots=True)
@@ -15,8 +15,15 @@ class MACAllocationIndex(IndexService):
     prefixes_28: dict[str, MACAllocationEntry] = field(default_factory=dict)
     prefixes_24: dict[str, MACAllocationEntry] = field(default_factory=dict)
     IAB_ENCLOSING_IEEE_RAS = frozenset({"0050C2", "40D855"})
+    # IAB-Based Identifiers
+    # 2026-11-04: https://standards-support.ieee.org/hc/en-us/articles/4888705676564-Guidelines-for-Use-of-Extended-Unique-Identifier-EUI-Organizationally-Unique-Identifier-OUI-and-Company-ID-CID
+    # While the IEEE RA did not guarantee that the 36-bit IAB identifier
+    # would always be created from the same OUI, all IAB assignments were
+    # in fact created from two particular OUIs: 00-50-C2hex and 40-D8-55hex.
+    # The former was used until all the IABs based on it were assigned [(200X)], after which the latter was used [(201X)].
+    # TODO: That should be the obly two enclosing IEEE-RA's but I'm slightly uncertain.
 
-    def insert(self, registry: IEEERegistry, entries: Iterable[MACAllocationEntry]) -> None:
+    def insert(self, registry: RegistrySource, entries: Iterable[MACAllocationEntry]) -> None:
         match registry.prefix_bits:
             case 36:
                 target = self.prefixes_36
@@ -46,8 +53,8 @@ class MACAllocationIndex(IndexService):
         MA-L, MA-M, MA-S (not IAB) can flip the I/G bit of an assignment to create a multicast address (per IEEE)
         Hence IAB must be excluded in this very lookup."""
 
-        mac = "".join(c for c in identifier.upper() if c in HEX_DIGITS)
-
+        m = "".join(c for c in identifier.upper() if c in HEX_DIGITS)
+        mac = self.clear_ig_bit(m)
         entry_36 = self.prefixes_36.get(mac[:9])
         entry_24 = self.prefixes_24.get(mac[:6])
         return (
@@ -55,7 +62,7 @@ class MACAllocationIndex(IndexService):
             or self.prefixes_28.get(mac[:7])
             or (
                 entry_24
-                if entry_24 is not None and entry_24.assignment not in self.IAB_ENCLOSING_IEEE_RAS
+                if entry_24 is not None and mac[:6] not in self.IAB_ENCLOSING_IEEE_RAS
                 else None
             )
         )

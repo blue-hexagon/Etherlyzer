@@ -5,14 +5,14 @@ from typing import TypeVar
 
 from etherlyzer.ieee.index.store import IndexStore
 from etherlyzer.ieee.registry.family import RegistryFamily
-from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.ieee_registry import RegistrySource
 
 T = TypeVar("T")
 
 
 class IndexBuilder:
     @staticmethod
-    def build(registries: Iterable[IEEERegistry[T]]) -> IndexStore:
+    def build(registries: Iterable[RegistrySource[T]]) -> IndexStore:
         indexes = IndexStore()
 
         for registry in registries:

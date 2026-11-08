@@ -4,7 +4,7 @@ from typing import TypeVar
 from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
 from etherlyzer.ieee.registry.family import RegistryFamily
-from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.ieee_registry import RegistrySource, SourceFormat
 
 T = TypeVar("T")
 
@@ -12,12 +12,12 @@ T = TypeVar("T")
 class RegistryProvider:
     def __init__(self, cache_dir: Path | None = None):
         self.cache_dir: Path | None = cache_dir
-        self.registries: dict[str, IEEERegistry] = self._create_registries()
+        self.registries: dict[str, RegistrySource] = self._create_registries()
 
-    def _create_registries(self) -> dict[str, IEEERegistry[T]]:
+    def _create_registries(self) -> dict[str, RegistrySource[T]]:
         return {
-            "mal": IEEERegistry(
-                enabled=True,
+            "mal": RegistrySource(
+                authority="IEEE",
                 name="MA-L",
                 model=MACAllocationEntry,
                 full_name="MAC Address Block Large",
@@ -32,11 +32,12 @@ class RegistryProvider:
                     "Organizationally Unique Identifier (OUI). Used by vendors "
                     "requiring large address spaces."
                 ),
+                format=SourceFormat.CSV,
                 url="https://standards-oui.ieee.org/oui/oui.csv",
                 cache_dir=self.cache_dir,
             ),
-            "mam": IEEERegistry(
-                enabled=True,
+            "mam": RegistrySource(
+                authority="IEEE",
                 name="MA-M",
                 model=MACAllocationEntry,
                 full_name="MAC Address Block Medium",
@@ -50,11 +51,12 @@ class RegistryProvider:
                     "Medium-sized IEEE MAC address allocation intended for "
                     "organizations requiring fewer addresses than MA-L."
                 ),
+                format=SourceFormat.CSV,
                 url="https://standards-oui.ieee.org/oui28/mam.csv",
                 cache_dir=self.cache_dir,
             ),
-            "mas": IEEERegistry(
-                enabled=True,
+            "mas": RegistrySource(
+                authority="IEEE",
                 name="MA-S",
                 model=MACAllocationEntry,
                 full_name="MAC Address Block Small",
@@ -68,11 +70,12 @@ class RegistryProvider:
                     "Small IEEE MAC address allocation for embedded devices, "
                     "IoT, industrial equipment, and smaller manufacturers."
                 ),
+                format=SourceFormat.CSV,
                 url="https://standards-oui.ieee.org/oui36/oui36.csv",
                 cache_dir=self.cache_dir,
             ),
-            "cid": IEEERegistry(
-                enabled=True,
+            "cid": RegistrySource(
+                authority="IEEE",
                 name="CID",
                 model=MACAllocationEntry,
                 full_name="Company Identifier",
@@ -83,11 +86,12 @@ class RegistryProvider:
                     "Unique company identifiers assigned by IEEE. Identifies "
                     "organizations independently of MAC address allocations."
                 ),
+                format=SourceFormat.CSV,
                 url="https://standards-oui.ieee.org/cid/cid.csv",
                 cache_dir=self.cache_dir,
             ),
-            "iab": IEEERegistry(
-                enabled=True,
+            "iab": RegistrySource(
+                authority="IEEE",
                 name="IAB",
                 model=MACAllocationEntry,
                 full_name="Individual Address Block",
@@ -101,11 +105,12 @@ class RegistryProvider:
                     "Legacy IEEE MAC address allocation scheme superseded by "
                     "MA-S. Retained for compatibility with older hardware."
                 ),
+                format=SourceFormat.CSV,
                 url="https://standards-oui.ieee.org/iab/iab.csv",
                 cache_dir=self.cache_dir,
             ),
-            "ethertype": IEEERegistry(
-                enabled=True,
+            "ethertype": RegistrySource(
+                authority="IEEE",
                 name="EtherType",
                 model=EtherTypeEntry,
                 full_name="EtherType Registry",
@@ -117,12 +122,115 @@ class RegistryProvider:
                     "including IPv4, IPv6, ARP, VLAN tagging, LLDP, MPLS, "
                     "802.1X, and many vendor-specific protocols."
                 ),
+                format=SourceFormat.CSV,
                 url="https://standards-oui.ieee.org/ethertype/eth.csv",
                 cache_dir=self.cache_dir,
             ),
+            # "sgma": RegistrySource(
+            #     authority="IEEE",
+            #     name="SGMA",
+            #     model=object,
+            #     full_name="Standards Group MAC",
+            #     legacy_name=None,
+            #     family=RegistryFamily.MAC_REGISTRY,
+            #     legacy=False,
+            #     description="",
+            #     format=SourceFormat.HTML,
+            #     url="https://standards.ieee.org/products-programs/regauth/grpmac/public/",
+            #     cache_dir=self.cache_dir,
+            # ),
+            # "iana-ucast": RegistrySource(
+            #     authority="IANA",
+            #     name="IANA-UCAST",
+            #     model=object,
+            #     full_name="IANA Unicast MAC Addresses",
+            #     legacy_name=None,
+            #     family=RegistryFamily.MAC_REGISTRY,
+            #     legacy=False,
+            #     description=(
+            #         "IANA-managed unicast MAC address assignments under the "
+            #         "00-00-5E OUI. Includes protocol-specific allocations "
+            #         "for VRRP, BFD, TRILL, and other IETF protocols."
+            #     ),
+            #     format=SourceFormat.CSV,
+            #     url="https://www.iana.org/assignments/ethernet-numbers/ethernet-numbers-2.csv",
+            #     cache_dir=self.cache_dir,
+            #     misc={"static_prefix": "00-00-5E"},
+            # ),
+            # "iana-mcast": RegistrySource(
+            #     authority="IANA",
+            #     name="IANA-MCAST",
+            #     model=object,
+            #     full_name="IANA Multicast MAC Addresses",
+            #     legacy_name=None,
+            #     family=RegistryFamily.MAC_REGISTRY,
+            #     legacy=False,
+            #     description=(
+            #         "IANA-managed multicast MAC address assignments under the "
+            #         "01-00-5E prefix. Includes IPv4 multicast, MPLS multicast, "
+            #         "BFD, TRILL, and other IETF protocol-specific assignments."
+            #     ),
+            #     format=SourceFormat.CSV,
+            #     url="https://www.iana.org/assignments/ethernet-numbers/ethernet-numbers-3.csv",
+            #     cache_dir=self.cache_dir,
+            # ),
+            # "iana-ipv4-mcast": RegistrySource(
+            #     authority="IANA",
+            #     name="IANA-IPV4-MCAST",
+            #     model=object,
+            #     full_name="IPv4 Multicast Address Space",
+            #     legacy_name=None,
+            #     family=RegistryFamily.IP_MULTICAST_REGISTRY,
+            #     legacy=False,
+            #     description=(
+            #         "IANA registry of IPv4 multicast group assignments within "
+            #         "224.0.0.0/4. Includes routing, discovery, and application "
+            #         "protocol multicast groups, which can be mapped to their "
+            #         "corresponding Ethernet multicast addresses."
+            #     ),
+            #     format=SourceFormat.XML,
+            #     url="https://www.iana.org/assignments/multicast-addresses/multicast-addresses.xml",
+            #     cache_dir=self.cache_dir,
+            # ),
+            # "iana-ipv6-mcast": RegistrySource(
+            #     authority="IANA",
+            #     name="IANA-IPV6-MCAST",
+            #     model=object,
+            #     full_name="IPv6 Multicast Address Space",
+            #     legacy_name=None,
+            #     family=RegistryFamily.IP_MULTICAST_REGISTRY,
+            #     legacy=False,
+            #     description=(
+            #         "IANA registry of IPv6 multicast group assignments, "
+            #         "including protocol-specific groups, scope definitions, "
+            #         "and reserved ranges. Supports derivation of corresponding "
+            #         "33-33 Ethernet multicast addresses."
+            #     ),
+            #     format=SourceFormat.XML,
+            #     url="https://www.iana.org/assignments/ipv6-multicast-addresses/ipv6-multicast-addresses.xml",
+            #     cache_dir=self.cache_dir,
+            # ),
+            # "wireshark-wka": RegistrySource(
+            #     authority="Wireshark",
+            #     name="WKA",
+            #     model=object,
+            #     full_name="Well-Known MAC Addresses",
+            #     legacy_name=None,
+            #     family=RegistryFamily.MAC_REGISTRY,
+            #     legacy=False,
+            #     description=(
+            #         "Wireshark-maintained collection of well-known MAC addresses "
+            #         "and prefixes associated with network protocols, virtual "
+            #         "devices, and vendor-specific implementations. Includes "
+            #         "HSRP, VRRP, CDP, PVST+, and various legacy protocols."
+            #     ),
+            #     format=SourceFormat.TSV,
+            #     url="https://raw.githubusercontent.com/wireshark/wireshark/master/wka",
+            #     cache_dir=self.cache_dir,
+            # ),
         }
 
-    def get(self, registry_name: str, require_cache: bool = False) -> IEEERegistry[T]:
+    def get(self, registry_name: str, require_cache: bool = False) -> RegistrySource[T]:
         registry = self.registries.get(registry_name)
 
         if registry is None:
@@ -133,14 +241,14 @@ class RegistryProvider:
 
         return registry
 
-    def get_by_name(self, name: str) -> IEEERegistry[T]:
+    def get_by_name(self, name: str) -> RegistrySource[T]:
         for registry in self.registries.values():
             if registry.name.casefold() == name.casefold():
                 return registry
 
         raise KeyError(f"Unknown registry: {name!r}")
 
-    def get_all(self, require_cache: bool = False) -> list[IEEERegistry[T]]:
+    def get_all(self, require_cache: bool = False) -> list[RegistrySource[T]]:
         if require_cache:
             self.ensure_all_caches_exist()
 
@@ -161,5 +269,5 @@ class RegistryProvider:
         if not self.all_caches_exist():
             raise RuntimeError("One or more registry caches are missing.")
 
-    def __getitem__(self, key: str) -> IEEERegistry[T]:
+    def __getitem__(self, key: str) -> RegistrySource[T]:
         return self.registries[key]

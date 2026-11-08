@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from etherlyzer.core.analytics.allocation_stats import summarize_vendor_allocations
-from etherlyzer.core.analytics.mac_identity import analyze_mac_identity
 from etherlyzer.core.formatting import MACFormatter
 from etherlyzer.core.translation import PresentationTranslator
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.ieee_registry import RegistrySource
 from etherlyzer.presentation.reporting.model import Item, Section
-from etherlyzer.presentation.terminal.commands.inspect.common import InspectionParams
+from etherlyzer.presentation.terminal.commands.inspect.common import (
+    MacInspectionParams,
+)
 
 
 def build_associated_block_count_section(
@@ -88,7 +89,7 @@ def build_vendor_blocks_section(
 
 def build_ieee_registration_section(
     entry: MACAllocationEntry,
-    reg: IEEERegistry,
+    reg: RegistrySource,
 ) -> Section:
     range_start = MACFormatter.format_default(entry.assignment, "0")
     range_end = MACFormatter.format_default(entry.assignment, "f")
@@ -147,11 +148,11 @@ def build_ieee_registration_section(
     )
 
 
-def build_mac_autopsy_section(params: InspectionParams) -> Section:
+def build_mac_autopsy_section(
+    params: MacInspectionParams, identity, registration, kind, assessment
+) -> Section:
+    normalized = params.classified_mac.normalized
 
-    args, context, _, classified_mac, _ = params.to_vars()
-    normalized = classified_mac.normalized
-    identity, registration, kind = analyze_mac_identity(classified_mac, context)
     mac_int_padded = int(normalized.ljust(12, "0"), 16)
 
     first_octet = mac_int_padded >> 40
@@ -165,7 +166,7 @@ def build_mac_autopsy_section(params: InspectionParams) -> Section:
     ig_bit_addon = "Group / Multicast" if ig_bit else "Individual / Unicast"
 
     pt = PresentationTranslator
-    pt.strict = False
+    pt.strict = False  # len != 12
 
     return Section(
         title="MAC Address Autopsy",
@@ -173,7 +174,7 @@ def build_mac_autopsy_section(params: InspectionParams) -> Section:
             Section(
                 title="Input",
                 items=[
-                    Item(key="Value", value=args.value),
+                    Item(key="Value", value=params.args.value),
                     Item(key="Length", value=f"{len(normalized) * 4} bits"),
                 ],
             ),
@@ -185,9 +186,13 @@ def build_mac_autopsy_section(params: InspectionParams) -> Section:
                     Item("Registration", registration),
                     Item(
                         "SLAP Quadrant",
-                        classified_mac.slap_quadrant.value
-                        if classified_mac.slap_quadrant is not None
+                        params.classified_mac.slap_quadrant.value
+                        if params.classified_mac.slap_quadrant is not None
                         else "None",
+                    ),
+                    Section(
+                        title="Assessment",
+                        items=[Item(ass.label, ass.description) for ass in assessment],
                     ),
                 ],
             ),
@@ -206,8 +211,8 @@ def build_mac_autopsy_section(params: InspectionParams) -> Section:
             Section(
                 title="Address Properties",
                 items=[
-                    Item(key="Null Address", value=classified_mac.is_zero),
-                    Item(key="Broadcast", value=classified_mac.is_broadcast),
+                    Item(key="Null Address", value=params.classified_mac.is_zero),
+                    Item(key="Broadcast", value=params.classified_mac.is_broadcast),
                     Section(
                         title="Special Bits",
                         items=[
@@ -221,30 +226,50 @@ def build_mac_autopsy_section(params: InspectionParams) -> Section:
     )
 
 
-def build_cid_registration_section(params: InspectionParams) -> Section:
+def build_cid_registration_section(
+    params: MacInspectionParams, clear_ig_bit: bool = False
+) -> Section:
+    context = params.context
+    classified_mac = params.classified_mac
     CID_LENGTH = 6
-    _, context, _, classified_mac, _ = params.to_vars()
-
-    cid_entry = context.indexes.identifier.lookup(classified_mac.normalized[:CID_LENGTH])
-
+    if clear_ig_bit:
+        cid_entry = context.indexes.identifier.lookup_with_ig_bit_cleared(
+            classified_mac.normalized[:CID_LENGTH]
+        )
+    else:
+        cid_entry = context.indexes.identifier.lookup(classified_mac.normalized[:CID_LENGTH])
     if cid_entry is None:
-        return Section(
+        section = Section(
             title="CID",
             items=[
-                Item(key="Organization", value="Not Registered"),
+                Section(
+                    title="Assignment",
+                    items=[
+                        Item(key="Organization", value="Not Found"),
+                    ],
+                )
+            ],
+        )
+    else:
+        section = Section(
+            title="CID",
+            items=[
+                Section(
+                    title="Assignment",
+                    items=[
+                        Item(key="Organization", value=cid_entry.organization_name),
+                        Section(
+                            title="Address",
+                            items=[
+                                Item(key=f"Line {i}", value=piece)
+                                for i, piece in enumerate(
+                                    cid_entry.format_vendor_address(), start=1
+                                )
+                            ],
+                        ),
+                    ],
+                ),
             ],
         )
 
-    return Section(
-        title="CID",
-        items=[
-            Item(key="Organization", value=cid_entry.organization_name),
-            Section(
-                title="Address",
-                items=[
-                    Item(key=f"Line {i}", value=piece)
-                    for i, piece in enumerate(cid_entry.format_vendor_address(), start=1)
-                ],
-            ),
-        ],
-    )
+    return section

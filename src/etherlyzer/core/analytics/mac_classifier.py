@@ -61,8 +61,11 @@ def classify_mac(mac: str) -> MACClassification:
     is_group = bool(first & 0x01)
 
     quadrant = None
-
-    if is_local and not is_group:
+    # RFC 9542 : 2.1.1: Setting I/G does not affect the Y/Z bit
+    # RFC 9542 : 2.3.1: explicitly identifies 33:33:XX:XX:XX:XX as IPv6 multicast addresses within the Administratively Assigned SLAP quadrant.
+    # RFC 8947 : explicitly describes CID-derived ELI addresses as supporting group M-bit = 0 and 1 (furthermore MA-L, MA-M and MA-S supports M-bit)
+    # Hence: AAI, SAI and ELI supports the M-bit.
+    if is_local:
         quadrant = {
             0x00: SLAPQuadrant.AAI,
             0x08: SLAPQuadrant.ELI,
