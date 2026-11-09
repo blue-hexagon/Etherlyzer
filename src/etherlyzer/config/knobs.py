@@ -9,6 +9,7 @@ from typing import get_type_hints
 from dotenv import load_dotenv
 
 from etherlyzer.config.dirs import DEFAULT_CACHE_DIR
+from etherlyzer.core.constants import TypoTolerance
 
 
 class MACCasing(StrEnum):
@@ -37,20 +38,35 @@ class EtherlyzerKnobs:
     mac_separator: str = "."
     mac_block_size: int = 4
     mac_case: MACCasing = MACCasing.UPPER
+    typo_tolerance: TypoTolerance = TypoTolerance.STRICT
 
     show_sync_messages: bool = False
 
 
+def try_find_project_env() -> Path | None:
+    cwd = Path.cwd().resolve()
+
+    for directory in (cwd, *cwd.parents):
+        env_file = directory / "etherlyzer.env"
+
+        if env_file.is_file():
+            return env_file
+
+    return None
+
+
 def _load_environment() -> None:
-    DEFAULT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    destination_env = try_find_project_env()
 
-    destination_env = DEFAULT_CACHE_DIR / "etherlyzer.env"
+    if destination_env is None:
+        DEFAULT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        destination_env = DEFAULT_CACHE_DIR / "etherlyzer.env"
 
-    if not destination_env.exists():
-        template_env = files("etherlyzer").joinpath("etherlyzer.env")
+        if not destination_env.is_file():
+            template_env = files("etherlyzer").joinpath("etherlyzer.env")
 
-        with template_env.open("rb") as src, destination_env.open("wb") as dst:
-            shutil.copyfileobj(src, dst)
+            with template_env.open("rb") as src, destination_env.open("wb") as dst:
+                shutil.copyfileobj(src, dst)
 
     load_dotenv(destination_env)
 
@@ -136,7 +152,7 @@ def knobs_builder(cls: type[EtherlyzerKnobs]) -> EtherlyzerKnobs:
 
         # ------------------------------------------------------------------ Value is Enum
         elif isinstance(type_, type) and issubclass(type_, Enum):
-            values[field.name] = type_(value)
+            values[field.name] = type_[value.strip().upper()]
 
         else:
             raise TypeError(f"Unsupported config type: {type_}")

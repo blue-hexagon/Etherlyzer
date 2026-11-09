@@ -1,3 +1,5 @@
+from enum import Enum
+
 HEX_DIGITS = frozenset("0123456789ABCDEFabcdef")
 VALID_SEPARATORS = frozenset(" -.:")
 STRICT_TYPOS: dict[str, str] = {" ": "", "\t": ""}
@@ -18,3 +20,9 @@ LENIENT_TYPOS: dict[str, str] = {
     "ø": "0",
     "Ø": "0",
 }
+
+#
+class TypoTolerance(Enum):
+    STRICT = STRICT_TYPOS
+    RELAXED = RELAXED_TYPOS
+    LENIENT = LENIENT_TYPOS
