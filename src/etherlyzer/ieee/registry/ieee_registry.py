@@ -75,7 +75,7 @@ class RegistrySource[T]:
         return self.family is RegistryFamily.MAC_REGISTRY
 
     @property
-    def is_protocol_registry(self) -> bool:
+    def is_ethertype_registry(self) -> bool:
         return self.family is RegistryFamily.ETHERTYPE_REGISTRY
 
     @property

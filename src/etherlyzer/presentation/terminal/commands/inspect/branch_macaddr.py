@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from etherlyzer.core.analytics.mac_classifier import (
+from etherlyzer.core.application.analytics.mac_classifier import (
     Administration,
     DeliveryType,
     SLAPQuadrant,
 )
-from etherlyzer.core.analytics.mac_identity import analyze_mac_identity
+from etherlyzer.core.application.analytics.mac_identity import analyze_mac_identity
 from etherlyzer.presentation.reporting.renderers.text import TextRenderer
 from etherlyzer.presentation.terminal.commands.inspect.branch_macaddr_presentation import (
     build_cid_registration_section,
@@ -63,7 +63,7 @@ def mac_inspection_router(
             mac_identity.identity,
             mac_identity.resolution,
             mac_identity.form,
-            mac_identity.assessment
+            mac_identity.assessment,
         ),
     )
 
@@ -75,7 +75,7 @@ def mac_inspection_router(
             classified_mac.delivery,
         ):
             case (Administration.UNIVERSAL, _):
-                inspect_universal(params) # U/G branch
+                inspect_universal(params)  # U/G branch
 
             case (Administration.LOCAL, _) if classified_mac.slap_quadrant == SLAPQuadrant.ELI:
                 report.previous_section.append(

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from etherlyzer.core.analytics.mac_classifier import classify_mac
+from etherlyzer.core.application.analytics.mac_classifier import classify_mac
 from etherlyzer.ieee.initialize import (
     initialize_etherlyzer,
 )

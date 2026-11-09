@@ -1,7 +1,7 @@
 from typing import Literal
 
 from etherlyzer.config.knobs import etherlyzer_knobs
-from etherlyzer.core.constants import HEX_DIGITS, LENIENT_TYPOS
+from etherlyzer.core.constants import HEX_DIGITS, TypoTolerance
 from etherlyzer.core.normalization import normalize
 
 
@@ -30,7 +30,7 @@ class MACFormatter:
     ) -> str:
         """Custom MAC address formatting"""
         if fix_typos:
-            mac = cls.fix_typos(mac)
+            mac = cls.fix_typos_or_mark_invalid(mac)
         mac = normalize(mac)
         mac = separator.join(mac[i : i + block_size] for i in range(0, len(mac), block_size))
         if case == "upper":
@@ -38,10 +38,12 @@ class MACFormatter:
         return mac.lower()
 
     @classmethod
-    def fix_typos(cls, mac: str) -> str:
+    def fix_typos_or_mark_invalid(
+        cls, mac: str, typo_tolerance: TypoTolerance = etherlyzer_knobs.typo_tolerance
+    ) -> str:
         for c in mac:
-            if c in LENIENT_TYPOS:
-                mac = mac.replace(c, LENIENT_TYPOS[c])
+            if c in typo_tolerance.value:
+                mac = mac.replace(c, typo_tolerance.value[c])
             elif c not in HEX_DIGITS:
                 mac = mac.replace(c, "#")
         return mac

@@ -1,10 +1,9 @@
 from etherlyzer.presentation.reporting.renderers.text import TextRenderer
-from etherlyzer.presentation.terminal.commands.inspect.common import (
-    CommonInspectionParams,
-    MacInspectionParams,
-)
 from etherlyzer.presentation.terminal.commands.inspect.branch_macaddr_presentation import (
     build_cid_registration_section,
+)
+from etherlyzer.presentation.terminal.commands.inspect.common import (
+    MacInspectionParams,
 )
 
 

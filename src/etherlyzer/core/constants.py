@@ -21,6 +21,7 @@ LENIENT_TYPOS: dict[str, str] = {
     "Ø": "0",
 }
 
+
 #
 class TypoTolerance(Enum):
     STRICT = STRICT_TYPOS

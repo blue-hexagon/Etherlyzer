@@ -4,4 +4,4 @@ from etherlyzer.presentation.terminal.commands.inspect.common import CommonInspe
 def inspect_mcast_ip(
     par: CommonInspectionParams,
 ) -> int:
-    pass
+    return 2

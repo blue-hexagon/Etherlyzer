@@ -1,4 +1,5 @@
-from etherlyzer.core.analytics.mac_classifier import DeliveryType
+from etherlyzer.core.application.analytics.mac_classifier import DeliveryType
+from etherlyzer.ieee.registry.provider import Registry, is_mac_registry
 from etherlyzer.presentation.terminal.commands.inspect.branch_macaddr_presentation import (
     build_associated_block_count_section,
     build_ieee_registration_section,
@@ -21,8 +22,8 @@ def inspect_universal(params: MacInspectionParams) -> bool | None:
         entry = context.indexes.mac.lookup_group_allocation(args.value)
 
     if entry is not None:
-        registry = context.provider.get_by_name(entry.registry)
-        if True:
+        registry: Registry = context.provider.get_by_name(entry.registry)
+        if True and is_mac_registry(registry):
             ieee_registry_section = build_ieee_registration_section(entry, registry)
 
         if inspect_flags.show_vendor_stats or inspect_flags.show_vendor_blocks:
@@ -42,4 +43,3 @@ def inspect_universal(params: MacInspectionParams) -> bool | None:
         return True
     if entry is None:
         return False
-    return False

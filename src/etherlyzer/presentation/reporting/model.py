@@ -31,7 +31,7 @@ class Report:
         return renderer.render(self)
 
     @property
-    def previous_section(self):
+    def previous_section(self) -> Section:
         return self.sections[-1]
 
 

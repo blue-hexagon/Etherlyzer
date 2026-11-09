@@ -24,7 +24,9 @@ class TextRenderer:
                 )
             if _section.layout == "grid":
                 blocks = [
-                    f"[{item.key}] {item.value}" for item in _section.items if isinstance(item, Item)
+                    f"[{item.key}] {item.value}"
+                    for item in _section.items
+                    if isinstance(item, Item)
                 ]
 
                 cell_width = max(map(len, blocks), default=0) + 2

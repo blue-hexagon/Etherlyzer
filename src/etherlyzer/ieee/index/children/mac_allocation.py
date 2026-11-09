@@ -23,7 +23,9 @@ class MACAllocationIndex(IndexService):
     # The former was used until all the IABs based on it were assigned [(200X)], after which the latter was used [(201X)].
     # TODO: That should be the obly two enclosing IEEE-RA's but I'm slightly uncertain.
 
-    def insert(self, registry: RegistrySource, entries: Iterable[MACAllocationEntry]) -> None:
+    def insert(
+        self, registry: RegistrySource[MACAllocationEntry], entries: Iterable[MACAllocationEntry]
+    ) -> None:
         match registry.prefix_bits:
             case 36:
                 target = self.prefixes_36

@@ -21,7 +21,6 @@ repos:
           - --config-file=pyproject.toml
           - --explicit-package-bases
           - src
-          - tests
         pass_filenames: false
         types: [ python ]
   - repo: https://github.com/pre-commit/pre-commit-hooks

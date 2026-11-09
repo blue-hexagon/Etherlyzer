@@ -23,12 +23,12 @@ class MACAllocationEntry(BaseEntry):
 
     def format_vendor_address(self) -> list[str]:
         """Format the vendors registered compnay address"""
-        addr_representation = []
+        addr_representation: list[str] = []
         for addr_outer in self.organization_address.split(","):
             addr = addr_outer.split("  ")
             for line in addr:
                 if line:
-                    addr_representation.append(line.strip())
+                    addr_representation.extend(line.strip())
         return addr_representation
 
 

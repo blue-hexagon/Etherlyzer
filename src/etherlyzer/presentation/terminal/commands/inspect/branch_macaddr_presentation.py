@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from etherlyzer.core.analytics.allocation_stats import summarize_vendor_allocations
+from etherlyzer.core.application.analytics.allocation_stats import summarize_vendor_allocations
+from etherlyzer.core.application.analytics.mac_identity import MacAssessment
 from etherlyzer.core.formatting import MACFormatter
-from etherlyzer.core.translation import PresentationTranslator
+from etherlyzer.core.presentation.translation import PresentationTranslator
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
 from etherlyzer.ieee.registry.ieee_registry import RegistrySource
 from etherlyzer.presentation.reporting.model import Item, Section
@@ -51,7 +52,9 @@ def build_associated_block_count_section(
                 Item(key="Capacity", value=f"{iab_alloc.total_addresses:,}"),
             ],
         )
-    stats_for_each_registry = [s for s in [mal, mam, mas, iab] if s is not None]
+    stats_for_each_registry: list[Item | Section] = [
+        s for s in [mal, mam, mas, iab] if s is not None
+    ]
     return Section(
         title="Associated Allocations",
         items=[
@@ -89,13 +92,13 @@ def build_vendor_blocks_section(
 
 def build_ieee_registration_section(
     entry: MACAllocationEntry,
-    reg: RegistrySource,
+    reg: RegistrySource[MACAllocationEntry],
 ) -> Section:
     range_start = MACFormatter.format_default(entry.assignment, "0")
     range_end = MACFormatter.format_default(entry.assignment, "f")
     address = entry.format_vendor_address()
 
-    allocation_items = [
+    allocation_items: list[Item | Section] = [
         Item(
             key="Registry",
             value=f"{entry.registry} [{reg.full_name}]",
@@ -149,7 +152,11 @@ def build_ieee_registration_section(
 
 
 def build_mac_autopsy_section(
-    params: MacInspectionParams, identity, registration, kind, assessment
+    params: MacInspectionParams,
+    identity: str,
+    registration: str,
+    kind: str,
+    assessment: frozenset[MacAssessment],
 ) -> Section:
     normalized = params.classified_mac.normalized
 
@@ -193,7 +200,9 @@ def build_mac_autopsy_section(
                     Section(
                         title="Assessment",
                         items=[Item(ass.label, ass.description) for ass in assessment],
-                    ),
+                    )
+                    if len(assessment) > 0
+                    else Item("No Observations", "Zero Assessments Made"),
                 ],
             ),
             Section(

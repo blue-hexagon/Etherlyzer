@@ -5,8 +5,7 @@ from typing import TypeVar
 
 from etherlyzer.ieee.index.builder import IndexBuilder
 from etherlyzer.ieee.index.store import IndexStore
-from etherlyzer.ieee.registry.ieee_registry import RegistrySource
-from etherlyzer.ieee.registry.provider import RegistryProvider
+from etherlyzer.ieee.registry.provider import Registry, RegistryProvider
 
 T = TypeVar("T")
 
@@ -24,7 +23,7 @@ def initialize_etherlyzer(
 ) -> EtherlyzerContext:
     provider = RegistryProvider(cache_dir=cache_dir)
 
-    registries = select_registries(
+    registries: list[Registry] = select_registries(
         provider,
         inclusions=registry_inclusions,
         exemptions=registry_exemptions,
@@ -39,7 +38,7 @@ def select_registries(
     provider: RegistryProvider,
     inclusions: list[str] | None = None,
     exemptions: list[str] | None = None,
-) -> list[RegistrySource[T]]:
+) -> list[Registry]:
     included = {name.casefold() for name in (inclusions or [])}
     excluded = {name.casefold() for name in (exemptions or [])}
 
@@ -51,7 +50,7 @@ def select_registries(
     ]
 
 
-def initialize_registry_caches(registries: list[RegistrySource]) -> None:
+def initialize_registry_caches(registries: list[Registry]) -> None:
 
     for registry in registries:
         if registry.registry_cache.filepath.exists():
@@ -61,5 +60,5 @@ def initialize_registry_caches(registries: list[RegistrySource]) -> None:
             raise RuntimeError(f"Failed to synchronize registry cache: {registry.name}")
 
 
-def initialize_indexes(registries: Iterable[RegistrySource]) -> IndexStore:
+def initialize_indexes(registries: Iterable[Registry]) -> IndexStore:
     return IndexBuilder.build(registries)

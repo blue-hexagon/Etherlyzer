@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import TypeVar
+from typing import TypeGuard, TypeVar
 
 from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
@@ -7,14 +7,27 @@ from etherlyzer.ieee.registry.family import RegistryFamily
 from etherlyzer.ieee.registry.ieee_registry import RegistrySource, SourceFormat
 
 T = TypeVar("T")
+type Registry = RegistrySource[MACAllocationEntry] | RegistrySource[EtherTypeEntry]
+
+
+def is_mac_registry(
+    registry: Registry,
+) -> TypeGuard[RegistrySource[MACAllocationEntry]]:
+    return registry.model is MACAllocationEntry
+
+
+def is_ethertype_registry(
+    registry: Registry,
+) -> TypeGuard[RegistrySource[EtherTypeEntry]]:
+    return registry.model is EtherTypeEntry
 
 
 class RegistryProvider:
     def __init__(self, cache_dir: Path | None = None):
         self.cache_dir: Path | None = cache_dir
-        self.registries: dict[str, RegistrySource] = self._create_registries()
+        self.registries: dict[str, Registry] = self._create_registries()
 
-    def _create_registries(self) -> dict[str, RegistrySource[T]]:
+    def _create_registries(self) -> dict[str, Registry]:
         return {
             "mal": RegistrySource(
                 authority="IEEE",
@@ -126,111 +139,112 @@ class RegistryProvider:
                 url="https://standards-oui.ieee.org/ethertype/eth.csv",
                 cache_dir=self.cache_dir,
             ),
-            # "sgma": RegistrySource(
-            #     authority="IEEE",
-            #     name="SGMA",
-            #     model=object,
-            #     full_name="Standards Group MAC",
-            #     legacy_name=None,
-            #     family=RegistryFamily.MAC_REGISTRY,
-            #     legacy=False,
-            #     description="",
-            #     format=SourceFormat.HTML,
-            #     url="https://standards.ieee.org/products-programs/regauth/grpmac/public/",
-            #     cache_dir=self.cache_dir,
-            # ),
-            # "iana-ucast": RegistrySource(
-            #     authority="IANA",
-            #     name="IANA-UCAST",
-            #     model=object,
-            #     full_name="IANA Unicast MAC Addresses",
-            #     legacy_name=None,
-            #     family=RegistryFamily.MAC_REGISTRY,
-            #     legacy=False,
-            #     description=(
-            #         "IANA-managed unicast MAC address assignments under the "
-            #         "00-00-5E OUI. Includes protocol-specific allocations "
-            #         "for VRRP, BFD, TRILL, and other IETF protocols."
-            #     ),
-            #     format=SourceFormat.CSV,
-            #     url="https://www.iana.org/assignments/ethernet-numbers/ethernet-numbers-2.csv",
-            #     cache_dir=self.cache_dir,
-            #     misc={"static_prefix": "00-00-5E"},
-            # ),
-            # "iana-mcast": RegistrySource(
-            #     authority="IANA",
-            #     name="IANA-MCAST",
-            #     model=object,
-            #     full_name="IANA Multicast MAC Addresses",
-            #     legacy_name=None,
-            #     family=RegistryFamily.MAC_REGISTRY,
-            #     legacy=False,
-            #     description=(
-            #         "IANA-managed multicast MAC address assignments under the "
-            #         "01-00-5E prefix. Includes IPv4 multicast, MPLS multicast, "
-            #         "BFD, TRILL, and other IETF protocol-specific assignments."
-            #     ),
-            #     format=SourceFormat.CSV,
-            #     url="https://www.iana.org/assignments/ethernet-numbers/ethernet-numbers-3.csv",
-            #     cache_dir=self.cache_dir,
-            # ),
-            # "iana-ipv4-mcast": RegistrySource(
-            #     authority="IANA",
-            #     name="IANA-IPV4-MCAST",
-            #     model=object,
-            #     full_name="IPv4 Multicast Address Space",
-            #     legacy_name=None,
-            #     family=RegistryFamily.IP_MULTICAST_REGISTRY,
-            #     legacy=False,
-            #     description=(
-            #         "IANA registry of IPv4 multicast group assignments within "
-            #         "224.0.0.0/4. Includes routing, discovery, and application "
-            #         "protocol multicast groups, which can be mapped to their "
-            #         "corresponding Ethernet multicast addresses."
-            #     ),
-            #     format=SourceFormat.XML,
-            #     url="https://www.iana.org/assignments/multicast-addresses/multicast-addresses.xml",
-            #     cache_dir=self.cache_dir,
-            # ),
-            # "iana-ipv6-mcast": RegistrySource(
-            #     authority="IANA",
-            #     name="IANA-IPV6-MCAST",
-            #     model=object,
-            #     full_name="IPv6 Multicast Address Space",
-            #     legacy_name=None,
-            #     family=RegistryFamily.IP_MULTICAST_REGISTRY,
-            #     legacy=False,
-            #     description=(
-            #         "IANA registry of IPv6 multicast group assignments, "
-            #         "including protocol-specific groups, scope definitions, "
-            #         "and reserved ranges. Supports derivation of corresponding "
-            #         "33-33 Ethernet multicast addresses."
-            #     ),
-            #     format=SourceFormat.XML,
-            #     url="https://www.iana.org/assignments/ipv6-multicast-addresses/ipv6-multicast-addresses.xml",
-            #     cache_dir=self.cache_dir,
-            # ),
-            # "wireshark-wka": RegistrySource(
-            #     authority="Wireshark",
-            #     name="WKA",
-            #     model=object,
-            #     full_name="Well-Known MAC Addresses",
-            #     legacy_name=None,
-            #     family=RegistryFamily.MAC_REGISTRY,
-            #     legacy=False,
-            #     description=(
-            #         "Wireshark-maintained collection of well-known MAC addresses "
-            #         "and prefixes associated with network protocols, virtual "
-            #         "devices, and vendor-specific implementations. Includes "
-            #         "HSRP, VRRP, CDP, PVST+, and various legacy protocols."
-            #     ),
-            #     format=SourceFormat.TSV,
-            #     url="https://raw.githubusercontent.com/wireshark/wireshark/master/wka",
-            #     cache_dir=self.cache_dir,
-            # ),
         }
 
-    def get(self, registry_name: str, require_cache: bool = False) -> RegistrySource[T]:
+        # "sgma": RegistrySource(
+        #     authority="IEEE",
+        #     name="SGMA",
+        #     model=object,
+        #     full_name="Standards Group MAC",
+        #     legacy_name=None,
+        #     family=RegistryFamily.MAC_REGISTRY,
+        #     legacy=False,
+        #     description="",
+        #     format=SourceFormat.HTML,
+        #     url="https://standards.ieee.org/products-programs/regauth/grpmac/public/",
+        #     cache_dir=self.cache_dir,
+        # ),
+        # "iana-ucast": RegistrySource(
+        #     authority="IANA",
+        #     name="IANA-UCAST",
+        #     model=object,
+        #     full_name="IANA Unicast MAC Addresses",
+        #     legacy_name=None,
+        #     family=RegistryFamily.MAC_REGISTRY,
+        #     legacy=False,
+        #     description=(
+        #         "IANA-managed unicast MAC address assignments under the "
+        #         "00-00-5E OUI. Includes protocol-specific allocations "
+        #         "for VRRP, BFD, TRILL, and other IETF protocols."
+        #     ),
+        #     format=SourceFormat.CSV,
+        #     url="https://www.iana.org/assignments/ethernet-numbers/ethernet-numbers-2.csv",
+        #     cache_dir=self.cache_dir,
+        #     misc={"static_prefix": "00-00-5E"},
+        # ),
+        # "iana-mcast": RegistrySource(
+        #     authority="IANA",
+        #     name="IANA-MCAST",
+        #     model=object,
+        #     full_name="IANA Multicast MAC Addresses",
+        #     legacy_name=None,
+        #     family=RegistryFamily.MAC_REGISTRY,
+        #     legacy=False,
+        #     description=(
+        #         "IANA-managed multicast MAC address assignments under the "
+        #         "01-00-5E prefix. Includes IPv4 multicast, MPLS multicast, "
+        #         "BFD, TRILL, and other IETF protocol-specific assignments."
+        #     ),
+        #     format=SourceFormat.CSV,
+        #     url="https://www.iana.org/assignments/ethernet-numbers/ethernet-numbers-3.csv",
+        #     cache_dir=self.cache_dir,
+        # ),
+        # "iana-ipv4-mcast": RegistrySource(
+        #     authority="IANA",
+        #     name="IANA-IPV4-MCAST",
+        #     model=object,
+        #     full_name="IPv4 Multicast Address Space",
+        #     legacy_name=None,
+        #     family=RegistryFamily.IP_MULTICAST_REGISTRY,
+        #     legacy=False,
+        #     description=(
+        #         "IANA registry of IPv4 multicast group assignments within "
+        #         "224.0.0.0/4. Includes routing, discovery, and application "
+        #         "protocol multicast groups, which can be mapped to their "
+        #         "corresponding Ethernet multicast addresses."
+        #     ),
+        #     format=SourceFormat.XML,
+        #     url="https://www.iana.org/assignments/multicast-addresses/multicast-addresses.xml",
+        #     cache_dir=self.cache_dir,
+        # ),
+        # "iana-ipv6-mcast": RegistrySource(
+        #     authority="IANA",
+        #     name="IANA-IPV6-MCAST",
+        #     model=object,
+        #     full_name="IPv6 Multicast Address Space",
+        #     legacy_name=None,
+        #     family=RegistryFamily.IP_MULTICAST_REGISTRY,
+        #     legacy=False,
+        #     description=(
+        #         "IANA registry of IPv6 multicast group assignments, "
+        #         "including protocol-specific groups, scope definitions, "
+        #         "and reserved ranges. Supports derivation of corresponding "
+        #         "33-33 Ethernet multicast addresses."
+        #     ),
+        #     format=SourceFormat.XML,
+        #     url="https://www.iana.org/assignments/ipv6-multicast-addresses/ipv6-multicast-addresses.xml",
+        #     cache_dir=self.cache_dir,
+        # ),
+        # "wireshark-wka": RegistrySource(
+        #     authority="Wireshark",
+        #     name="WKA",
+        #     model=object,
+        #     full_name="Well-Known MAC Addresses",
+        #     legacy_name=None,
+        #     family=RegistryFamily.MAC_REGISTRY,
+        #     legacy=False,
+        #     description=(
+        #         "Wireshark-maintained collection of well-known MAC addresses "
+        #         "and prefixes associated with network protocols, virtual "
+        #         "devices, and vendor-specific implementations. Includes "
+        #         "HSRP, VRRP, CDP, PVST+, and various legacy protocols."
+        #     ),
+        #     format=SourceFormat.TSV,
+        #     url="https://raw.githubusercontent.com/wireshark/wireshark/master/wka",
+        #     cache_dir=self.cache_dir,
+        # ),
+
+    def get(self, registry_name: str, require_cache: bool = False) -> Registry:
         registry = self.registries.get(registry_name)
 
         if registry is None:
@@ -241,14 +255,14 @@ class RegistryProvider:
 
         return registry
 
-    def get_by_name(self, name: str) -> RegistrySource[T]:
+    def get_by_name(self, name: str) -> Registry:
         for registry in self.registries.values():
             if registry.name.casefold() == name.casefold():
                 return registry
 
         raise KeyError(f"Unknown registry: {name!r}")
 
-    def get_all(self, require_cache: bool = False) -> list[RegistrySource[T]]:
+    def get_all(self, require_cache: bool = False) -> list[Registry]:
         if require_cache:
             self.ensure_all_caches_exist()
 
@@ -269,5 +283,5 @@ class RegistryProvider:
         if not self.all_caches_exist():
             raise RuntimeError("One or more registry caches are missing.")
 
-    def __getitem__(self, key: str) -> RegistrySource[T]:
+    def __getitem__(self, key: str) -> Registry:
         return self.registries[key]

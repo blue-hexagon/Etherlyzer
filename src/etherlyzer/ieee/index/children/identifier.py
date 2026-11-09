@@ -14,7 +14,9 @@ class IdentifierIndex(IndexService):
     opid: dict[str, MACAllocationEntry] = field(default_factory=dict)
     manid: dict[str, MACAllocationEntry] = field(default_factory=dict)
 
-    def insert(self, registry: RegistrySource, entries: Iterable[MACAllocationEntry]) -> None:
+    def insert(
+        self, registry: RegistrySource[MACAllocationEntry], entries: Iterable[MACAllocationEntry]
+    ) -> None:
         match registry.name:
             case "CID":
                 target = self.cid

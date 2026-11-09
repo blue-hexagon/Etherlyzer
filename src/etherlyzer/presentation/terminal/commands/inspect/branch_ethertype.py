@@ -19,7 +19,7 @@ def inspect_ethertype(
     if not isinstance(lookup, EtherTypeEntry) and lookup is not None:
         raise TypeError("Wrong ethertype entry")
 
-    items = [
+    items: list[Section | Item] = [
         Section(
             title="Input",
             items=[

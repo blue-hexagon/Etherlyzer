@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum, StrEnum
 
-from etherlyzer.core.analytics.mac_classifier import (
+from etherlyzer.core.application.analytics.mac_classifier import (
     Administration,
     DeliveryType,
     MACClassification,
@@ -66,6 +66,7 @@ class MacResolution(StrEnum):
     NO_CID_MATCH = "No Matching IEEE CID"
 
     # SLAP assignment mechanisms
+    SLAP_ELI = "SLAP Extended Local Identifier"
     SLAP_AAI = "SLAP Administrative Assignment Space"
     SLAP_SAI = "SLAP Standard Assignment Space"
     SLAP_RESERVED = "Reserved SLAP Assignment Space"
@@ -164,7 +165,7 @@ class MacIdentityResult:
     cmac: MACClassification
     assessment: frozenset[MacAssessment] = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.assessment = self.assess_mac_identity(self.cmac)
 
     def assess_mac_identity(
