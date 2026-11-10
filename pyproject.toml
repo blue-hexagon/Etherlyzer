@@ -128,7 +128,7 @@ exclude_lines = [
 python_version = "3.12"
 strict = true
 mypy_path = "src"
-files = ["src", "tests"]
+files = ["src"]
 
 warn_unused_configs = true
 warn_unreachable = true

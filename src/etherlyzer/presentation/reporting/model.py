@@ -17,6 +17,10 @@ class Section:
     title: str
     items: list[Item | Section] = field(default_factory=list)
     layout: Literal["default", "grid"] = "default"
+    legend: str | None = None
+
+    def append(self, item: Item | Section) -> None:
+        self.items.append(item)
 
 
 @dataclass(slots=True)
@@ -25,6 +29,10 @@ class Report:
 
     def render(self, renderer: ReportRenderer) -> str:
         return renderer.render(self)
+
+    @property
+    def previous_section(self) -> Section:
+        return self.sections[-1]
 
 
 class ReportRenderer(Protocol):

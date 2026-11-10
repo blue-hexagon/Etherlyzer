@@ -1,8 +1,9 @@
-import datetime
 import json
 from dataclasses import dataclass
 
 from etherlyzer.presentation.reporting.model import Item, Report, Section
+
+type JSONValue = str | int | float | bool | list[JSONValue] | dict[str, JSONValue] | None
 
 
 @dataclass(slots=True)
@@ -10,7 +11,7 @@ class JSONRenderer:
     indentation: int = 2
 
     def render(self, report: Report) -> str:
-        def serialize(node: Section | Item) -> dict[str, str | int | float | datetime]:
+        def serialize(node: Section | Item) -> dict[str, JSONValue]:
             if isinstance(node, Item):
                 return {
                     "type": "item",

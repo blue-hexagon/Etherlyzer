@@ -7,7 +7,7 @@ from etherlyzer.ieee.entry.mac import MACAllocationEntry
 from etherlyzer.ieee.registry.cache import RegistryCache
 from etherlyzer.ieee.registry.downloader import RegistryDownloader
 from etherlyzer.ieee.registry.family import RegistryFamily
-from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.ieee_registry import RegistrySource, SourceFormat
 
 T = TypeVar("T")
 
@@ -16,15 +16,14 @@ T = TypeVar("T")
 def ieee_registry(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-) -> IEEERegistry[T]:
+) -> RegistrySource[T]:
     # Redirect registry files to pytest's temporary directory.
     monkeypatch.setattr(
         "etherlyzer.ieee.registry.cache.DEFAULT_CACHE_DIR",
         tmp_path,
     )
 
-    return IEEERegistry(
-        enabled=True,
+    return RegistrySource(
         name="MA-L",
         model=MACAllocationEntry,
         full_name="Test IEEE Registry",
@@ -32,6 +31,8 @@ def ieee_registry(
         family=RegistryFamily.MAC_REGISTRY,
         legacy=False,
         description="Testing Registry",
+        authority="IEEE",
+        format=SourceFormat.CSV,
     )
 
 

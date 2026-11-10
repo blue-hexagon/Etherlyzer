@@ -68,6 +68,11 @@ function Test {
         poetry run pytest
     }
 }
+function Test-Brief {
+    Invoke-Step "Running tests with brief output" {
+        pytest -q --tb=no --disable-warnings
+    }
+}
 
 function Coverage {
     Invoke-Step "Coverage" {
@@ -134,13 +139,13 @@ function Check {
     Format
     Lint
     TypeCheck
-    Test
+    Test-Brief
 }
 
 function CI {
     PreCommitAll
     TypeCheck
-    Test
+    Test-Brief
     Audit
     Security
     DeadCode
@@ -195,6 +200,11 @@ $commands = @{
 
     test = @{
         Action = ${function:Test}
+        Help   = "Run the complete test suite."
+    }
+
+    test_brief = @{
+        Action = ${function:Test-Brief}
         Help   = "Run the complete test suite."
     }
 

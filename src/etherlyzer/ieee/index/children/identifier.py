@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
 from etherlyzer.ieee.index.children.proto import IndexService
-from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.ieee_registry import RegistrySource
 
 
 @dataclass(slots=True)
@@ -14,7 +14,9 @@ class IdentifierIndex(IndexService):
     opid: dict[str, MACAllocationEntry] = field(default_factory=dict)
     manid: dict[str, MACAllocationEntry] = field(default_factory=dict)
 
-    def insert(self, registry: IEEERegistry, entries: Iterable[MACAllocationEntry]) -> None:
+    def insert(
+        self, registry: RegistrySource[MACAllocationEntry], entries: Iterable[MACAllocationEntry]
+    ) -> None:
         match registry.name:
             case "CID":
                 target = self.cid
@@ -29,4 +31,9 @@ class IdentifierIndex(IndexService):
 
     def lookup(self, identifier: str) -> MACAllocationEntry | None:
         identifier = identifier.upper()
+
+        return self.cid.get(identifier) or self.opid.get(identifier) or self.manid.get(identifier)
+
+    def lookup_with_ig_bit_cleared(self, identifier: str) -> MACAllocationEntry | None:
+        identifier = self.clear_ig_bit(identifier.upper())
         return self.cid.get(identifier) or self.opid.get(identifier) or self.manid.get(identifier)

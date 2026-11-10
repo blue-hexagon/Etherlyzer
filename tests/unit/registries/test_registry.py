@@ -4,13 +4,13 @@ from unittest.mock import Mock
 import pytest
 
 from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.ieee_registry import RegistrySource
 
 T = TypeVar("T")
 
 
 def test_registry_loads(
-    ieee_registry: IEEERegistry[T],
+    ieee_registry: RegistrySource,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Preconditions: cache not expired and cache available."""
@@ -47,7 +47,7 @@ MA-L,644C69,CONPROVE,"75, Visconde de Ouro Preto St. Uberlândia Minas Gerais BR
 
 
 def test_registry_load_raises_when_cache_missing(
-    ieee_registry: IEEERegistry,
+    ieee_registry: RegistrySource,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     assert not ieee_registry.registry_cache.filepath.exists()

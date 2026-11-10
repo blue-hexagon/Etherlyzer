@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
+from enum import StrEnum
 from pathlib import Path
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from etherlyzer.ieee.registry.cache import RegistryCache
 from etherlyzer.ieee.registry.downloader import RegistryDownloader
@@ -10,24 +11,35 @@ from etherlyzer.ieee.registry.parser import RegistryParser
 T = TypeVar("T")
 
 
+class SourceFormat(StrEnum):
+    CSV = "csv"
+    TSV = "tsv"
+    XML = "xml"
+    YAML = "yaml"
+    TEXT = "text"
+    HTML = "html"
+    JSON = "json"
+
+
 @dataclass
-class IEEERegistry[T]:
+class RegistrySource[T]:
     """
     Metadata describing an IEEE Registration Authority registry.
     """
 
-    enabled: bool
     name: str
+    authority: str
     model: type[T]
     full_name: str
     url: str
+    format: SourceFormat
 
     family: RegistryFamily
 
     legacy: bool
 
     description: str = ""
-
+    misc: dict[str, Any] = field(default_factory=dict)
     legacy_name: str | None = None
 
     prefix_bits: int | None = None
@@ -63,7 +75,7 @@ class IEEERegistry[T]:
         return self.family is RegistryFamily.MAC_REGISTRY
 
     @property
-    def is_protocol_registry(self) -> bool:
+    def is_ethertype_registry(self) -> bool:
         return self.family is RegistryFamily.ETHERTYPE_REGISTRY
 
     @property

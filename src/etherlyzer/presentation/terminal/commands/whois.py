@@ -57,13 +57,16 @@ def run(args: argparse.Namespace) -> int:
             continue
 
         if result.entry is not None:
-            fields = (
+            fields: tuple[str, ...] = (
                 "MATCH",
                 str(result.entry.registry),
                 str(result.entry.assignment),
                 str(result.entry.organization_name),
             )
         else:
+            if result.reason is None:
+                raise ValueError("Expected a reason for this result")
+
             fields = (
                 result.reason.upper().replace(" ", "_"),
                 "N/A",
@@ -78,7 +81,7 @@ def run(args: argparse.Namespace) -> int:
             fields = (number, *fields)
         rows.append(fields)
 
-    headers = ("Result", "Registry", "Assignment", "Organization")
+    headers: tuple[str, ...] = ("Result", "Registry", "Assignment", "Organization")
 
     if args.linenumbers:
         headers = ("Line", *headers)

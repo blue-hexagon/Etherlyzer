@@ -15,3 +15,8 @@ def normalize_semi_strict(mac: str) -> str:
         raise ValueError(f"Invalid MAC address: {mac!r}")
 
     return normalized
+
+
+# def normalize_with_tolerance(mac: str) -> str:
+#
+#     normalized = normalize(mac)

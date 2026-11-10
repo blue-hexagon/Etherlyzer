@@ -5,7 +5,7 @@ import sys
 from enum import StrEnum
 
 from etherlyzer.core.normalization import normalize_semi_strict
-from etherlyzer.core.translation import PresentationTranslator, get_arrlen_chwidth
+from etherlyzer.core.presentation.translation import PresentationTranslator, get_arrlen_chwidth
 from etherlyzer.presentation.terminal.utility import read_multiline
 
 

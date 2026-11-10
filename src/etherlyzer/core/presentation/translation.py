@@ -1,21 +1,27 @@
 import string
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, ClassVar
 
 
 def get_arrlen_chwidth(arr: list[Any]) -> int:
-    return len(str(len(arr)))
+    return len(str(len(arr)))  # 0-9 = 1; 10-99 = 2; 100-999 = 3 etc..
 
 
 @dataclass(slots=True)
 class PresentationTranslator:
-    @staticmethod
-    def validate(normalized: str) -> None:
-        if len(normalized) != 12 or not all(c in string.hexdigits for c in normalized):
-            raise ValueError(normalized)
+    strict: ClassVar[bool] = True  # Strict validation means len == 12
+
+    @classmethod
+    def validate(cls, normalized: str) -> None:
+        if (
+            len(normalized) != 12 or not all(c in string.hexdigits for c in normalized)
+        ) and cls.strict:
+            raise ValueError(f"{normalized} is not a valid 6-12-ch hex string")
 
     @classmethod
     def _raw(cls, normalized: str) -> bytes:
+        if not len(normalized) % 2 == 0:
+            raise ValueError(f"Invalid hexadecimal input '{normalized}': odd number of digits")
         cls.validate(normalized)
         return bytes.fromhex(normalized)
 
@@ -52,7 +58,9 @@ class PresentationTranslator:
     @classmethod
     def to_hex(cls, normalized: str) -> str:
         val = int.from_bytes(cls._raw(normalized), byteorder="big")
-        return f"0x{val:012X}"
+        ln = len(normalized)
+
+        return f"0x{val:0{ln}X}"
 
     @classmethod
     def to_hex_bytes(cls, normalized: str) -> str:

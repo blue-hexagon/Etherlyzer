@@ -5,28 +5,32 @@ from typing import TypeVar
 
 from etherlyzer.ieee.index.store import IndexStore
 from etherlyzer.ieee.registry.family import RegistryFamily
-from etherlyzer.ieee.registry.ieee_registry import IEEERegistry
+from etherlyzer.ieee.registry.provider import Registry, is_ethertype_registry, is_mac_registry
 
 T = TypeVar("T")
 
 
 class IndexBuilder:
     @staticmethod
-    def build(registries: Iterable[IEEERegistry[T]]) -> IndexStore:
+    def build(registries: Iterable[Registry]) -> IndexStore:
         indexes = IndexStore()
 
         for registry in registries:
-            entries = registry.load()
-
             match registry.family:
                 case RegistryFamily.MAC_REGISTRY:
-                    indexes.mac.insert(registry, entries)
+                    if is_mac_registry(registry):
+                        mac_registry = registry.load()
+                        indexes.mac.insert(registry, mac_registry)
 
                 case RegistryFamily.ETHERTYPE_REGISTRY:
-                    indexes.ethertype.insert(entries)
+                    if is_ethertype_registry(registry):
+                        ethertype_registry = registry.load()
+                        indexes.ethertype.insert(ethertype_registry)
 
                 case RegistryFamily.IDENTIFIER_REGISTRY:
-                    indexes.identifier.insert(registry, entries)
+                    if is_mac_registry(registry):
+                        mac_registry = registry.load()
+                        indexes.identifier.insert(registry, mac_registry)
 
                 case _:
                     raise ValueError(f"Unsupported registry category: {registry.family}")
