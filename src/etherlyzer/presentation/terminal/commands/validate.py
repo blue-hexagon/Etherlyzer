@@ -21,6 +21,7 @@ def run(args: argparse.Namespace) -> int:
     invalid_count = 0
     for mac in macs:
         validated_mac, validation_mask = MACValidator.validate(mac)
+        # TODO: Expand reporting
         if args.linenumbers:
             linenumber += 1
             if MACValidator.mask_is_valid(validation_mask) or not args.strict:

@@ -46,6 +46,7 @@ dependencies = [
     "pandas>=3.0.6,<4.0.0",
     "tqdm>=4.70.1,<5.0.0",
     "scapy (>=2.8.0,<3.0.0)",
+    "wcwidth (>=0.9.4,<0.10.0)",
 ]
 
 [project.urls]
@@ -54,7 +55,7 @@ Repository = "https://github.com/blue-hexagon/EtherLyzer"
 Issues = "https://github.com/blue-hexagon/EtherLyzer/issues"
 
 [project.scripts]
-etherlyzer = "etherlyzer.presentation.terminal.cli:main"
+etherlyzer = "etherlyzer.presentation.terminal.cli_parser:main"
 
 
 [tool.poetry]

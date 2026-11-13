@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TypeVar
 
-from etherlyzer.ieee.index.builder import IndexBuilder
-from etherlyzer.ieee.index.store import IndexStore
-from etherlyzer.ieee.registry.provider import Registry, RegistryProvider
+from etherlyzer.domain.index.builder import IndexBuilder
+from etherlyzer.domain.index.store import IndexStore
+from etherlyzer.domain.registry.provider import Registry, RegistryProvider
 
 T = TypeVar("T")
 

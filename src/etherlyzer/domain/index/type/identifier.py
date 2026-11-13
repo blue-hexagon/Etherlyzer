@@ -3,9 +3,9 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 
-from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.index.children.proto import IndexService
-from etherlyzer.ieee.registry.ieee_registry import RegistrySource
+from etherlyzer.domain.entry.mac import MACAllocationEntry
+from etherlyzer.domain.index.service import IndexService
+from etherlyzer.domain.registry.ieee_registry import RegistrySource
 
 
 @dataclass(slots=True)

@@ -3,12 +3,11 @@ from __future__ import annotations
 import argparse
 
 from etherlyzer import __version__
-from etherlyzer.ieee.registry.provider import RegistryProvider
+from etherlyzer.domain.registry.provider import RegistryProvider
 
 
 def run(args: argparse.Namespace) -> int:
     manager = RegistryProvider()
-
     print()
 
     print(f"EtherLyzer {__version__}")
@@ -17,6 +16,7 @@ def run(args: argparse.Namespace) -> int:
     print("Registries")
     registries = manager.get_all(require_cache=True)
     if not args.verbose:
+        # TODO: Refactor into Report usage
         for registry in registries:
             print(
                 f"Name            : {registry.name} ({registry.full_name})"
@@ -29,6 +29,7 @@ def run(args: argparse.Namespace) -> int:
             print()
     else:
         for registry in manager.get_all(require_cache=True):
+            # TODO: Refactor into Report usage
             print(
                 f"Name            : {registry.name} ({registry.full_name})"
                 f"\nLegacy Name     : {registry.legacy_name}"

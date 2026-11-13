@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.domain.entry.mac import MACAllocationEntry
 
 
 @dataclass(frozen=True, slots=True)

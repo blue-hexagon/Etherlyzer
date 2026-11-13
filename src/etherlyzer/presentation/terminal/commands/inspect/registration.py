@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from etherlyzer.ieee.registry.family import RegistryFamily
+from etherlyzer.domain.registry.family import RegistryFamily
 from etherlyzer.presentation.terminal.commands.inspect.branch_dispatch import dispatch
 
 

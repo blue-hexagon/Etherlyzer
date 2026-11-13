@@ -1,4 +1,4 @@
-from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
+from etherlyzer.domain.entry.ethertype import EtherTypeEntry
 from etherlyzer.presentation.reporting.model import Item, Section
 from etherlyzer.presentation.reporting.renderers.text import TextRenderer
 from etherlyzer.presentation.terminal.commands.inspect.common import CommonInspectionParams

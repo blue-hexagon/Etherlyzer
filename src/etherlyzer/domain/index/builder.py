@@ -3,9 +3,9 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import TypeVar
 
-from etherlyzer.ieee.index.store import IndexStore
-from etherlyzer.ieee.registry.family import RegistryFamily
-from etherlyzer.ieee.registry.provider import Registry, is_ethertype_registry, is_mac_registry
+from etherlyzer.domain.index.store import IndexStore
+from etherlyzer.domain.registry.family import RegistryFamily
+from etherlyzer.domain.registry.provider import Registry, is_ethertype_registry, is_mac_registry
 
 T = TypeVar("T")
 

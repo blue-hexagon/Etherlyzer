@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from etherlyzer.core.application.analytics.allocation_stats import summarize_vendor_allocations
-from etherlyzer.core.application.analytics.mac_identity import MacAssessment
+from etherlyzer.application.analysis.allocation_stats import summarize_vendor_allocations
+from etherlyzer.application.analysis.mac_identity import MacAssessment
 from etherlyzer.core.formatting import MACFormatter
 from etherlyzer.core.presentation.translation import PresentationTranslator
-from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.registry.ieee_registry import RegistrySource
+from etherlyzer.domain.entry.mac import MACAllocationEntry
+from etherlyzer.domain.registry.ieee_registry import RegistrySource
 from etherlyzer.presentation.reporting.model import Item, Section
 from etherlyzer.presentation.terminal.commands.inspect.common import (
     MacInspectionParams,

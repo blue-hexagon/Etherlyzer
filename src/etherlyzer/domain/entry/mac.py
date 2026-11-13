@@ -1,9 +1,7 @@
 import re
-import string
 from dataclasses import dataclass
 
-from etherlyzer.core.normalization import normalize
-from etherlyzer.ieee.entry.base import BaseEntry
+from etherlyzer.domain.entry.base import BaseEntry
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,31 +28,3 @@ class MACAllocationEntry(BaseEntry):
                 if line:
                     addr_representation.extend(line.strip())
         return addr_representation
-
-
-@dataclass(frozen=True, slots=True)
-class MACLookupResult:
-    line_number: int
-    mac: str
-    entry: MACAllocationEntry | None = None
-    reason: str | None = None
-
-
-def classify_mac(mac: str) -> str | None:
-    normalized = normalize(mac)
-
-    if len(normalized) != 12 or any(c not in string.hexdigits for c in normalized):
-        return "Invalid format"
-
-    first_octet = int(normalized[:2], 16)
-
-    is_group = bool(first_octet & 0x01)
-    is_local = bool(first_octet & 0x02)
-
-    if not (is_group or is_local):
-        return None
-
-    administration = "Local" if is_local else "Universal"
-    delivery = "Multicast" if is_group else "Unicast"
-
-    return f"{administration} {delivery}"

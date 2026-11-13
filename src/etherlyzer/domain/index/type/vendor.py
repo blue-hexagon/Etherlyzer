@@ -3,8 +3,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.index.children.proto import IndexService
+from etherlyzer.domain.entry.mac import MACAllocationEntry
+from etherlyzer.domain.index.service import IndexService
 
 
 def normalize_vendor_name(name: str) -> str:

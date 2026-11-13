@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
-from etherlyzer.ieee.entry.mac import MACAllocationEntry
+from etherlyzer.domain.entry.ethertype import EtherTypeEntry
+from etherlyzer.domain.entry.mac import MACAllocationEntry
 
 
 class IndexService(Protocol):

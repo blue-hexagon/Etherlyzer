@@ -4,8 +4,8 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 from etherlyzer.core.constants import HEX_DIGITS
-from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
-from etherlyzer.ieee.index.children.proto import IndexService
+from etherlyzer.domain.entry.ethertype import EtherTypeEntry
+from etherlyzer.domain.index.service import IndexService
 
 
 @dataclass(slots=True)

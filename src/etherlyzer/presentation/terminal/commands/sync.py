@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import time
 
-from etherlyzer.ieee.registry.provider import RegistryProvider
+from etherlyzer.domain.registry.provider import RegistryProvider
 
 
 def normalize_name(name: str) -> str:

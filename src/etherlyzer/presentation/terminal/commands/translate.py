@@ -63,7 +63,7 @@ def run(args: argparse.Namespace) -> int:
         if args.bulk
         else [args.mac]
     )
-
+    # TODO: Expand Reporting - add line-feeds
     padding = get_arrlen_chwidth(macs) + 1
     invalid_lines: list[int] = []
     for linenumber, mac in enumerate(macs, start=1):

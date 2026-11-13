@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from etherlyzer.core.application.analytics.mac_classifier import (
+from etherlyzer.application.analysis.mac_classifier import (
     Administration,
     DeliveryType,
     SLAPQuadrant,
 )
-from etherlyzer.core.application.analytics.mac_identity import analyze_mac_identity
+from etherlyzer.application.analysis.mac_identity import analyze_mac_identity
 from etherlyzer.presentation.reporting.renderers.text import TextRenderer
 from etherlyzer.presentation.terminal.commands.inspect.branch_macaddr_presentation import (
     build_cid_registration_section,

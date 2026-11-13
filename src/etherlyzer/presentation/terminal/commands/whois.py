@@ -1,98 +1,163 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Iterable
+from dataclasses import dataclass
 from pathlib import Path
 
-from etherlyzer.config.knobs import etherlyzer_knobs
-from etherlyzer.ieee.initialize import (
-    initialize_etherlyzer,
+from etherlyzer.application.analysis.mac_classifier import classify_mac
+from etherlyzer.application.analysis.mac_identity import (
+    MacForm,
+    MacIdentity,
+    MacResolution,
+    analyze_mac_identity,
 )
-from etherlyzer.presentation.terminal.utility import print_table, read_multiline
+from etherlyzer.domain.entry.mac import MACAllocationEntry
+from etherlyzer.domain.initialize import EtherlyzerContext, initialize_etherlyzer
+from etherlyzer.presentation.reporting.model import Item, Report, Section, Table
+from etherlyzer.presentation.reporting.renders import get_render, get_render_choices
+from etherlyzer.presentation.terminal.utility import read_multiline
 
 
-def run(args: argparse.Namespace) -> int:
-    context = initialize_etherlyzer()
-    if args.linenumbers and not (args.bulk or args.file):
-        print("error: --linenumbers requires --bulk or --file")
-        return 2
+@dataclass(frozen=True, slots=True)
+class MACTerminalLookupResult:
+    line_number: int
+    mac: str
+    form: MacForm
+    identity: MacIdentity
+    resolution: MacResolution
+    entry: MACAllocationEntry | None = None
 
-    separator = args.delimiter if args.delimiter is not None else etherlyzer_knobs.field_separator
 
-    if args.mac:
-        entry = context.indexes.mac.lookup(args.mac)
+def get_bulk(
+    context: EtherlyzerContext,
+    values: Iterable[str],
+    include_unsuccessful: bool = False,
+) -> list[MACTerminalLookupResult]:
+    results = []
 
-        if entry is None:
-            print("No entry found.")
-            return 1
+    for line_number, mac in enumerate(values, start=1):
+        mac = mac.strip()
+        reason = analyze_mac_identity(classify_mac(mac), context)
 
-        print(
-            entry.registry,
-            entry.assignment,
-            entry.organization_name,
-            sep=separator,
+        entry = context.indexes.mac.lookup_group_allocation(mac)
+        result = MACTerminalLookupResult(
+            entry=entry,
+            line_number=line_number,
+            mac=mac,
+            form=reason.form,
+            resolution=reason.resolution,
+            identity=reason.identity,
         )
-        return 0
+        if result.entry is not None or include_unsuccessful:
+            results.append(result)
 
-    if args.bulk:
-        source = read_multiline(skip_empty_lines=False)
-    elif args.file:
-        source = args.file.read_text(encoding="utf-8").splitlines()
-    else:
-        return 2
+    return results
 
-    results = context.indexes.mac.get_bulk(  # TODO: refactorize to get_many instead and remove get_bulk entirely. This is the only usage.
-        ieee_index=context.indexes.mac,
+
+def handle_single(context: EtherlyzerContext, report: Report, args: argparse.Namespace) -> int:
+    entry = context.indexes.mac.lookup(args.mac)
+    if entry is None:
+        report.sections.append(
+            Section(title="IEEE Assignment", items=[Item(key="Result", value="No match found.")])
+        )
+        return 1
+
+    report.sections.append(
+        Section(
+            title="IEEE Assignment",
+            items=[
+                Item(key="Registry", value=entry.registry),
+                Item(key="Assignment", value=entry.assignment),
+                Item(key="Name", value=entry.organization_name),
+                Item(key="Address", value=entry.organization_address),
+            ],
+        )
+    )
+    return 0
+
+
+def handle_many(
+    context: EtherlyzerContext, report: Report, args: argparse.Namespace, source: list[str]
+) -> int:
+    results = get_bulk(
+        context=context,
         values=source,
         include_unsuccessful=True,
     )
 
     if not results:
-        print("No entries found.")
+        report.sections.append(
+            Section(
+                title="IEEE Assignment",
+                items=[
+                    Item(key="Results", value="No matches found."),
+                ],
+            )
+        )
         return 0
-
-    rows: list[tuple[str, ...]] = []
-
-    for result in results:
-        if result.entry is None and not args.preserve_bad_entries:
-            continue
-
-        if result.entry is not None:
-            fields: tuple[str, ...] = (
-                "MATCH",
-                str(result.entry.registry),
-                str(result.entry.assignment),
-                str(result.entry.organization_name),
-            )
-        else:
-            if result.reason is None:
-                raise ValueError("Expected a reason for this result")
-
-            fields = (
-                result.reason.upper().replace(" ", "_"),
-                "N/A",
-                "N/A",
-                "N/A",
-            )
-
-        if args.linenumbers:
-            number = (
-                str(result.line_number) if args.delimiter is not None else f"{result.line_number}."
-            )
-            fields = (number, *fields)
-        rows.append(fields)
-
-    headers: tuple[str, ...] = ("Result", "Registry", "Assignment", "Organization")
-
-    if args.linenumbers:
-        headers = ("Line", *headers)
-
-    print_table(
-        rows,
-        headers=headers if args.column_names else None,
-        delimiter=args.delimiter,
+    table = Table(
+        columns=(
+            "Line",
+            "Input",
+            "Registry",
+            "Assignment",
+            "Organization",
+            "Form",
+            "Identity",
+            "Resolution",
+        )
     )
+    for result in results:
+        if result.entry is None and args.preserve_bad_entries:
+            table.append(
+                result.line_number,
+                result.mac,
+                "-",
+                "-",
+                "-",
+                result.form,
+                result.identity,
+                result.resolution,
+            )
 
+        elif result.entry is not None:
+            table.append(
+                result.line_number,
+                result.mac,
+                result.entry.registry,
+                result.entry.assignment,
+                result.entry.organization_name,
+                result.form,
+                result.identity,
+                result.resolution,
+            )
+
+    report.sections.append(
+        Section(
+            items=[table],
+        )
+    )
     return 0
+
+
+def run(args: argparse.Namespace) -> int:
+    context = initialize_etherlyzer()
+    report = Report()
+
+    if args.mac:
+        status = handle_single(context, report, args)
+        return status
+    if args.bulk:
+        raw_input = read_multiline(skip_empty_lines=False)
+    elif args.file:
+        raw_input = args.file.read_text(encoding="utf-8").splitlines()
+    else:
+        return 2
+
+    status = handle_many(context, report, args, raw_input)
+    print(report.render(get_render(args.format)))
+    return status
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -105,37 +170,23 @@ Examples:
   etherlyzer whois 00:11:22:33:44:55   Look up a single MAC address
   etherlyzer whois -b                  Enter MAC addresses interactively
   etherlyzer whois -f .\macs.txt       Look up MAC addresses from a file
-  etherlyzer whois -bl                 Show original input line numbers
   etherlyzer whois -bp                 Include unsuccessful lookups
-  etherlyzer whois -blcp               Show all results in an aligned table
-  etherlyzer whois -blcp -d ";"        Output semicolon-delimited results
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     source = parser.add_mutually_exclusive_group(required=True)
     parser.add_argument(
-        "-d",
-        "--delimiter",
+        "-o",
+        "--format",
         type=str,
-        help="Select a delimiter, if none is chosen tabs is default",
+        help="Select a format for the output",
+        choices=get_render_choices(),
     )
     parser.add_argument(
         "-p",
         "--preserve-bad-entries",
         action="store_true",
         help=".",
-    )
-    parser.add_argument(
-        "-l",
-        "--linenumbers",
-        action="store_true",
-        help="Prefix output lines with their corresponding input line number",
-    )
-    parser.add_argument(
-        "-c",
-        "--column-names",
-        action="store_true",
-        help="Write a header row on the first line of the output",
     )
     source.add_argument(
         "mac",
@@ -147,7 +198,7 @@ Examples:
         "-f",
         "--file",
         type=Path,
-        help="Read MAC addresses from a file",
+        help="Read multiple MAC addresses from a file",
     )
 
     source.add_argument(

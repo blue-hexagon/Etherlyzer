@@ -6,7 +6,7 @@ from requests import RequestException
 from tqdm import tqdm
 
 from etherlyzer.config.knobs import etherlyzer_knobs
-from etherlyzer.ieee.registry.cache import RegistryCache
+from etherlyzer.domain.registry.cache import RegistryCache
 
 
 class RegistryDownloader:

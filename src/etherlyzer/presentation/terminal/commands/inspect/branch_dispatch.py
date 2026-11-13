@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import argparse
 
-from etherlyzer.core.application.analytics.mac_classifier import classify_mac
-from etherlyzer.ieee.initialize import (
+from etherlyzer.application.analysis.mac_classifier import classify_mac
+from etherlyzer.domain.initialize import (
     initialize_etherlyzer,
 )
-from etherlyzer.ieee.registry.family import RegistryFamily
+from etherlyzer.domain.registry.family import RegistryFamily
 from etherlyzer.presentation.reporting.model import Report
 from etherlyzer.presentation.terminal.commands.inspect.branch_ethertype import (
     inspect_ethertype,

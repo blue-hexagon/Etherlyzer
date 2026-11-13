@@ -3,11 +3,11 @@ from typing import TypeVar
 
 import pytest
 
-from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.registry.cache import RegistryCache
-from etherlyzer.ieee.registry.downloader import RegistryDownloader
-from etherlyzer.ieee.registry.family import RegistryFamily
-from etherlyzer.ieee.registry.ieee_registry import RegistrySource, SourceFormat
+from etherlyzer.domain.entry.mac import MACAllocationEntry
+from etherlyzer.domain.registry.cache import RegistryCache
+from etherlyzer.domain.registry.downloader import RegistryDownloader
+from etherlyzer.domain.registry.family import RegistryFamily
+from etherlyzer.domain.registry.ieee_registry import RegistrySource, SourceFormat
 
 T = TypeVar("T")
 

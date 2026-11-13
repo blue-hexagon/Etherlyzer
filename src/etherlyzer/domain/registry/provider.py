@@ -1,10 +1,10 @@
 from pathlib import Path
 from typing import TypeGuard, TypeVar
 
-from etherlyzer.ieee.entry.ethertype import EtherTypeEntry
-from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.registry.family import RegistryFamily
-from etherlyzer.ieee.registry.ieee_registry import RegistrySource, SourceFormat
+from etherlyzer.domain.entry.ethertype import EtherTypeEntry
+from etherlyzer.domain.entry.mac import MACAllocationEntry
+from etherlyzer.domain.registry.family import RegistryFamily
+from etherlyzer.domain.registry.ieee_registry import RegistrySource, SourceFormat
 
 T = TypeVar("T")
 type Registry = RegistrySource[MACAllocationEntry] | RegistrySource[EtherTypeEntry]

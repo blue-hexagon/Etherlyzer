@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from etherlyzer.ieee.index.children.ethertype import EthertypeIndex
-from etherlyzer.ieee.index.children.identifier import IdentifierIndex
-from etherlyzer.ieee.index.children.mac_allocation import MACAllocationIndex
-from etherlyzer.ieee.index.children.vendor import VendorIndex
+from etherlyzer.domain.index.type.ethertype import EthertypeIndex
+from etherlyzer.domain.index.type.identifier import IdentifierIndex
+from etherlyzer.domain.index.type.mac_allocation import MACAllocationIndex
+from etherlyzer.domain.index.type.vendor import VendorIndex
 
 
 @dataclass(slots=True)

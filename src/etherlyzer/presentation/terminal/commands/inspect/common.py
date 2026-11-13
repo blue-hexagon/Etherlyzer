@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 
-from etherlyzer.core.application.analytics.mac_classifier import MACClassification
-from etherlyzer.ieee.initialize import EtherlyzerContext
+from etherlyzer.application.analysis.mac_classifier import MACClassification
+from etherlyzer.domain.initialize import EtherlyzerContext
 from etherlyzer.presentation.reporting.model import Report
 
 

@@ -3,10 +3,10 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, TypeVar
 
-from etherlyzer.ieee.registry.cache import RegistryCache
-from etherlyzer.ieee.registry.downloader import RegistryDownloader
-from etherlyzer.ieee.registry.family import RegistryFamily
-from etherlyzer.ieee.registry.parser import RegistryParser
+from etherlyzer.domain.registry.cache import RegistryCache
+from etherlyzer.domain.registry.downloader import RegistryDownloader
+from etherlyzer.domain.registry.family import RegistryFamily
+from etherlyzer.domain.registry.parser import RegistryParser
 
 T = TypeVar("T")
 
