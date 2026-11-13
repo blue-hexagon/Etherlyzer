@@ -1,6 +1,6 @@
 # from etherlyzer.exporter import RegistryMatchExporter
-# from etherlyzer.ieee.index.ieee_index import IEEEIndexCatalog
-# from etherlyzer.ieee.registry.catalog import IEEERegistryCatalog
+# from etherlyzer.domain.index.ieee_index import IEEEIndexCatalog
+# from etherlyzer.domain.registry.catalog import IEEERegistryCatalog
 #
 # if __name__ == "__main__":
 #     import time
@@ -34,3 +34,51 @@
 #     retrieved_vendors = index.get_bulk(ieee_index=index.mac_index, infile="src/etherlyzer/in2.txt")
 #     RegistryMatchExporter().export_csv_to_console(retrieved_vendors)
 #     print(f"{len(retrieved_vendors)} vendors found")
+from etherlyzer.presentation.reporting.model import Report, Section, Table
+from etherlyzer.presentation.reporting.renderers.text import TextRenderer
+
+if __name__ == "__main__":
+    report = Report()
+
+    table = Table(
+        columns=(
+            "Input",
+            "Registry",
+            "Assignment",
+            "Organization",
+            "Blocks",
+        )
+    )
+
+    table.append(
+        "00:00:0C",
+        "MA-L",
+        "00000C",
+        "Cisco Systems, Inc.",
+        1258,
+    )
+
+    table.append(
+        "70:B3:D5",
+        "MA-S",
+        "70B3D5...dasdsads",
+        "Nordic Øresund\nOffice København",
+        7,
+    )
+
+    table.append(
+        "INVALID",
+        None,
+        None,
+        None,
+        None,
+    )
+
+    report.sections.append(
+        Section(
+            title="IEEE Assignments",
+            items=[table],
+        )
+    )
+
+    print(report.render(TextRenderer()))

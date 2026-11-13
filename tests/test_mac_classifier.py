@@ -1,6 +1,6 @@
 import pytest
 
-from etherlyzer.core.application.analytics.mac_classifier import (
+from etherlyzer.core.interpretation.mac.classifier import (
     Administration,
     DeliveryType,
     SLAPQuadrant,

@@ -3,11 +3,11 @@ from typing import TypeVar
 
 import pytest
 
-from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.registry.cache import RegistryCache
-from etherlyzer.ieee.registry.downloader import RegistryDownloader
-from etherlyzer.ieee.registry.family import RegistryFamily
-from etherlyzer.ieee.registry.ieee_registry import RegistrySource, SourceFormat
+from etherlyzer.domain.entry.mac import MACAllocationEntry
+from etherlyzer.infrastructure.registry.cache import RegistryCache
+from etherlyzer.infrastructure.registry.downloader import RegistryDownloader
+from etherlyzer.infrastructure.registry.family import RegistryFamily
+from etherlyzer.infrastructure.registry.registry_source import RegistrySource, SourceFormat
 
 T = TypeVar("T")
 
@@ -19,7 +19,7 @@ def ieee_registry(
 ) -> RegistrySource[T]:
     # Redirect registry files to pytest's temporary directory.
     monkeypatch.setattr(
-        "etherlyzer.ieee.registry.cache.DEFAULT_CACHE_DIR",
+        "etherlyzer.infrastructure.registry.cache.DEFAULT_CACHE_DIR",
         tmp_path,
     )
 
@@ -42,7 +42,7 @@ def registry_cache(
     monkeypatch: pytest.MonkeyPatch,
 ) -> RegistryCache:
     monkeypatch.setattr(
-        "etherlyzer.ieee.registry.cache.DEFAULT_CACHE_DIR",
+        "etherlyzer.infrastructure.registry.cache.DEFAULT_CACHE_DIR",
         tmp_path,
     )
 

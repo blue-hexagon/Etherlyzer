@@ -3,8 +3,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from etherlyzer.ieee.entry.mac import MACAllocationEntry
-from etherlyzer.ieee.registry.ieee_registry import RegistrySource
+from etherlyzer.domain.entry.mac import MACAllocationEntry
+from etherlyzer.infrastructure.registry.registry_source import RegistrySource
 
 T = TypeVar("T")
 
