@@ -2,50 +2,59 @@ from __future__ import annotations
 
 import argparse
 
-from etherlyzer import __version__
 from etherlyzer.infrastructure.registry.provider import RegistryProvider
+from etherlyzer.presentation.reporting.model import Item, Report, Section
+from etherlyzer.presentation.reporting.renders import get_render
 
 
 def run(args: argparse.Namespace) -> int:
     manager = RegistryProvider()
-    print()
 
-    print(f"EtherLyzer {__version__}")
-    print()
-
-    print("Registries")
     registries = manager.get_all(require_cache=True)
+    reg_sections = []
     if not args.verbose:
-        # TODO: Refactor into Report usage
         for registry in registries:
-            print(
-                f"Name            : {registry.name} ({registry.full_name})"
-                f"\nCategory        : {registry.family}"
-                f"\nDescription     : {registry.description}"
-                f"\nFile            : {registry.registry_cache.filepath}"
-                f"\nSource URL      : {registry.url}"
-                f"\nLast Retrieved  : {registry.registry_cache.last_retrieved}"
+            reg_sections.append(  # noqa: PERF401
+                Section(
+                    title=f"{registry.name} ({registry.full_name})",
+                    items=[
+                        Item(key="Category", value=registry.family),
+                        Item(key="Description", value=registry.description),
+                        Item(key="File", value=str(registry.registry_cache.filepath)),
+                        Item(key="Source URL", value=str(registry.url)),
+                        Item(
+                            key="Last Retrieved", value=str(registry.registry_cache.last_retrieved)
+                        ),
+                    ],
+                )
             )
-            print()
     else:
         for registry in manager.get_all(require_cache=True):
-            # TODO: Refactor into Report usage
-            print(
-                f"Name            : {registry.name} ({registry.full_name})"
-                f"\nLegacy Name     : {registry.legacy_name}"
-                f"\nCategory        : {registry.family}"
-                f"\nDescription     : {registry.description}"
-                f"\nLegacy          : {registry.legacy}"
-                f"\nFile            : {registry.registry_cache.filepath}"
-                f"\nSource URL      : {registry.url}"
-                f"\nPrefix Bits     : {registry.prefix_bits}"
-                f"\nLast Retrieved  : {registry.registry_cache.last_retrieved}"
-                f"\nUpdate Interval : {registry.registry_cache.update_interval}"
+            reg_sections.append(  # noqa: PERF401
+                Section(
+                    title=f"{registry.name} ({registry.full_name})",
+                    items=[
+                        Item(key="Legacy Name", value=registry.legacy_name),
+                        Item(key="Category", value=registry.family),
+                        Item(key="Description", value=registry.description),
+                        Item(key="Legacy", value=registry.legacy),
+                        Item(key="File", value=str(registry.registry_cache.filepath)),
+                        Item(key="Source URL", value=str(registry.url)),
+                        Item(key="Prefix Bits", value=str(registry.prefix_bits)),
+                        Item(
+                            key="Last Retrieved", value=str(registry.registry_cache.last_retrieved)
+                        ),
+                        Item(
+                            key="Update Interval",
+                            value=str(registry.registry_cache.update_interval),
+                        ),
+                    ],
+                )
             )
-            print()
 
-    print()
-
+    main_section = Section(title="Registries", items=reg_sections)
+    report = Report(sections=[main_section])
+    print(report.render(get_render("text")))
     return 0
 
 
