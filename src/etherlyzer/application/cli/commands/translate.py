@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import sys
 from enum import StrEnum
+from pathlib import Path
 
 from etherlyzer.application.cli.multiline_stdin import read_multiline
 from etherlyzer.core.interpretation.mac.normalization import normalize_semi_strict
@@ -55,15 +56,16 @@ def run(args: argparse.Namespace) -> int:
     if args.linenumbers and not args.bulk:
         print("error: --linenumbers requires --bulk", file=sys.stderr)
         return 2
-    macs = (
-        read_multiline(
+    if args.bulk:
+        macs = read_multiline(
             linetype="MAC addresses",
             skip_empty_lines=False,
         )
-        if args.bulk
-        else [args.mac]
-    )
-    # TODO: Expand Reporting - add line-feeds
+    elif args.file:
+        macs = args.file.read_text(encoding="utf-8").splitlines()
+    else:
+        macs = [args.mac]
+
     padding = get_arrlen_chwidth(macs) + 1
     invalid_lines: list[int] = []
     for linenumber, mac in enumerate(macs, start=1):
@@ -132,6 +134,12 @@ Examples:
         "--bulk",
         action="store_true",
         help="Read multiple MAC addresses interactively.",
+    )
+    source.add_argument(
+        "-f",
+        "--file",
+        type=Path,
+        help="Read MAC addresses from a specified file.",
     )
 
     parser.add_argument(

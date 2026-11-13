@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from etherlyzer.application.cli.multiline_stdin import read_multiline
+from etherlyzer.application.services.get import get_mac_assignment
 from etherlyzer.bootstrap import EtherlyzerContext, initialize_etherlyzer
 from etherlyzer.core.interpretation.mac.classifier import classify_mac
 from etherlyzer.core.interpretation.mac.identifier import (
@@ -57,27 +58,15 @@ def get_bulk(
 
 def handle_single(context: EtherlyzerContext, report: Report, args: argparse.Namespace) -> int:
     entry = context.indexes.mac.lookup(args.mac)
+    entry_section = get_mac_assignment(context, args.mac)
     if entry is None:
-        report.sections.append(
-            Section(title="IEEE Assignment", items=[Item(key="Result", value="No match found.")])
-        )
+        report.sections.append(entry_section)
         return 1
-
-    report.sections.append(
-        Section(
-            title="IEEE Assignment",
-            items=[
-                Item(key="Registry", value=entry.registry),
-                Item(key="Assignment", value=entry.assignment),
-                Item(key="Name", value=entry.organization_name),
-                Item(key="Address", value=entry.organization_address),
-            ],
-        )
-    )
+    report.sections.append(entry_section)
     return 0
 
 
-def handle_many(
+def handle_bulk(
     context: EtherlyzerContext, report: Report, args: argparse.Namespace, source: list[str]
 ) -> int:
     results = get_bulk(
@@ -156,7 +145,7 @@ def run(args: argparse.Namespace) -> int:
     else:
         return 2
 
-    status = handle_many(context, report, args, raw_input)
+    status = handle_bulk(context, report, args, raw_input)
     print(report.render(get_render(args.format)))
     return status
 
