@@ -1,7 +1,6 @@
 import os
 import sys
 from importlib.metadata import version
-from pathlib import Path
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -146,7 +145,7 @@ templates_path = ["_templates"]
 html_static_path = ["_static"]
 exclude_patterns = []
 
-sys.path.insert(0, Path.resolve("../../src"))
+sys.path.insert(0, os.path.abspath("../../src"))  # ruff: PTH100
 html_show_sphinx = True
 html_search_language = "en"
 toc_object_entries = True
