@@ -157,7 +157,7 @@ Use this table when you know what you want to accomplish but aren't sure which c
 | Examine address bits                               | `translate -t binary`                                        |
 | Reverse the bit order within each octet            | `translate -t bit_reversed`                                  |
 | Check local IEEE registry freshness                | `sync -s`                                                    |
-| Refresh expired IEEE registry data                 | `sync`                                                       |
+| Refresh expired IEEE registry data                 | `synchronize.py`                                                       |
 | Force registry synchronization                     | `sync -f`                                                    |
 
 ## CLI option reference
@@ -201,8 +201,8 @@ EtherLyzer uses command-specific option names. Some short flags have different m
 | `-s, --show-vendor-stats`    | `inspect`   | Display allocation counts and capacities     |
 | `-b, --show-vendor-blocks`   | `inspect`   | List related IEEE allocations                |
 | `-a, --all`                  | `inspect`   | Display all available inspection details     |
-| `-s, --status`               | `sync`      | Display registry expiration status           |
-| `-f, --force`                | `sync`      | Force registry synchronization               |
+| `-s, --status`               | `synchronize.py`      | Display registry expiration status           |
+| `-f, --force`                | `synchronize.py`      | Force registry synchronization               |
 
 :::{warning}
 **Short flags are not interchangeable between commands.**

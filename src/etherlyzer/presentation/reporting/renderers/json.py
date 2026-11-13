@@ -14,13 +14,13 @@ class JSONRenderer:
         def serialize(node: Section | Item) -> dict[str, JSONValue]:
             if isinstance(node, Item):
                 return {
-                    "type": "item",
+                    "implementation": "item",
                     "key": node.key,
                     "value": node.value,
                 }
 
             return {
-                "type": "section",
+                "implementation": "section",
                 "title": node.title,
                 "items": [serialize(child) for child in node.items],
             }

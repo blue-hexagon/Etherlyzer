@@ -9,7 +9,7 @@ from typing import get_type_hints
 from dotenv import load_dotenv
 
 from etherlyzer.config.dirs import DEFAULT_CACHE_DIR
-from etherlyzer.core.constants import TypoTolerance
+from etherlyzer.core.interpretation.mac.constants import TypoTolerance
 
 
 class MACCasing(StrEnum):

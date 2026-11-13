@@ -1,6 +1,6 @@
 import pytest
 
-from etherlyzer.core.normalization import normalize
+from etherlyzer.core.interpretation.mac.normalization import normalize
 
 
 @pytest.mark.parametrize(

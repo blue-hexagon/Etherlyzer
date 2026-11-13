@@ -1,6 +1,6 @@
 import pytest
 
-from etherlyzer.core.formatting import MACFormatter
+from etherlyzer.core.interpretation.mac.formatting import MACFormatter
 
 
 @pytest.mark.parametrize(

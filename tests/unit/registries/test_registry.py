@@ -4,7 +4,7 @@ from unittest.mock import Mock
 import pytest
 
 from etherlyzer.domain.entry.mac import MACAllocationEntry
-from etherlyzer.domain.registry.ieee_registry import RegistrySource
+from etherlyzer.infrastructure.registry.registry_source import RegistrySource
 
 T = TypeVar("T")
 

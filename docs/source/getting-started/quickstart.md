@@ -11,7 +11,7 @@ EtherLyzer provides commands for identifying, inspecting, validating, and format
 | `validate` | Validate and normalize MAC addresses with optional diagnostics and filtering.                 |
 | `format`  | Normalize MAC address formatting with optional typo correction.                               |
 | `registries` | Show local IEEE registry metadata and synchronization status.                                 |
-| `sync`    | Synchronize the local IEEE registry database with upstream sources.                           |
+| `synchronize.py`    | Synchronize the local IEEE registry database with upstream sources.                           |
 
 ## Identify a MAC address
 

@@ -4,7 +4,7 @@ from datetime import timedelta
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
-from etherlyzer.domain.registry.cache import RegistryCache
+from etherlyzer.infrastructure.registry.cache import RegistryCache
 
 
 @pytest.mark.parametrize(

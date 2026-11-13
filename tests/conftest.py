@@ -1,6 +1,6 @@
 import pytest
 
-from etherlyzer.domain.registry.provider import RegistryProvider
+from etherlyzer.infrastructure.registry.provider import RegistryProvider
 
 
 @pytest.fixture
