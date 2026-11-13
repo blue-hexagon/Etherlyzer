@@ -2,16 +2,16 @@ from __future__ import annotations
 
 import argparse
 
-from etherlyzer.application.cli.commands.inspect.branch_ethertype import (
-    inspect_ethertype,
-)
-from etherlyzer.application.cli.commands.inspect.branch_macaddr import (
-    mac_inspection_router,
-)
 from etherlyzer.application.cli.commands.inspect.common import (
     CommonInspectionParams,
     MacInspectionParams,
     TerminalInspectFlags,
+)
+from etherlyzer.application.cli.commands.inspect.ethertype import (
+    inspect_ethertype,
+)
+from etherlyzer.application.cli.commands.inspect.macaddr_router import (
+    mac_inspection_router,
 )
 from etherlyzer.bootstrap import (
     initialize_etherlyzer,
@@ -19,8 +19,6 @@ from etherlyzer.bootstrap import (
 from etherlyzer.core.interpretation.mac.classifier import classify_mac
 from etherlyzer.infrastructure.registry.family import RegistryFamily
 from etherlyzer.presentation.reporting.model import Report
-
-# from etherlyzer.presentation.terminal.commands.inspect.branch_identifier import inspect_identifier
 
 
 def validate_inspect_args(args: argparse.Namespace) -> None:

@@ -1,10 +1,9 @@
-from etherlyzer.application.cli.commands.inspect.branch_macaddr_presentation import (
-    build_cid_registration_section,
-)
 from etherlyzer.application.cli.commands.inspect.common import (
     MacInspectionParams,
 )
 from etherlyzer.presentation.reporting.renderers.text import TextRenderer
+
+from .macaddr_presentation import build_cid_registration_section
 
 
 def inspect_identifier(

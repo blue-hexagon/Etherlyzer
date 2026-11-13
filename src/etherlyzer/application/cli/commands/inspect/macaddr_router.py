@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from etherlyzer.application.cli.commands.inspect.branch_macaddr_presentation import (
+from etherlyzer.application.cli.commands.inspect.common import (
+    MacInspectionParams,
+)
+from etherlyzer.application.cli.commands.inspect.macaddr_presentation import (
     build_cid_registration_section,
     build_mac_autopsy_section,
 )
-from etherlyzer.application.cli.commands.inspect.branch_macaddr_uaa_ig import (
+from etherlyzer.application.cli.commands.inspect.macaddr_uaa_ig import (
     inspect_universal,
-)
-from etherlyzer.application.cli.commands.inspect.common import (
-    MacInspectionParams,
 )
 from etherlyzer.core.interpretation.mac.classifier import (
     Administration,

@@ -147,6 +147,7 @@ def run(args: argparse.Namespace) -> int:
 
     if args.mac:
         status = handle_single(context, report, args)
+        print(report.render(get_render(args.format)))
         return status
     if args.bulk:
         raw_input = read_multiline(skip_empty_lines=False)

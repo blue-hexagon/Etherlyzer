@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from etherlyzer.application.cli.commands.inspect.dispatch import dispatch
+from etherlyzer.application.cli.commands.inspect.router import dispatch
 from etherlyzer.infrastructure.registry.family import RegistryFamily
 
 
