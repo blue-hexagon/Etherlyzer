@@ -3,7 +3,7 @@ from etherlyzer.application.cli.commands.inspect.common import (
 )
 from etherlyzer.presentation.reporting.renderers.text import TextRenderer
 
-from .macaddr_presentation import build_cid_registration_section
+from etherlyzer.application.services.mac import build_cid_registration_section
 
 
 def inspect_identifier(

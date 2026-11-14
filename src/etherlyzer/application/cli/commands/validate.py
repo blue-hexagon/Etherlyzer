@@ -5,6 +5,7 @@ import argparse
 from etherlyzer.application.cli.multiline_stdin import read_multiline
 from etherlyzer.core.interpretation.mac.normalization import normalize
 from etherlyzer.core.interpretation.mac.validation import MACValidator
+from etherlyzer.presentation.reporting.model import Report, Table, Section
 
 
 def run(args: argparse.Namespace) -> int:
@@ -13,7 +14,26 @@ def run(args: argparse.Namespace) -> int:
         if args.bulk
         else [args.mac]
     )
-
+    table = Table(
+        columns=(
+            "Line",
+            "Input",
+            "Registry",
+            "Assignment",
+            "Organization",
+            "Form",
+            "Identity",
+            "Resolution",
+        )
+    )
+    report = Report(
+        [
+            Section(
+                title="",
+                items=[table],
+            ),
+        ],
+    )
     linenumber = 0
     invalid_lines: list[int] = []
     padding = len(str(len(macs))) + 2

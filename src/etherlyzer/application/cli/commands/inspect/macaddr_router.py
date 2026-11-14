@@ -3,7 +3,7 @@ from __future__ import annotations
 from etherlyzer.application.cli.commands.inspect.common import (
     MacInspectionParams,
 )
-from etherlyzer.application.cli.commands.inspect.macaddr_presentation import (
+from etherlyzer.application.services.mac import (
     build_cid_registration_section,
     build_mac_autopsy_section,
 )

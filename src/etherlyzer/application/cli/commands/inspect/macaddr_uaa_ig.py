@@ -1,8 +1,8 @@
 from etherlyzer.application.cli.commands.inspect.common import (
     MacInspectionParams,
 )
-from etherlyzer.application.cli.commands.inspect.macaddr_presentation import (
-    build_associated_block_count_section,
+from etherlyzer.application.services.mac import (
+    build_associated_block_summary_section,
     build_ieee_registration_section,
     build_vendor_blocks_section,
 )
@@ -30,21 +30,21 @@ def inspect_universal(params: MacInspectionParams) -> bool | None:
 
         registry: Registry = context.provider.get_by_name(entry.registry)
         if True and is_mac_registry(registry):
-            ieee_registry_section = build_ieee_registration_section(entry, registry)
+            ieee_registry_section = build_ieee_registration_section(entry=entry, reg=registry)
 
         if inspect_flags.show_vendor_stats or inspect_flags.show_vendor_blocks:
-            vendor_correlated_entries = context.indexes.vendor.lookup_many(entry.organization_name)
+            vendor_correlated_entries = build_vendor_blocks_section(entry=entry, eth_ctx=context)
             if vendor_correlated_entries:
                 if inspect_flags.show_vendor_stats:
                     ieee_registry_section.items.append(
-                        build_associated_block_count_section(vendor_correlated_entries),
+                        build_associated_block_summary_section(entry=entry, eth_ctx=context),
                     )
 
                 if inspect_flags.show_vendor_blocks:
                     ieee_registry_section.items.append(
-                        build_vendor_blocks_section(vendor_correlated_entries),
+                        build_vendor_blocks_section(entry=entry, eth_ctx=context),
                     )
         report.previous_section.append(ieee_registry_section)
         return True
-    if entry is None:
+    if entry is None:  # noqa
         return False

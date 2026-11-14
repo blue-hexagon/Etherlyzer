@@ -3,6 +3,7 @@ from __future__ import annotations
 from etherlyzer.application.cli.commands.inspect.common import (
     MacInspectionParams,
 )
+from etherlyzer.bootstrap import EtherlyzerContext
 from etherlyzer.core.interpretation.mac.allocation_analysis import summarize_vendor_allocations
 from etherlyzer.core.interpretation.mac.formatting import MACFormatter
 from etherlyzer.core.interpretation.mac.identifier import MacAssessment
@@ -12,13 +13,20 @@ from etherlyzer.infrastructure.registry.registry_source import RegistrySource
 from etherlyzer.presentation.reporting.model import Item, Section
 
 
-def build_associated_block_count_section(
-    vendor_correlated_entries: list[MACAllocationEntry],
+def build_associated_block_summary_section(
+    entry: MACAllocationEntry, eth_ctx: EtherlyzerContext
 ) -> Section:
+    org_name: str = entry.organization_name
+    related_entries: list[MACAllocationEntry] | None = eth_ctx.indexes.vendor.lookup_many(org_name)
+    if related_entries is None:
+        raise RuntimeError(
+            "Logic error occured - related_entries should resolve because MacAllocationEntry is already resolved."
+        )
     total_alloc, iab_alloc, mal_alloc, mam_alloc, mas_alloc = summarize_vendor_allocations(
-        vendor_correlated_entries
+        related_entries
     )
     mal, mam, mas, iab = None, None, None, None
+
     if mal_alloc.total_blocks > 0:
         mal = Section(
             title="MA-L",
@@ -73,9 +81,15 @@ def build_associated_block_count_section(
     )
 
 
-def build_vendor_blocks_section(
-    vendor_correlated_entries: list[MACAllocationEntry],
-) -> Section:
+def build_vendor_blocks_section(entry: MACAllocationEntry, eth_ctx: EtherlyzerContext) -> Section:
+    """Takes a list of MacAllocationEntry's *from the same vendor*"""
+    org_name: str = entry.organization_name
+    related_entries: list[MACAllocationEntry] | None = eth_ctx.indexes.vendor.lookup_many(org_name)
+    if related_entries is None:
+        raise RuntimeError(
+            "Logic error occured - related_entries should resolve because MacAllocationEntry is already resolved."
+        )
+
     return Section(
         title="Registered Blocks",
         layout="grid",
@@ -84,7 +98,7 @@ def build_vendor_blocks_section(
                 key=entry.registry_id(),
                 value=MACFormatter.format_default(entry.assignment),
             )
-            for entry in vendor_correlated_entries
+            for entry in related_entries
         ],
         legend="B=IAB, S=MA-S, M=MA-M, L=MA-L",
     )
