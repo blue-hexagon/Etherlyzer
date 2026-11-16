@@ -26,66 +26,41 @@
 
 ---
 
-**EtherLyzer** is a Python library and CLI toolkit for analyzing MAC addresses, IEEE assignments, and Ethernet-related identifiers. It combines **local IEEE registry lookups**, **structural classification**, **standards-aware identity resolution**, **formatting and translation**, and **packet-capture extraction** in a composable interface.
+**EtherLyzer** is an offline-first Python library and command-line toolkit for examining **MAC addresses, IEEE
+registrations, EtherTypes, and other Ethernet identifiers**.
 
-It goes beyond conventional OUI lookups: an address can identify an IEEE-registered organization, follow a protocol-defined addressing rule, or have a special purpose without belonging to an ordinary vendor allocation.
+A MAC address is more than an OUI, and an EtherType is more than a protocol name. EtherLyzer combines IEEE registry data
+with address structure, standards-defined identities, precise allocation boundaries, and reusable analysis tools to
+explain **what an identifier is, what it is used for, and what can actually be inferred from it**.
 
-Designed for network engineering, automation, asset discovery, NOC/SOC investigations, and network forensics.
+Use it from the terminal or build it into your own network automation, asset inventory, packet-analysis, and security
+workflows. Registry-backed lookups run locally after the required datasets have been synchronized.
 
-## Why EtherLyzer?
+## A lookup is only the beginning
 
-A conventional lookup might tell you that a MAC prefix belongs to a particular organization. EtherLyzer helps answer different questions:
+Consider three different identifiers:
 
-- **Who holds the allocation?** Resolve MA-L, MA-M, MA-S, and legacy IAB assignments, including the registered organization and assignment prefix.
-- **What kind of address is this?** Examine individual/group delivery, universal/local administration, broadcast and zero-address properties, and the applicable SLAP quadrant.
-- **Does it have a standards-defined purpose?** Recognize addresses and address patterns used by protocols such as IPv6 multicast, rather than treating every unmatched address as unknown.
-- **What can legitimately be inferred?** Distinguish a registered *address block* from a verified assignment of a specific 48-bit address.
-- **How can I process it?** Normalize, validate, reformat, translate, extract, inspect, and incorporate results into structured reports.
+| Identifier          | What EtherLyzer can establish                                                                                                         |
+|---------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `B8:1E:A4:33:70:3F` | An individual, universally administered address within an IEEE MA-L allocation registered to Liteon Technology Corporation.           |
+| `33:33:00:00:00:01` | A protocol-defined IPv6 multicast address (RFC 2464), even without an ordinary IEEE organizational allocation match.                  |
+| `0x88B7`            | An OUI Extended EtherType: the following **3-byte OUI + 2-byte protocol ID** are needed to identify the organization-scoped protocol. |
 
-For example, `33:33:00:00:00:01` need not match an IEEE vendor allocation to be meaningful: EtherLyzer can identify it as an **IPv6 multicast address** under the mapping defined by RFC 2464.
+Those are different kinds of answers. EtherLyzer distinguishes **structural classification**, **registry resolution**,
+and **standards-defined identity** instead of treating them as the same lookup.
 
-An inspection can distinguish the address's structure from its standards-defined identity:
+## Install
 
-```text
-MAC: 33:33:00:00:00:01
-  Delivery       : Group Address
-  Administration : Locally Administered Address (LAA)
-  Identity       : IPv6 Multicast Address
-  Resolution     : IETF IPv6 Multicast Mapping (RFC 2464)
-  IEEE Assignment: No match found
-```
-
-A missing vendor match is not the same as an unknown address.
-
-## Features
-
-| Capability                   | Description                                                                             |
-|------------------------------|-----------------------------------------------------------------------------------------|
-| IEEE lookup                  | Local lookups for MA-L, MA-M, MA-S, IAB, and company identifiers (CID)                  |
-| MAC inspection               | Structural classification, address identity, registry resolution, and assessments       |
-| Special addresses            | Recognition of supported standards-defined fixed addresses and group address ranges     |
-| EtherType intelligence       | Lookup and inspection of Ethernet protocol identifiers                                  |
-| Allocation analysis          | Prefixes, address ranges, capacities, and related organizational allocations            |
-| Normalization and formatting | Strict or lenient normalization; common and customizable MAC representations            |
-| Translation                  | Binary, hexadecimal, decimal, byte-oriented, and per-octet bit-reversed representations |
-| Extraction                   | Source and destination MAC extraction from supported files and packet captures          |
-| Reporting                    | Composable `Report`, `Section`, and `Item` objects with text, JSON, and CSV renderers   |
-| Local operation              | Synchronizable IEEE datasets; ordinary lookups do not require third-party lookup APIs   |
-
-## Installation
-
-The currently published PyPI distribution requires **Python 3.14+**. Check your development branch's `pyproject.toml` if you are using an unreleased version.
+Requires **Python 3.12+** (Python 3.12 to 3.x; see `pyproject.toml` for the authoritative constraint).
 
 ```console
 python -m pip install etherlyzer
 etherlyzer --version
 ```
 
-## Quick start: Python API
+## Quick start
 
-The Python API exposes domain operations directly and groups related transformations into modules.
-
-### Inspect a MAC address
+### Identify a MAC address
 
 ```python
 from etherlyzer import inspect_mac, lookup_mac
@@ -99,12 +74,127 @@ print(inspection.structure.delivery.value)
 print(inspection.structure.administration.value)
 print(inspection.identity.value)
 print(inspection.resolution.value)
-print(registration.organization_name if registration else "No IEEE assignment found")
+print(registration.organization_name if registration else "No IEEE allocation match")
 ```
 
-**Inspection and registration are deliberately separate.** `lookup_mac()` resolves organizational allocations; `inspect_mac()` interprets structure and identity, including standards-defined addresses without an ordinary vendor registration.
+`inspect_mac()` answers **what the address represents**. `lookup_mac()` independently answers **which IEEE allocation,
+if any, covers it**.
 
-An allocation match identifies the holder of an IEEE-registered block. It does **not** prove the observed device's manufacturer, the current owner, or that a specific 48-bit address was legitimately assigned.
+### Inspect an EtherType
+
+```python
+from etherlyzer import inspect_ethertype
+
+result = inspect_ethertype("88B7")
+
+print(result.field_type.value)  # EtherType
+print(result.is_ethertype)  # True
+print(result.requires_oui_pid)  # True
+print(result.match_status)  # Depends on the local IEEE registry data
+```
+
+EtherLyzer understands the **16-bit Ethernet Type/Length field**, including the distinction between payload lengths, the
+undefined interval, and actual EtherTypes:
+
+| Range             | Interpretation                         |
+|-------------------|----------------------------------------|
+| `0x0000`–`0x05DC` | IEEE 802.3 length field (0–1500 bytes) |
+| `0x05DD`–`0x05FF` | Undefined Length/Type values           |
+| `0x0600`–`0xFFFF` | EtherType values                       |
+
+A valid EtherType value does **not** necessarily have a matching IEEE registry entry. And inspecting `88B7` alone does
+not reveal its encapsulated protocol: that requires the additional five bytes from the frame.
+
+## What EtherLyzer does
+
+| Capability               | Details                                                                                                                                                      |
+|--------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **MAC inspection**       | Individual/group delivery, universal/local administration, broadcast and zero addresses, SLAP quadrants, address form, identity, resolution, and assessments |
+| **IEEE lookup**          | MA-L, MA-M, MA-S, legacy IAB, and CID information; organization metadata and associated allocation data                                                      |
+| **EtherType inspection** | 16-bit field classification, registered protocol information, unknown EtherTypes, and OUI Extended EtherType recognition                                     |
+| **Address intelligence** | Supported fixed and ranged protocol-defined MAC identities, including IPv4/IPv6 multicast and IEEE link-local group addresses                                |
+| **Formatting**           | Canonical, Cisco, default, and configurable grouping, separators, and case                                                                                   |
+| **Translation**          | Binary, decimal, hexadecimal, octet-oriented, and per-octet bit-reversed representations                                                                     |
+| **Extraction**           | MAC extraction from supported files and Ethernet packet captures, including PCAP/PCAPNG                                                                      |
+| **Reporting**            | Composable `Report`, `Section`, and `Item` objects; text, JSON, and CSV renderers                                                                            |
+| **Offline-first**        | Local, synchronizable IEEE datasets and indexed lookups without per-query external API requests                                                              |
+
+## Python API
+
+EtherLyzer exposes high-level domain operations directly and groups stateless transformations into modules:
+
+```python
+from etherlyzer import (
+    extraction,
+    formatting,
+    inspect_ethertype,
+    inspect_mac,
+    lookup_mac,
+    normalize,
+    normalize_strict,
+    translation,
+)
+from etherlyzer.presentation import Item, Report, Section, get_renderer
+```
+
+### MAC inspection: structure, identity, and evidence
+
+```python
+from etherlyzer import inspect_mac
+
+result = inspect_mac("33:33:00:00:00:01")
+
+print(result.structure.normalized)
+print(result.structure.delivery.value)
+print(result.structure.administration.value)
+print(result.structure.slap_quadrant.value if result.structure.slap_quadrant else None)
+print(result.form.value)
+print(result.identity.value)
+print(result.resolution.value)
+
+for assessment in sorted(result.assessment, key=lambda item: item.name):
+    print(f"{assessment.label}: {assessment.description}")
+```
+
+An abridged example of the interpreted result:
+
+```text
+Address        : 33:33:00:00:00:01
+Delivery       : Group Address
+Administration : Locally Administered Address (LAA)
+SLAP           : Administratively Assigned (AAI)
+Form           : Special (Protocol-Defined Address)
+Identity       : IPv6 Multicast Address
+Resolution     : IETF IPv6 Multicast Mapping (RFC 2464)
+Assessment     : Standards-Defined
+```
+
+**A missing vendor registration is not an unknown address.** The IPv6 multicast mapping is defined by a protocol
+standard, not by an ordinary manufacturer allocation.
+
+Conversely, a registered MA-L/MA-M/MA-S match identifies the **holder of the assigned address block**. It does not prove
+the manufacturer or owner of an observed device, or establish that a particular MAC was legitimately assigned.
+EtherLyzer's inspection assessments preserve that distinction.
+
+### EtherType inspection: more than protocol names
+
+```python
+from etherlyzer import inspect_ethertype
+
+for identifier in ("05DC", "05DD", "0800", "0806", "86DD", "88B7"):
+    result = inspect_ethertype(identifier)
+    print(
+        f"0x{result.assignment} | "
+        f"{result.field_type.value} | "
+        f"{result.description or result.match_status}"
+    )
+```
+
+The returned structure also exposes the numeric value, optional length in bytes, registry metadata, organization
+information, match status, and whether the identifier is `0x88B7` (OUI Extended EtherType).
+
+Some familiar EtherTypes include `0x0800` (IPv4), `0x0806` (ARP), `0x86DD` (IPv6), `0x888E` (802.1X/EAPOL), `0x88CC`
+(LLDP), and `0x88E5` (MACsec).
 
 ### Normalize, format, and translate
 
@@ -117,133 +207,235 @@ print(formatting.to_canonical_format(mac))
 print(formatting.to_customized_format(mac, block_size=4, separator=".", case="lower"))
 print(translation.to_binary(mac))
 print(translation.to_decimal(mac))
+print(translation.to_hex_bytes(mac))
 print(translation.to_bit_reversed(mac))
 ```
 
-`normalize_strict()` requires a complete 48-bit address and rejects unsupported characters. The more permissive `normalize()` is also available when lenient input cleanup is intentional.
+`normalize_strict()` requires a complete 48-bit hexadecimal address, allowing supported separators. The lenient
+`normalize()` is available for deliberate input cleanup. Bit reversal operates **within each octet**, not across the
+entire 48-bit address.
 
-### Extract unique MAC addresses from a packet capture
+### Extract unique addresses from a capture
 
 ```python
 from pathlib import Path
-from etherlyzer import extraction, inspect_mac, normalize_strict
+from etherlyzer import extraction, inspect_mac
 
-unique_macs = {
-    normalize_strict(address)
-    for packet in extraction.extract_file(Path("capture.pcapng"))
-    for address in (packet.src, packet.dst)
-    if address is not None
-}
+macs = extraction.extract_unique_pcap_macs(Path("capture.pcapng"))
 
-for mac in sorted(unique_macs):
+for mac in sorted(macs):
     result = inspect_mac(mac)
-    print(mac, result.identity.value)
+    print(f"{mac}: {result.identity.value}")
 ```
 
-This extracts both source and destination MAC addresses, normalizes them, and performs one inspection per unique address. For captures with unusual or malformed records, handle normalization errors per record.
+This is useful when analyzing network captures, building address inventories, or enriching capture-derived datasets.
+Inspecting a set of addresses avoids repeating registry lookups for every observed packet.
 
-### Build structured reports
+### Build a report and export it as text or JSON
 
-EtherLyzer's presentation API is independent of its inspection and lookup logic. Applications can assemble their own report hierarchy and choose an output renderer.
+EtherLyzer's reporting objects are **independent of extraction and classification**. You decide which facts to include
+and how to present them.
 
 ```python
-from etherlyzer import inspect_mac, lookup_mac
+from pathlib import Path
+from etherlyzer import extraction, inspect_mac, lookup_mac
 from etherlyzer.presentation import Item, Report, Section, get_renderer
 
-mac = "33:33:00:00:00:01"
-inspection = inspect_mac(mac)
-registration = lookup_mac(mac)
+macs = extraction.extract_unique_pcap_macs(Path("capture.pcapng"))
+sections = []
 
-report = Report(
-    sections=[
+for mac in sorted(macs):
+    inspection = inspect_mac(mac)
+    registration = lookup_mac(mac)
+
+    sections.append(
         Section(
-            title="MAC Analysis",
+            title=mac,
             items=[
-                Item("Address", mac),
                 Item("Identity", inspection.identity.value),
                 Item("Resolution", inspection.resolution.value),
-                Item("IEEE Assignment", registration.assignment if registration else None),
+                Item(
+                    "IEEE Organization",
+                    registration.organization_name if registration else None,
+                ),
+                Section(
+                    title="Assessment",
+                    items=[
+                        Item(item.label, item.description)
+                        for item in sorted(inspection.assessment, key=lambda x: x.name)
+                    ],
+                ),
             ],
         )
-    ]
-)
+    )
+
+report = Report(sections=sections)
 
 print(report.render(get_renderer("text")))
-print(report.render(get_renderer("json")))
+Path("report.json").write_text(
+    report.render(get_renderer("json")),
+    encoding="utf-8",
+)
 ```
 
-The same report model can support text, JSON, and CSV workflows. More elaborate reports can compose nested sections for formatting, translation, IEEE registration, and structural inspection.
+One report, one consistent data model, different output formats. A CSV renderer is also available where a tabular
+representation is appropriate.
 
 ## Command-line interface
 
-The CLI provides lookup, inspection, validation, formatting, extraction, and local registry management. Examples below use the newer, type-first `inspect` syntax from the current development interface; run `--help` against your installed version to confirm its supported commands and options.
+The CLI provides interactive and batch-oriented access to the same underlying capabilities.
 
 ```console
-# Identify an IEEE allocation holder
-etherlyzer whois B8:1E:A4:33:70:3F
+# whois bulk example
+etherlyzer whois -f addrs.txt -p
 
-# Inspect a MAC address and its classification
+╭──────┬───────────────────┬──────────┬────────────┬─────────────────────────────────────────────────┬────────────────────────────────────┬───────────────────────────────────────┬───────────────────────────────────────────────╮
+│ Line │ Input             │ Registry │ Assignment │ Organization                                    │ Form                               │ Identity                              │ Resolution                                    │
+├──────┼───────────────────┼──────────┼────────────┼─────────────────────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────┼───────────────────────────────────────────────┤
+│    1 │ 00:00:0C:12:34:56 │ MA-L     │ 00000C     │ Cisco Systems, Inc                              │ Universal Individual Address       │ EUI-48-Compatible Individual Address  │ Registered Block (MA-L)                       │
+│    2 │ 00:50:56:12:34:56 │ MA-L     │ 005056     │ VMware, Inc.                                    │ Universal Individual Address       │ EUI-48-Compatible Individual Address  │ Registered Block (MA-L)                       │
+│    3 │ 05:0C:29:AA:BB:CC │ -        │ -          │ -                                               │ Universal Group Address            │ Group Address                         │ No Matching Eligible IEEE Allocation          │
+│    4 │ 08:00:27:12:34:56 │ MA-L     │ 080027     │ PCS Systemtechnik GmbH                          │ Universal Individual Address       │ EUI-48-Compatible Individual Address  │ Registered Block (MA-L)                       │
+│    5 │ 03:1C:42:12:34:56 │ -        │ -          │ -                                               │ Local Group Address                │ AAI Address                           │ SLAP Administrative Assignment Space          │
+│    6 │ B8:27:EB:12:34:56 │ MA-L     │ B827EB     │ Raspberry Pi Foundation                         │ Universal Individual Address       │ EUI-48-Compatible Individual Address  │ Registered Block (MA-L)                       │
+│    7 │ DC:A6:32:12:34:56 │ MA-L     │ DCA632     │ Raspberry Pi Trading Ltd                        │ Universal Individual Address       │ EUI-48-Compatible Individual Address  │ Registered Block (MA-L)                       │
+│    8 │ 00:15:5D:12:34:56 │ MA-L     │ 00155D     │ Microsoft Corporation                           │ Universal Individual Address       │ EUI-48-Compatible Individual Address  │ Registered Block (MA-L)                       │
+│    9 │ 01:16:3E:12:34:56 │ MA-L     │ 00163E     │ Xensource, Inc.                                 │ Universal Group Address            │ OUI-Derived Group Address             │ Registered Block (MA-L)                       │
+│   10 │ 52:54:00:12:34:56 │ -        │ -          │ -                                               │ Local Individual Address           │ AAI Address                           │ SLAP Administrative Assignment Space          │
+│   11 │ 00:00:00:12:34:56 │ MA-L     │ 000000     │ XEROX CORPORATION                               │ Universal Individual Address       │ EUI-48-Compatible Individual Address  │ Registered Block (MA-L)                       │
+│   12 │ 70:B3:D5:12:34:56 │ MA-S     │ 70B3D5123  │ Amfitech ApS                                    │ Universal Individual Address       │ EUI-48-Compatible Individual Address  │ Registered Block (MA-S)                       │
+│   13 │ 00:1B:21:12:34:56 │ MA-L     │ 001B21     │ Intel Corporate                                 │ Universal Individual Address       │ EUI-48-Compatible Individual Address  │ Registered Block (MA-L)                       │
+│   14 │ 02:00:00:00:00:01 │ -        │ -          │ -                                               │ Local Individual Address           │ AAI Address                           │ SLAP Administrative Assignment Space          │
+│   15 │ 06:11:22:33:44:55 │ -        │ -          │ -                                               │ Local Individual Address           │ Reserved SLAP Address                 │ Reserved SLAP Assignment Space                │
+│   16 │ 01:00:5E:00:00:01 │ MA-L     │ 00005E     │ ICANN, IANA Department                          │ Special (Protocol-Defined Address) │ IPv4 Multicast Address                │ IETF IPv4 Multicast Mapping (RFC 1112 + 9542) │
+│   17 │ 33:33:00:00:00:01 │ -        │ -          │ -                                               │ Special (Protocol-Defined Address) │ IPv6 Multicast Address                │ IETF IPv6 Multicast Mapping (RFC 2464)        │
+│   18 │ 01:80:C2:00:00:0E │ MA-L     │ 0080C2     │ IEEE 802.1 Working Group                        │ Special (Protocol-Defined Address) │ Nearest Bridge Group Address          │ IEEE 802.1Q Defined                           │
+│   19 │ 01:80:C2:00:00:00 │ MA-L     │ 0080C2     │ IEEE 802.1 Working Group                        │ Special (Protocol-Defined Address) │ Nearest Customer Bridge Group Address │ IEEE 802.1Q Defined                           │
+│   20 │ FF:FF:FF:FF:FF:FF │ -        │ -          │ -                                               │ Special (Fixed Address)            │ Ethernet Broadcast                    │ IEEE 802.3 Defined                            │
+│   21 │ 00:00:00:00:00:00 │ -        │ -          │ -                                               │ Special (Fixed Address)            │ All-Zero / Null Address               │ IEEE RA Reserved                              │
+│   22 │ 00:00:00:00:00:0F │ MA-L     │ 000000     │ XEROX CORPORATION                               │ Universal Individual Address       │ EUI-48-Compatible Individual Address  │ Registered Block (MA-L)                       │
+│   23 │ 00:00:00:00:00:0  │ -        │ -          │ -                                               │ Universal Individual Prefix        │ Ambiguous Identity                    │ Prefix Spans Multiple Address Identities      │
+│   24 │ AAF01901CDFA      │ CID      │ AAF019     │ TransferJet Consortium Incorporated Association │ Local Individual Address           │ ELI-48-Compatible Individual Address  │ Registered (CID)                              │
+│   25 │ ABF01901          │ CID      │ AAF019     │ TransferJet Consortium Incorporated Association │ Local Group Prefix                 │ Group ELI Prefix                      │ Registered (CID)                              │
+│   26 │ 0AAB.8C01.cabf    │ CID      │ 0AAB8C     │ Midwest Microwave Solutions Inc.                │ Local Individual Address           │ ELI-48-Compatible Individual Address  │ Registered (CID)                              │
+│   27 │ 0BAB.8C01.cabf    │ CID      │ 0AAB8C     │ Midwest Microwave Solutions Inc.                │ Local Group Address                │ ELI-48-Compatible Group Address       │ Registered (CID)                              │
+│   28 │ 000000            │ -        │ -          │ -                                               │ Universal Individual Prefix        │ Ambiguous Identity                    │ Prefix Spans Multiple Address Identities      │
+│   29 │ 00000000          │ -        │ -          │ -                                               │ Universal Individual Prefix        │ Ambiguous Identity                    │ Prefix Spans Multiple Address Identities      │
+│   30 │ 0000000000        │ -        │ -          │ -                                               │ Universal Individual Prefix        │ Ambiguous Identity                    │ Prefix Spans Multiple Address Identities      │
+│   31 │ 000000000000      │ -        │ -          │ -                                               │ Special (Fixed Address)            │ All-Zero / Null Address               │ IEEE RA Reserved                              │
+│   32 │ 000000000001      │ MA-L     │ 000000     │ XEROX CORPORATION                               │ Universal Individual Address       │ EUI-48-Compatible Individual Address  │ Registered Block (MA-L)                       │
+│   33 │ 52:54:00:12:34:5  │ -        │ -          │ -                                               │ Local Individual Prefix            │ AAI Prefix                            │ SLAP Administrative Assignment Space          │
+│   34 │ 57:54:00:12:34:56 │ -        │ -          │ -                                               │ Local Group Address                │ Reserved SLAP Address                 │ Reserved SLAP Assignment Space                │
+│   35 │ 57:500:12:34:56   │ -        │ -          │ -                                               │ Local Group Prefix                 │ Reserved SLAP Prefix                  │ Reserved SLAP Assignment Space                │
+│   36 │ 53:54:00:12:34:56 │ -        │ -          │ -                                               │ Local Group Address                │ AAI Address                           │ SLAP Administrative Assignment Space          │
+│   37 │ 53:00:12:34:56    │ -        │ -          │ -                                               │ Local Group Prefix                 │ AAI Prefix                            │ SLAP Administrative Assignment Space          │
+╰──────┴───────────────────┴──────────┴────────────┴─────────────────────────────────────────────────┴────────────────────────────────────┴───────────────────────────────────────┴───────────────────────────────────────────────╯
+
+```
+
+```console
+# Inspect MAC address structure and identity
 etherlyzer inspect mac 333300000001
 
-# Inspect an EtherType identifier
-etherlyzer inspect ethertype 0800
-
-# Validate or format MAC input
-etherlyzer validate 00-11-22-33-44-55
-etherlyzer format 001122334455
-
-# Inspect and update local IEEE registry data
-etherlyzer registries
-etherlyzer sync
-
-# Discover available extraction options
-etherlyzer extract --help
+MAC Address Autopsy
+  Input
+    Value                        : 0AAB.8C01.cabf
+    Length                       : 48 bits
+  IEEE Identity
+    Kind                         : Local Individual Address
+    Type                         : ELI-48-Compatible Individual Address
+    Registration                 : Registered (CID)
+    SLAP Quadrant                : Extended Local (ELI)
+    Assessment
+      Registered Candidate       : The complete identifier falls within an eligible IEEE-registered allocation, but assignment of the specific identifier has not been verified.
+      Structurally Conformant    : The identifier conforms to the applicable structural addressing rules. This does not establish that it has been registered or assigned.
+  Representations
+    Canonical                    : 0A-AB-8C-01-CA-BF
+    Bit-Reversed                 : 50:D5:31:80:53:FD
+    To Hex                       : 0x0AAB8C01CABF
+    To Integer                   : 11,731,904,613,055
+    To Decimals                  : 10 171 140 1 202 191
+    To Binary                    : 00001010.10101011.10001100.00000001.11001010.10111111
+    To Bytes                     : 0A AB 8C 01 CA BF
+  Address Properties
+    Null Address                 : False
+    Broadcast                    : False
+    Special Bits
+      U/L                        : 1 Local / Locally Administered
+      I/G                        : 0 Individual / Unicast
+  CID
+    Assignment
+      Organization               : Midwest Microwave Solutions Inc.
+      Address
+        Line 1                   : 2000 Progress Drive Hiawatha IA US 52233
 ```
-
-For command-specific options:
 
 ```console
-etherlyzer --help
-etherlyzer inspect --help
-etherlyzer whois --help
+# Inspect an Ethernet Type/Length identifier
+etherlyzer inspect ethertype 88B7
+
+# Inspect an IEEE company identifier
+etherlyzer inspect identifier 0A6791
+
+# Validate, format, and translate addresses
+etherlyzer validate 00-11-22-33-44-55
+etherlyzer format 001122334455
+etherlyzer translate 001122334455
+
+# Extract addresses from a packet capture
+etherlyzer extract -f capture.pcapng
+
+# Inspect and refresh local registry data
+etherlyzer registries
+etherlyzer sync
 ```
 
-> **Version note:** The public PyPI release may not yet include all APIs or command-line syntax shown in this development-oriented README. Check the installed package version and the changelog before relying on an example.
+See `etherlyzer --help` or `etherlyzer <command> --help` for the commands and options supported by your installed
+version.
 
-## Supported IEEE data
+## IEEE registry coverage and interpretation
 
-| Dataset   | Scope                                                               |
-|-----------|---------------------------------------------------------------------|
-| MA-L      | Large MAC address allocations; 24-bit assignment prefixes (OUI-24)  |
-| MA-M      | Medium MAC address allocations; 28-bit assignment prefixes          |
-| MA-S      | Small MAC address allocations; 36-bit assignment prefixes           |
-| IAB       | Legacy Individual Address Blocks                                    |
-| CID       | IEEE Company Identifiers; not equivalent to MAC address allocations |
-| EtherType | Ethernet protocol identifier assignments                            |
+EtherLyzer works with the following IEEE datasets:
 
-EtherLyzer uses applicable assignment boundaries for resolution, including more specific allocations where relevant. Results may include allocation capacities, ranges, registry metadata, and related blocks associated with an organization.
+| Registry      | Meaning                       | Identifier width / allocation scope                                   |
+|---------------|-------------------------------|-----------------------------------------------------------------------|
+| **MA-L**      | MAC Address Block Large       | 24-bit allocation prefix; remaining 24 bits within EUI-48 space       |
+| **MA-M**      | MAC Address Block Medium      | 28-bit allocation prefix; remaining 20 bits within EUI-48 space       |
+| **MA-S**      | MAC Address Block Small       | 36-bit allocation prefix; remaining 12 bits within EUI-48 space       |
+| **IAB**       | Individual Address Block      | Legacy allocations using a 36-bit assignment scope                    |
+| **CID**       | Company Identifier            | 24-bit company identifier; **not** an ordinary MAC address allocation |
+| **EtherType** | Ethernet protocol identifiers | 16-bit protocol / Type-field assignments                              |
+
+For MAC allocations, EtherLyzer considers the applicable assignment scope, not just the first three octets. This matters
+when more specific MA-M, MA-S, or legacy IAB assignments overlap broad prefix patterns.
+
+Its address interpretation also recognizes supported standards-defined special addresses and distinguishes
+**structurally conformant**, **registered-candidate**, and **standards-defined** results. The existence of a registry
+entry should not be mistaken for evidence that a specific observed device is genuine.
 
 ## Offline-first by design
 
-EtherLyzer maintains local copies of supported IEEE datasets and builds indexes for repeated lookups. Once the necessary data is available, routine lookups can be completed locally without sending queried MAC addresses or internal inventory data to third-party lookup services.
+Supported IEEE datasets are cached and indexed locally. Once available, ordinary address lookups do not need to submit
+queried MACs or inventory data to a third-party API.
 
-This is especially useful for restricted environments, private inventories, offline analysis, packet-capture investigations, and bulk enrichment pipelines. Network access may be required for initial dataset acquisition or synchronization, including any configured automatic refresh.
+That makes EtherLyzer well suited for network automation, NOC/SOC investigations, asset inventories, offline packet
+analysis, and restricted environments. Initial dataset acquisition and configured synchronization may require network
+access.
 
-## Documentation
+## Documentation and development
 
 Full documentation: **[etherlyzer.docs.manjana.dev](https://etherlyzer.docs.manjana.dev/)**
 
-Explore the CLI reference, Python API, IEEE registry concepts, MAC address classification, validation, configuration, and registry synchronization guides.
+The documentation covers CLI commands, public Python interfaces, IEEE registries, MAC addressing, validation,
+configuration, and synchronization.
 
-## Development
+To work on EtherLyzer locally:
 
 ```console
 git clone https://github.com/blue-hexagon/Etherlyzer.git
 cd Etherlyzer
 poetry install
 ```
-
-The repository uses Poetry for dependency management, with pytest, mypy, and Ruff for testing and code quality. Refer to `pyproject.toml` for the authoritative Python version and development configuration.
 
 ## License
 

@@ -1,0 +1,316 @@
+[
+  {
+    "sections": [
+      {
+        "implementation": "section",
+        "title": "Report 1/2 [0020af1b07fa]:",
+        "items": [
+          {
+            "implementation": "section",
+            "title": "Formats",
+            "items": [
+              {
+                "implementation": "item",
+                "key": "Etherlyzer",
+                "value": "00:20:af:1b:07:fa"
+              },
+              {
+                "implementation": "item",
+                "key": "Canonical",
+                "value": "00-20-AF-1B-07-FA"
+              },
+              {
+                "implementation": "item",
+                "key": "Cisco",
+                "value": "0020.af1b.07fa"
+              }
+            ]
+          },
+          {
+            "implementation": "section",
+            "title": "IEEE Assignment",
+            "items": [
+              {
+                "implementation": "item",
+                "key": "Registry",
+                "value": "MA-L"
+              },
+              {
+                "implementation": "item",
+                "key": "Assignment",
+                "value": "0020AF"
+              },
+              {
+                "implementation": "item",
+                "key": "Name",
+                "value": "3COM"
+              },
+              {
+                "implementation": "item",
+                "key": "Address",
+                "value": "5400 BAYFRONT PLAZA SANTA CLARA CA US 95052 "
+              }
+            ]
+          },
+          {
+            "implementation": "section",
+            "title": "Mac Inspection",
+            "items": [
+              {
+                "implementation": "section",
+                "title": "Autopsy",
+                "items": [
+                  {
+                    "implementation": "item",
+                    "key": "Normalization",
+                    "value": "0020af1b07fa"
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Complete",
+                    "value": true
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Zero Address",
+                    "value": false
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Broadcast Address",
+                    "value": false
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Delivery",
+                    "value": "Individual Address"
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Administration",
+                    "value": "Universally Administered Address (UAA)"
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "SLAP",
+                    "value": null
+                  }
+                ]
+              },
+              {
+                "implementation": "section",
+                "title": "Identity",
+                "items": [
+                  {
+                    "implementation": "item",
+                    "key": "Form",
+                    "value": "Universal Individual Address"
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Resolution",
+                    "value": "Registered Block (MA-L)"
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Identity",
+                    "value": "EUI-48-Compatible Individual Address"
+                  },
+                  {
+                    "implementation": "section",
+                    "title": "Assessment",
+                    "items": [
+                      {
+                        "implementation": "item",
+                        "key": "Registered Candidate",
+                        "value": "The complete identifier falls within an eligible IEEE-registered allocation, but assignment of the specific identifier has not been verified."
+                      },
+                      {
+                        "implementation": "item",
+                        "key": "Structurally Conformant",
+                        "value": "The identifier conforms to the applicable structural addressing rules. This does not establish that it has been registered or assigned."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "implementation": "section",
+            "title": "Translation",
+            "items": [
+              {
+                "implementation": "item",
+                "key": "Binary",
+                "value": "00000000.00100000.10101111.00011011.00000111.11111010"
+              },
+              {
+                "implementation": "item",
+                "key": "Bytes",
+                "value": "00 20 AF 1B 07 FA"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sections": [
+      {
+        "implementation": "section",
+        "title": "Report 2/2 [00e029688bfb]:",
+        "items": [
+          {
+            "implementation": "section",
+            "title": "Formats",
+            "items": [
+              {
+                "implementation": "item",
+                "key": "Etherlyzer",
+                "value": "00:e0:29:68:8b:fb"
+              },
+              {
+                "implementation": "item",
+                "key": "Canonical",
+                "value": "00-E0-29-68-8B-FB"
+              },
+              {
+                "implementation": "item",
+                "key": "Cisco",
+                "value": "00e0.2968.8bfb"
+              }
+            ]
+          },
+          {
+            "implementation": "section",
+            "title": "IEEE Assignment",
+            "items": [
+              {
+                "implementation": "item",
+                "key": "Registry",
+                "value": "MA-L"
+              },
+              {
+                "implementation": "item",
+                "key": "Assignment",
+                "value": "00E029"
+              },
+              {
+                "implementation": "item",
+                "key": "Name",
+                "value": "STANDARD MICROSYSTEMS CORP."
+              },
+              {
+                "implementation": "item",
+                "key": "Address",
+                "value": "6 HUGHES IRVINE CA US 92718 "
+              }
+            ]
+          },
+          {
+            "implementation": "section",
+            "title": "Mac Inspection",
+            "items": [
+              {
+                "implementation": "section",
+                "title": "Autopsy",
+                "items": [
+                  {
+                    "implementation": "item",
+                    "key": "Normalization",
+                    "value": "00e029688bfb"
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Complete",
+                    "value": true
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Zero Address",
+                    "value": false
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Broadcast Address",
+                    "value": false
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Delivery",
+                    "value": "Individual Address"
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Administration",
+                    "value": "Universally Administered Address (UAA)"
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "SLAP",
+                    "value": null
+                  }
+                ]
+              },
+              {
+                "implementation": "section",
+                "title": "Identity",
+                "items": [
+                  {
+                    "implementation": "item",
+                    "key": "Form",
+                    "value": "Universal Individual Address"
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Resolution",
+                    "value": "Registered Block (MA-L)"
+                  },
+                  {
+                    "implementation": "item",
+                    "key": "Identity",
+                    "value": "EUI-48-Compatible Individual Address"
+                  },
+                  {
+                    "implementation": "section",
+                    "title": "Assessment",
+                    "items": [
+                      {
+                        "implementation": "item",
+                        "key": "Registered Candidate",
+                        "value": "The complete identifier falls within an eligible IEEE-registered allocation, but assignment of the specific identifier has not been verified."
+                      },
+                      {
+                        "implementation": "item",
+                        "key": "Structurally Conformant",
+                        "value": "The identifier conforms to the applicable structural addressing rules. This does not establish that it has been registered or assigned."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "implementation": "section",
+            "title": "Translation",
+            "items": [
+              {
+                "implementation": "item",
+                "key": "Binary",
+                "value": "00000000.11100000.00101001.01101000.10001011.11111011"
+              },
+              {
+                "implementation": "item",
+                "key": "Bytes",
+                "value": "00 E0 29 68 8B FB"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

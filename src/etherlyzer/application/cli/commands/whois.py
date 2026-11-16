@@ -15,6 +15,7 @@ from etherlyzer.core.interpretation.mac.inspection import (
     MacResolution,
     inspect,
 )
+from etherlyzer.core.interpretation.mac.normalization import normalize
 from etherlyzer.domain.entry.mac import MACAllocationEntry
 from etherlyzer.presentation.reporting.model import Item, Report, Section, Table
 from etherlyzer.presentation.reporting.renders import get_render_choices, get_renderer
@@ -40,8 +41,10 @@ def get_bulk(
     for line_number, mac in enumerate(values, start=1):
         mac = mac.strip()
         reason = inspect(get_mac_structure(mac), context)
-
-        entry = context.indexes.mac.lookup_group_allocation(mac)
+        normalized = normalize(mac)
+        entry = context.indexes.mac.lookup_inclusive_cid_and_group_allocation(mac)
+        if entry is None:
+            entry = context.indexes.identifier.lookup_with_ig_bit_cleared(normalized[:6])
         result = MACTerminalLookupResult(
             entry=entry,
             line_number=line_number,
@@ -58,6 +61,8 @@ def get_bulk(
 
 def handle_single(context: EtherlyzerContext, report: Report, args: argparse.Namespace) -> int:
     entry = context.indexes.mac.lookup(args.mac)
+    if entry is None:
+        entry = context.indexes.identifier.lookup(args.mac)
     entry_section = build_mac_registration(context, args.mac)
     if entry is None:
         report.sections.append(entry_section)

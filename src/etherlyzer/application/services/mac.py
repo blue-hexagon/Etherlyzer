@@ -115,7 +115,7 @@ def build_ieee_registration_section(
 ) -> Section:
     range_start = formatting.to_default_format(entry.assignment, "0")
     range_end = formatting.to_default_format(entry.assignment, "f")
-    address = entry.format_vendor_address()
+    address = entry.organization_address
 
     allocation_items: list[Item | Section] = [
         Item(

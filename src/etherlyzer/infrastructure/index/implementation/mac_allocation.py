@@ -52,8 +52,10 @@ class MACAllocationIndex(IndexService):
             or self.prefixes_24.get(mac[:6])
         )
 
-    def lookup_group_allocation(self, identifier: str) -> MACAllocationEntry | None:
-        """This is a special lookup only used once in the entire program.
+    def lookup_inclusive_cid_and_group_allocation(
+        self, identifier: str
+    ) -> MACAllocationEntry | None:
+        """This is a special lookup.
         It fixes an edge-case where IAB will take precendence over the MAM and MAL registry
         because it is more specific. But that is an error in this specific instance for the following reason:
         MA-L, MA-M, MA-S (not IAB) can flip the I/G bit of an assignment to create a multicast address (per IEEE)

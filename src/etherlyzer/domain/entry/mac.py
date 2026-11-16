@@ -21,6 +21,8 @@ class MACAllocationEntry(BaseEntry):
 
     def format_vendor_address(self) -> list[str]:
         """Format the vendors registered compnay address"""
+        if len(self.organization_address.split(",")) == 1:
+            return [self.organization_address]
         addr_representation: list[str] = []
         for addr_outer in self.organization_address.split(","):
             addr = addr_outer.split("  ")

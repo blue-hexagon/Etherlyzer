@@ -230,7 +230,7 @@ def build_ethertype_report():
 
 
 if __name__ == "__main__":
-    # build_reports_from_pcap(Path("./c04-wap-r1.pcap"))
-    # translate_bulk(Path("whois.txt"))
-    # format_bulk(Path("whois.txt"))
+    build_reports_from_pcap(Path("./c04-wap-r1.pcap"))
+    translate_bulk(Path("whois.txt"))
+    format_bulk(Path("whois.txt"))
     build_ethertype_report()

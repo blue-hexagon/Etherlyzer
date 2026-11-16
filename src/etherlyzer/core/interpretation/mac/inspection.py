@@ -249,7 +249,7 @@ def fixed_address_lookup(
                 structure=cmac,
             ),
             "50-FF": MacIdentityResult(
-                form=MacForm.UAA_ADDRESS,
+                form=MacForm.SPECIAL_UNASSIGNED_ADDRESS,
                 identity=MacIdentity.GROUP_ADDRESS,
                 resolution=MacResolution.UNASSIGNED,
                 structure=cmac,
@@ -322,7 +322,7 @@ def fixed_address_lookup(
         # Outer key contains only the first three octets.
         "0180C2": {
             "000300-FFFFFF": MacIdentityResult(
-                form=MacForm.UAA_ADDRESS,
+                form=MacForm.SPECIAL_UNASSIGNED_ADDRESS,
                 identity=MacIdentity.GROUP_ADDRESS,
                 resolution=MacResolution.UNASSIGNED,
                 structure=cmac,
@@ -514,21 +514,29 @@ def fixed_address_lookup(
 
 
 class MacForm(StrEnum):
-    UAA_PREFIX = "UAA Prefix"
-    UAA_ADDRESS = "UAA Address"
-    LAA_PREFIX = "LAA Prefix"
-    LAA_ADDRESS = "LAA Address"
+    UAA_UNICAST_PREFIX = "Universal Individual Prefix"
+    UAA_MULTICAST_PREFIX = "Universal Group Prefix"
+    UAA_UNICAST_ADDRESS = "Universal Individual Address"
+    UAA_MULTICAST_ADDRESS = "Universal Group Address"
+    LAA_UNICAST_PREFIX = "Local Individual Prefix"
+    LAA_MULTICAST_PREFIX = "Local Group Prefix"
+    LAA_UNICAST_ADDRESS = "Local Individual Address"
+    LAA_MULTICAST_ADDRESS = "Local Group Address"
 
     SPECIAL_FIXED_ADDRESS = "Special (Fixed Address)"
     SPECIAL_PROTOCOL_PREFIX = "Special (Protocol-Defined Prefix)"
     SPECIAL_PROTOCOL_ADDRESS = "Special (Protocol-Defined Address)"
     SPECIAL_RESERVED_ADDRESS = "Special (Reserved Address)"
+    SPECIAL_UNASSIGNED_ADDRESS = "Special (Unassigned Address)"
+    AMBIGUOUS_PREFIX = "Ambiguous Prefix"
 
 
 class MacIdentity(StrEnum):
     # Universally administered individual
     EUI48_PREFIX = "EUI-48-Compatible Prefix"
     EUI48_ADDRESS = "EUI-48-Compatible Individual Address"
+    OUI_GROUP_PREFIX = "OUI-Derived Group Prefix"
+    OUI_GROUP_ADDRESS = "OUI-Derived Group Address"
 
     # Universally administered group
     GROUP_PREFIX = "Group Address Prefix"
@@ -536,9 +544,9 @@ class MacIdentity(StrEnum):
 
     # Extended Local Identifier (ELI)
     ELI_INDIVIDUAL_PREFIX = "Individual ELI Prefix"
-    ELI_INDIVIDUAL_ADDRESS = "Individual ELI-48-Compatible Address"
+    ELI_INDIVIDUAL_ADDRESS = "ELI-48-Compatible Individual Address"
     ELI_GROUP_PREFIX = "Group ELI Prefix"
-    ELI_GROUP_ADDRESS = "Group ELI-48-Compatible Address"
+    ELI_GROUP_ADDRESS = "ELI-48-Compatible Group Address"
 
     # Structured Local Address Plan (SLAP)
     AAI_PREFIX = "AAI Prefix"
@@ -548,6 +556,8 @@ class MacIdentity(StrEnum):
     RESERVED_PREFIX = "Reserved SLAP Prefix"
     RESERVED_ADDRESS = "Reserved SLAP Address"
 
+    # UNASSIGNED_ADDRESS
+    UNASSIGNED_ADDRESS = "Unassigned Address"
     # Special-purpose identifiers
     IPV4_MULTICAST_ADDRESS = "IPv4 Multicast Address"
     MPLS_MULTICAST_ADDRESS = "MPLS Multicast Address"
@@ -555,7 +565,7 @@ class MacIdentity(StrEnum):
     IPV6_MULTICAST_ADDRESS = "IPv6 Multicast Address"
     ALL_ZERO = "All-Zero / Null Address"
     BROADCAST = "Ethernet Broadcast"
-
+    AMBIGUOUS_IDENTITY = "Ambiguous Identity"
     # IEEE 802.1Q reserved group addresses
     NEAREST_CUSTOMER_BRIDGE_GROUP = "Nearest Customer Bridge Group Address"
     MAC_SPECIFIC_CONTROL_PROTOCOLS = "MAC-Specific Control Protocols Group Address"
@@ -642,6 +652,7 @@ class MacResolution(StrEnum):
     NO_REGISTRY_MATCH = "No Matching Eligible IEEE Allocation"
     NO_CID_MATCH = "No Matching IEEE CID"
     UNASSIGNED = "Unassigned IEEE Group Address"
+    AMBIGUOUS_PREFIX = "Prefix Spans Multiple Address Identities"
 
     # SLAP assignment mechanisms
     SLAP_ELI = "SLAP Extended Local Identifier"
@@ -699,6 +710,8 @@ REGISTERED_RESOLUTIONS = frozenset(
 STANDARD_RESOLUTIONS = frozenset(
     {
         # IETF
+        MacResolution.IPV4_MULTICAST,
+        MacResolution.MPLS_MULTICAST,
         MacResolution.IPV6_MULTICAST,
         MacResolution.IETF_TRILL,
         # IEEE
@@ -779,6 +792,12 @@ class MacAssessment(Enum):
         "The available information is insufficient to establish the relevant "
         "assignment or interpretation.",
     )
+    MIXED_PREFIX = (
+        "Mixed Prefix",
+        "The supplied prefix encompasses addresses with different "
+        "identities or assignment mechanisms. A unique interpretation "
+        "cannot be established without additional address bits.",
+    )
 
     def __init__(self, label: str, description: str) -> None:
         self.label = label
@@ -788,7 +807,7 @@ class MacAssessment(Enum):
         return self.label
 
 
-@dataclass
+@dataclass(slots=True)
 class MacIdentityResult:
     form: MacForm
     identity: MacIdentity
@@ -827,8 +846,17 @@ class MacIdentityResult:
             assessments.add(MacAssessment.STANDARD_DEFINED)
 
         # Reserved address space
-        if self.resolution in RESERVED_RESOLUTIONS:
+        if self.resolution in RESERVED_RESOLUTIONS or self.form is MacForm.SPECIAL_RESERVED_ADDRESS:
             assessments.add(MacAssessment.RESERVED)
+
+        if self.resolution in {
+            MacResolution.NO_REGISTRY_MATCH,
+            MacResolution.NO_CID_MATCH,
+        }:
+            assessments.add(MacAssessment.UNRESOLVED)
+
+        if self.resolution is MacResolution.AMBIGUOUS_PREFIX:
+            assessments.add(MacAssessment.MIXED_PREFIX)
 
         return frozenset(assessments)
 
@@ -851,38 +879,38 @@ def _registered_block(registry: str) -> MacResolution:
 
 
 def inspect_uaa_mcast_prefix(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
-    entry = ctx.indexes.mac.lookup_group_allocation(cmac.normalized)
+    entry = ctx.indexes.mac.lookup_inclusive_cid_and_group_allocation(cmac.normalized)
 
     if entry is not None:
         return MacIdentityResult(
-            identity=MacIdentity.GROUP_PREFIX,
+            identity=MacIdentity.OUI_GROUP_PREFIX,
             resolution=_registered_block(entry.registry),
-            form=MacForm.UAA_PREFIX,
+            form=MacForm.UAA_MULTICAST_PREFIX,
             structure=cmac,
         )
 
     return MacIdentityResult(
         identity=MacIdentity.GROUP_PREFIX,
         resolution=MacResolution.NO_REGISTRY_MATCH,
-        form=MacForm.UAA_PREFIX,
+        form=MacForm.UAA_MULTICAST_PREFIX,
         structure=cmac,
     )
 
 
 def inspect_uaa_mcast_complete(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
-    entry = ctx.indexes.mac.lookup_group_allocation(cmac.normalized)
+    entry = ctx.indexes.mac.lookup_inclusive_cid_and_group_allocation(cmac.normalized)
     if entry is not None:
         return MacIdentityResult(
-            identity=MacIdentity.GROUP_ADDRESS,
+            identity=MacIdentity.OUI_GROUP_ADDRESS,
             resolution=_registered_block(entry.registry),
-            form=MacForm.UAA_ADDRESS,
+            form=MacForm.UAA_MULTICAST_ADDRESS,
             structure=cmac,
         )
 
     return MacIdentityResult(
         identity=MacIdentity.GROUP_ADDRESS,
         resolution=MacResolution.NO_REGISTRY_MATCH,
-        form=MacForm.UAA_ADDRESS,
+        form=MacForm.UAA_MULTICAST_ADDRESS,
         structure=cmac,
     )
 
@@ -894,13 +922,21 @@ def inspect_uaa_mcast_complete(cmac: MacStructure, ctx: EtherlyzerContext) -> Ma
 
 def inspect_uaa_unicast_prefix(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
     entry = ctx.indexes.mac.lookup(cmac.normalized)
-
+    # An incomplete prefix may cover both the special all-zero
+    # address and ordinary universally administered addresses.
+    if "000000000000".startswith(cmac.normalized):
+        return MacIdentityResult(
+            identity=MacIdentity.AMBIGUOUS_IDENTITY,
+            resolution=MacResolution.AMBIGUOUS_PREFIX,
+            form=MacForm.UAA_UNICAST_PREFIX,
+            structure=cmac,
+        )
     return MacIdentityResult(
         identity=MacIdentity.EUI48_PREFIX,
         resolution=_registered_block(entry.registry)
         if entry is not None
         else MacResolution.NO_REGISTRY_MATCH,
-        form=MacForm.UAA_PREFIX,
+        form=MacForm.UAA_UNICAST_PREFIX,
         structure=cmac,
     )
 
@@ -912,13 +948,13 @@ def inspect_uaa_unicast_complete(cmac: MacStructure, ctx: EtherlyzerContext) -> 
         return MacIdentityResult(
             identity=MacIdentity.EUI48_ADDRESS,
             resolution=_registered_block(entry.registry),
-            form=MacForm.UAA_ADDRESS,
+            form=MacForm.UAA_UNICAST_ADDRESS,
             structure=cmac,
         )
     return MacIdentityResult(
-        identity=MacIdentity.EUI48_ADDRESS if cmac.is_complete else MacIdentity.EUI48_PREFIX,
+        identity=MacIdentity.EUI48_ADDRESS,
         resolution=MacResolution.NO_REGISTRY_MATCH,
-        form=MacForm.UAA_ADDRESS,
+        form=MacForm.UAA_UNICAST_ADDRESS,
         structure=cmac,
     )
 
@@ -929,8 +965,27 @@ def inspect_uaa_unicast_complete(cmac: MacStructure, ctx: EtherlyzerContext) -> 
 
 
 def _inspect_laa_slap(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
+
     complete = cmac.is_complete
-    kind = MacForm.LAA_ADDRESS if complete else MacForm.LAA_PREFIX
+    first_byte = int(cmac.normalized[:2], 16)
+    is_local = bool(first_byte & 0x02)
+    is_group = bool(first_byte & 0x01)
+    kind: MacForm
+
+    match (is_local, is_group):
+        case (True, False):
+            kind = MacForm.LAA_UNICAST_ADDRESS if complete else MacForm.LAA_UNICAST_PREFIX
+
+        case (True, True):
+            kind = MacForm.LAA_MULTICAST_ADDRESS if complete else MacForm.LAA_MULTICAST_PREFIX
+
+        case (False, False):
+            kind = MacForm.UAA_UNICAST_ADDRESS if complete else MacForm.UAA_UNICAST_PREFIX
+
+        case (False, True):
+            kind = MacForm.UAA_MULTICAST_ADDRESS if complete else MacForm.UAA_MULTICAST_PREFIX
+        case _:
+            raise RuntimeError("Make the typechecker happy.")
 
     match cmac.slap_quadrant:
         case SLAPQuadrant.ELI:

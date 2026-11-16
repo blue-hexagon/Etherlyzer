@@ -23,7 +23,7 @@ def inspect_universal(params: MacInspectionParams) -> bool | None:
     if cmac.delivery == DeliveryType.INDIVIDUAL:
         entry = context.indexes.mac.lookup(args.value)
     else:
-        entry = context.indexes.mac.lookup_group_allocation(args.value)
+        entry = context.indexes.mac.lookup_inclusive_cid_and_group_allocation(args.value)
 
     if entry is not None:
         ieee_registry_section = Section(title="IEEE Registry", items=[])  # Fallback - TODO: fix.
@@ -46,5 +46,5 @@ def inspect_universal(params: MacInspectionParams) -> bool | None:
                     )
         report.previous_section.append(ieee_registry_section)
         return True
-    if entry is None:  # noqa
+    if entry is None:
         return False
