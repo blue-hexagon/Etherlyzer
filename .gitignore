@@ -1,9 +1,9 @@
 ideas.md
-c04-wap-r1.pcap
 features.md
 .coverage
 htmlcov/
 .pytest_cache/
+*.pcap
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
