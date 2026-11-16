@@ -3,7 +3,8 @@ from __future__ import annotations
 import argparse
 
 from etherlyzer.application.cli.multiline_stdin import read_multiline
-from etherlyzer.core.interpretation.mac.formatting import MACFormatter
+from etherlyzer.core.interpretation.mac import formatting
+from etherlyzer.core.interpretation.mac.validation import fix_typos_and_mark_invalid
 
 
 def run(args: argparse.Namespace) -> int:
@@ -27,13 +28,14 @@ def run(args: argparse.Namespace) -> int:
         if args.linenumbers:
             linenumber += 1
             print(f"{linenumber}.".ljust(padding, " "), end="")
+        if args.fix_typos:
+            fix_typos_and_mark_invalid(mac)
         print(
-            MACFormatter.format(
+            formatting.to_customized_format(
                 mac=mac,
                 separator=args.separator,
                 block_size=args.block_size,
                 case=args.casing,
-                fix_typos=args.fix_typos,
             )
         )
 

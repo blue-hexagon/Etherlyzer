@@ -7,13 +7,13 @@ from etherlyzer.bootstrap import EtherlyzerContext
 from etherlyzer.core.interpretation.mac.classifier import (
     Administration,
     DeliveryType,
-    MACClassification,
+    MacStructure,
     SLAPQuadrant,
 )
 
 
 def fixed_address_lookup(
-    cmac: MACClassification,
+    cmac: MacStructure,
 ) -> MacIdentityResult | None:
 
     STANDARDS_GROUP_MAC_PUBLIC_LISTING: dict[str, dict[str, MacIdentityResult]] = {
@@ -22,13 +22,13 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.IPV4_MULTICAST_ADDRESS,
                 resolution=MacResolution.IPV4_MULTICAST,
-                cmac=cmac,
+                structure=cmac,
             ),
             "800000-8FFFFF": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.MPLS_MULTICAST_ADDRESS,
                 resolution=MacResolution.MPLS_MULTICAST,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # IEEE 802.1Q reserved addresses
@@ -40,219 +40,219 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.NEAREST_CUSTOMER_BRIDGE_GROUP,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "01": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.MAC_SPECIFIC_CONTROL_PROTOCOLS,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "02": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.SLOW_PROTOCOLS_MULTICAST,
                 resolution=MacResolution.IEEE_8021AX,
-                cmac=cmac,
+                structure=cmac,
             ),
             "03": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.NEAREST_NON_TPMR_BRIDGE_PAE,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "04": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.MAC_SPECIFIC_CONTROL_PROTOCOLS,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "05": MacIdentityResult(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.RESERVED_FUTURE_STANDARDIZATION,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "06": MacIdentityResult(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.RESERVED_FUTURE_STANDARDIZATION,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "07": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.MEF_ELMI_GROUP,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "08": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.PROVIDER_BRIDGE_GROUP,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "09": MacIdentityResult(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.RESERVED_FUTURE_STANDARDIZATION,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "0A": MacIdentityResult(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.RESERVED_FUTURE_STANDARDIZATION,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "0B": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.EDE_SS_PEP,
                 resolution=MacResolution.IEEE_8021X_8021AE,
-                cmac=cmac,
+                structure=cmac,
             ),
             "0C": MacIdentityResult(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.RESERVED_FUTURE_STANDARDIZATION,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "0D": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.PROVIDER_BRIDGE_MVRP,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "0E": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.NEAREST_BRIDGE_GROUP,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "0F": MacIdentityResult(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.RESERVED_FUTURE_STANDARDIZATION,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             # Individual Standard Group MAC addresses
             "10": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_LANS_BRIDGE_MANAGEMENT,
                 resolution=MacResolution.IEEE_8021D,
-                cmac=cmac,
+                structure=cmac,
             ),
             "11": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.LOAD_SERVER_GENERIC,
                 resolution=MacResolution.IEEE_8021E,
-                cmac=cmac,
+                structure=cmac,
             ),
             "12": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.LOADABLE_DEVICE_GENERIC,
                 resolution=MacResolution.IEEE_8021E,
-                cmac=cmac,
+                structure=cmac,
             ),
             "13": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.IEEE_1905_CONTROL,
                 resolution=MacResolution.IEEE_1905_1,
-                cmac=cmac,
+                structure=cmac,
             ),
             "14": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_LEVEL_1_INTERMEDIATE_SYSTEMS,
                 resolution=MacResolution.ISO_IEC_10589,
-                cmac=cmac,
+                structure=cmac,
             ),
             "15": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_LEVEL_2_INTERMEDIATE_SYSTEMS,
                 resolution=MacResolution.ISO_IEC_10589,
-                cmac=cmac,
+                structure=cmac,
             ),
             "16": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_CONS_END_SYSTEMS,
                 resolution=MacResolution.ISO_IEC_10030,
-                cmac=cmac,
+                structure=cmac,
             ),
             "17": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_CONS_SNARES,
                 resolution=MacResolution.ISO_IEC_10030,
-                cmac=cmac,
+                structure=cmac,
             ),
             "18": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_MANAGER_STATIONS,
                 resolution=MacResolution.IEEE_8021B,
-                cmac=cmac,
+                structure=cmac,
             ),
             "19": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.GROUPCAST_WITH_RETRIES,
                 resolution=MacResolution.IEEE_80211AA,
-                cmac=cmac,
+                structure=cmac,
             ),
             "1A": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_AGENT_STATIONS,
                 resolution=MacResolution.IEEE_8021B,
-                cmac=cmac,
+                structure=cmac,
             ),
             "1B": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_MULTICAST_CAPABLE_END_SYSTEMS,
                 resolution=MacResolution.ISO_IEC_9542,
-                cmac=cmac,
+                structure=cmac,
             ),
             "1C": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_MULTICAST_ANNOUNCEMENTS,
                 resolution=MacResolution.ISO_IEC_9542,
-                cmac=cmac,
+                structure=cmac,
             ),
             "1D": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_MULTICAST_CAPABLE_INTERMEDIATE_SYSTEMS,
                 resolution=MacResolution.ISO_IEC_9542,
-                cmac=cmac,
+                structure=cmac,
             ),
             "1E": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_DTR_CONCENTRATORS,
                 resolution=MacResolution.ISO_IEC_8802_5,
-                cmac=cmac,
+                structure=cmac,
             ),
             "1F": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.EDE_CC_PEP,
                 resolution=MacResolution.IEEE_8021X_8021AE,
-                cmac=cmac,
+                structure=cmac,
             ),
             # Inclusive ranges within 01:80:C2:00:00
             "20-2F": MacIdentityResult(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.MRP_APPLICATION_RESERVED,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "30-3F": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.CFM_CCM_LINKTRACE_GROUP,
                 resolution=MacResolution.IEEE_8021Q,
-                cmac=cmac,
+                structure=cmac,
             ),
             "40-4F": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.TRILL_GROUP,
                 resolution=MacResolution.IETF_TRILL,
-                cmac=cmac,
+                structure=cmac,
             ),
             "50-FF": MacIdentityResult(
                 form=MacForm.UAA_ADDRESS,
                 identity=MacIdentity.GROUP_ADDRESS,
                 resolution=MacResolution.UNASSIGNED,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # ISO/IEC JTC1/SC25 allocated addresses
@@ -262,49 +262,49 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.RING_MANAGEMENT_DIRECTED_BEACON,
                 resolution=MacResolution.ISO_IEC_9314_6,
-                cmac=cmac,
+                structure=cmac,
             ),
             "01-0F": MacIdentityResult(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.ISO_SC25_FUTURE_USE,
                 resolution=MacResolution.ISO_IEC_SC25,
-                cmac=cmac,
+                structure=cmac,
             ),
             "10": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.STATUS_REPORT_PROTOCOL,
                 resolution=MacResolution.ISO_IEC_9314_6,
-                cmac=cmac,
+                structure=cmac,
             ),
             "11-1F": MacIdentityResult(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.ISO_SC25_FUTURE_USE,
                 resolution=MacResolution.ISO_IEC_SC25,
-                cmac=cmac,
+                structure=cmac,
             ),
             "20": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_FDDI_CONCENTRATORS,
                 resolution=MacResolution.ISO_IEC_9314_2,
-                cmac=cmac,
+                structure=cmac,
             ),
             "21-2F": MacIdentityResult(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.ISO_SC25_FUTURE_USE,
                 resolution=MacResolution.ISO_IEC_SC25,
-                cmac=cmac,
+                structure=cmac,
             ),
             "30": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.SYNCHRONOUS_BANDWIDTH_ALLOCATION,
                 resolution=MacResolution.ISO_IEC_9314_6,
-                cmac=cmac,
+                structure=cmac,
             ),
             "31-FF": MacIdentityResult(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.ISO_SC25_FUTURE_USE,
                 resolution=MacResolution.ISO_IEC_SC25,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # ETSI allocated address range
@@ -314,7 +314,7 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_RESERVED_ADDRESS,
                 identity=MacIdentity.ETSI_FUTURE_USE,
                 resolution=MacResolution.ETSI_RESERVED,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # Unassigned range
@@ -325,7 +325,7 @@ def fixed_address_lookup(
                 form=MacForm.UAA_ADDRESS,
                 identity=MacIdentity.GROUP_ADDRESS,
                 resolution=MacResolution.UNASSIGNED,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # ISO/IEC 9542 ES-IS addresses
@@ -335,13 +335,13 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_END_SYSTEM_NETWORK_ENTITIES,
                 resolution=MacResolution.ISO_IEC_9542,
-                cmac=cmac,
+                structure=cmac,
             ),
             "05": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_INTERMEDIATE_SYSTEM_NETWORK_ENTITIES,
                 resolution=MacResolution.ISO_IEC_9542,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # IEEE 802.5 locally administered functional addresses
@@ -352,19 +352,19 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.CONFIGURATION_REPORT_SERVER,
                 resolution=MacResolution.IEEE_8025,
-                cmac=cmac,
+                structure=cmac,
             ),
             "10": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.RING_ERROR_MONITOR,
                 resolution=MacResolution.IEEE_8025,
-                cmac=cmac,
+                structure=cmac,
             ),
             "40": MacIdentityResult(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.RING_PARAMETER_SERVER,
                 resolution=MacResolution.IEEE_8025,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # 03:00:00:00:01:00
@@ -373,7 +373,7 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_INTERMEDIATE_SYSTEM_NETWORK_ENTITIES,
                 resolution=MacResolution.ISO_IEC_9542,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # 03:00:00:00:02:00
@@ -382,7 +382,7 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_END_SYSTEMS_AND_LOBE_MEDIA_TEST,
                 resolution=MacResolution.ISO_IEC_9542_IEEE_8025,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # 03:00:00:00:04:00
@@ -391,7 +391,7 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_MANAGER_STATIONS,
                 resolution=MacResolution.IEEE_8021B,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # 03:00:00:00:08:00
@@ -400,7 +400,7 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_CONS_SNARES,
                 resolution=MacResolution.ISO_IEC_10030,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # 03:00:00:00:10:00
@@ -409,7 +409,7 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_CONS_END_SYSTEMS,
                 resolution=MacResolution.ISO_IEC_10030,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # 03:00:00:00:20:00
@@ -418,7 +418,7 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.LOADABLE_DEVICE_GENERIC,
                 resolution=MacResolution.IEEE_8021E,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # 03:00:00:00:40:00
@@ -427,7 +427,7 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.LOAD_SERVER_GENERIC,
                 resolution=MacResolution.IEEE_8021E,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
         # 03:00:00:40:00:00
@@ -436,7 +436,7 @@ def fixed_address_lookup(
                 form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
                 identity=MacIdentity.ALL_AGENT_STATIONS,
                 resolution=MacResolution.IEEE_8021B,
-                cmac=cmac,
+                structure=cmac,
             ),
         },
     }
@@ -793,15 +793,15 @@ class MacIdentityResult:
     form: MacForm
     identity: MacIdentity
     resolution: MacResolution
-    cmac: MACClassification
+    structure: MacStructure
     assessment: frozenset[MacAssessment] = field(init=False)
 
     def __post_init__(self) -> None:
-        self.assessment = self.assess_mac_identity(self.cmac)
+        self.assessment = self.assess_mac_identity(self.structure)
 
     def assess_mac_identity(
         self,
-        cmac: MACClassification,
+        cmac: MacStructure,
         *,
         attribution_ambiguous: bool = False,
     ) -> frozenset[MacAssessment]:
@@ -813,7 +813,7 @@ class MacIdentityResult:
 
         # Registry-backed identifiers
         if self.resolution in REGISTERED_RESOLUTIONS:
-            if cmac.is_complete():
+            if cmac.is_complete:
                 assessments.add(MacAssessment.REGISTERED_CANDIDATE)
             else:
                 assessments.add(MacAssessment.REGISTERED_PREFIX)
@@ -850,7 +850,7 @@ def _registered_block(registry: str) -> MacResolution:
 # ---------------------------------------------------------------------------
 
 
-def inspect_uaa_mcast_prefix(cmac: MACClassification, ctx: EtherlyzerContext) -> MacIdentityResult:
+def inspect_uaa_mcast_prefix(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
     entry = ctx.indexes.mac.lookup_group_allocation(cmac.normalized)
 
     if entry is not None:
@@ -858,34 +858,32 @@ def inspect_uaa_mcast_prefix(cmac: MACClassification, ctx: EtherlyzerContext) ->
             identity=MacIdentity.GROUP_PREFIX,
             resolution=_registered_block(entry.registry),
             form=MacForm.UAA_PREFIX,
-            cmac=cmac,
+            structure=cmac,
         )
 
     return MacIdentityResult(
         identity=MacIdentity.GROUP_PREFIX,
         resolution=MacResolution.NO_REGISTRY_MATCH,
         form=MacForm.UAA_PREFIX,
-        cmac=cmac,
+        structure=cmac,
     )
 
 
-def inspect_uaa_mcast_complete(
-    cmac: MACClassification, ctx: EtherlyzerContext
-) -> MacIdentityResult:
+def inspect_uaa_mcast_complete(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
     entry = ctx.indexes.mac.lookup_group_allocation(cmac.normalized)
     if entry is not None:
         return MacIdentityResult(
             identity=MacIdentity.GROUP_ADDRESS,
             resolution=_registered_block(entry.registry),
             form=MacForm.UAA_ADDRESS,
-            cmac=cmac,
+            structure=cmac,
         )
 
     return MacIdentityResult(
         identity=MacIdentity.GROUP_ADDRESS,
         resolution=MacResolution.NO_REGISTRY_MATCH,
         form=MacForm.UAA_ADDRESS,
-        cmac=cmac,
+        structure=cmac,
     )
 
 
@@ -894,9 +892,7 @@ def inspect_uaa_mcast_complete(
 # ---------------------------------------------------------------------------
 
 
-def inspect_uaa_unicast_prefix(
-    cmac: MACClassification, ctx: EtherlyzerContext
-) -> MacIdentityResult:
+def inspect_uaa_unicast_prefix(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
     entry = ctx.indexes.mac.lookup(cmac.normalized)
 
     return MacIdentityResult(
@@ -905,13 +901,11 @@ def inspect_uaa_unicast_prefix(
         if entry is not None
         else MacResolution.NO_REGISTRY_MATCH,
         form=MacForm.UAA_PREFIX,
-        cmac=cmac,
+        structure=cmac,
     )
 
 
-def inspect_uaa_unicast_complete(
-    cmac: MACClassification, ctx: EtherlyzerContext
-) -> MacIdentityResult:
+def inspect_uaa_unicast_complete(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
     entry = ctx.indexes.mac.lookup(cmac.normalized)
 
     if entry is not None:
@@ -919,13 +913,13 @@ def inspect_uaa_unicast_complete(
             identity=MacIdentity.EUI48_ADDRESS,
             resolution=_registered_block(entry.registry),
             form=MacForm.UAA_ADDRESS,
-            cmac=cmac,
+            structure=cmac,
         )
     return MacIdentityResult(
-        identity=MacIdentity.EUI48_ADDRESS if cmac.is_complete() else MacIdentity.EUI48_PREFIX,
+        identity=MacIdentity.EUI48_ADDRESS if cmac.is_complete else MacIdentity.EUI48_PREFIX,
         resolution=MacResolution.NO_REGISTRY_MATCH,
         form=MacForm.UAA_ADDRESS,
-        cmac=cmac,
+        structure=cmac,
     )
 
 
@@ -934,8 +928,8 @@ def inspect_uaa_unicast_complete(
 # ---------------------------------------------------------------------------
 
 
-def _inspect_laa_slap(cmac: MACClassification, ctx: EtherlyzerContext) -> MacIdentityResult:
-    complete = cmac.is_complete()
+def _inspect_laa_slap(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
+    complete = cmac.is_complete
     kind = MacForm.LAA_ADDRESS if complete else MacForm.LAA_PREFIX
 
     match cmac.slap_quadrant:
@@ -947,13 +941,13 @@ def _inspect_laa_slap(cmac: MACClassification, ctx: EtherlyzerContext) -> MacIde
             if cmac.delivery == DeliveryType.GROUP:
                 identity = (
                     MacIdentity.ELI_GROUP_ADDRESS
-                    if cmac.is_complete()
+                    if cmac.is_complete
                     else MacIdentity.ELI_GROUP_PREFIX
                 )
             else:
                 identity = (
                     MacIdentity.ELI_INDIVIDUAL_ADDRESS
-                    if cmac.is_complete()
+                    if cmac.is_complete
                     else MacIdentity.ELI_INDIVIDUAL_PREFIX
                 )
 
@@ -961,7 +955,7 @@ def _inspect_laa_slap(cmac: MACClassification, ctx: EtherlyzerContext) -> MacIde
                 MacResolution.REGISTERED_CID if entry is not None else MacResolution.NO_CID_MATCH
             )
             return MacIdentityResult(
-                identity=identity, resolution=registration, form=kind, cmac=cmac
+                identity=identity, resolution=registration, form=kind, structure=cmac
             )
 
         case SLAPQuadrant.AAI:
@@ -969,7 +963,7 @@ def _inspect_laa_slap(cmac: MACClassification, ctx: EtherlyzerContext) -> MacIde
                 identity=MacIdentity.AAI_ADDRESS if complete else MacIdentity.AAI_PREFIX,
                 resolution=MacResolution.SLAP_AAI,
                 form=kind,
-                cmac=cmac,
+                structure=cmac,
             )
 
         case SLAPQuadrant.SAI:
@@ -977,7 +971,7 @@ def _inspect_laa_slap(cmac: MACClassification, ctx: EtherlyzerContext) -> MacIde
                 identity=MacIdentity.SAI_ADDRESS if complete else MacIdentity.SAI_PREFIX,
                 resolution=MacResolution.SLAP_SAI,
                 form=kind,
-                cmac=cmac,
+                structure=cmac,
             )
 
         case SLAPQuadrant.RESERVED:
@@ -985,7 +979,7 @@ def _inspect_laa_slap(cmac: MACClassification, ctx: EtherlyzerContext) -> MacIde
                 identity=MacIdentity.RESERVED_ADDRESS if complete else MacIdentity.RESERVED_PREFIX,
                 resolution=MacResolution.SLAP_RESERVED,
                 form=kind,
-                cmac=cmac,
+                structure=cmac,
             )
 
         case _:
@@ -997,27 +991,25 @@ def _inspect_laa_slap(cmac: MACClassification, ctx: EtherlyzerContext) -> MacIde
 # ---------------------------------------------------------------------------
 
 
-def inspect_laa_mcast_prefix(cmac: MACClassification, ctx: EtherlyzerContext) -> MacIdentityResult:
+def inspect_laa_mcast_prefix(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
     if cmac.normalized.startswith("3333"):
         return MacIdentityResult(
             identity=MacIdentity.IPV6_MULTICAST_PREFIX,
             resolution=MacResolution.IPV6_MULTICAST,
             form=MacForm.SPECIAL_PROTOCOL_PREFIX,
-            cmac=cmac,
+            structure=cmac,
         )
 
     return _inspect_laa_slap(cmac, ctx)
 
 
-def inspect_laa_mcast_complete(
-    cmac: MACClassification, ctx: EtherlyzerContext
-) -> MacIdentityResult:
+def inspect_laa_mcast_complete(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
     if cmac.normalized.startswith("3333"):
         return MacIdentityResult(
             identity=MacIdentity.IPV6_MULTICAST_ADDRESS,
             resolution=MacResolution.IPV6_MULTICAST,
             form=MacForm.SPECIAL_PROTOCOL_ADDRESS,
-            cmac=cmac,
+            structure=cmac,
         )
 
     return _inspect_laa_slap(cmac, ctx)
@@ -1028,15 +1020,11 @@ def inspect_laa_mcast_complete(
 # ---------------------------------------------------------------------------
 
 
-def inspect_laa_unicast_prefix(
-    cmac: MACClassification, ctx: EtherlyzerContext
-) -> MacIdentityResult:
+def inspect_laa_unicast_prefix(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
     return _inspect_laa_slap(cmac, ctx)
 
 
-def inspect_laa_unicast_complete(
-    cmac: MACClassification, ctx: EtherlyzerContext
-) -> MacIdentityResult:
+def inspect_laa_unicast_complete(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
     return _inspect_laa_slap(cmac, ctx)
 
 
@@ -1045,27 +1033,27 @@ def inspect_laa_unicast_complete(
 # ---------------------------------------------------------------------------
 
 
-def _analyze(cmac: MACClassification, ctx: EtherlyzerContext) -> MacIdentityResult:
+def _analyze(cmac: MacStructure, ctx: EtherlyzerContext) -> MacIdentityResult:
     if cmac.is_zero:
         return MacIdentityResult(
             identity=MacIdentity.ALL_ZERO,
             resolution=MacResolution.IEEE_RA_RESERVED,
             form=MacForm.SPECIAL_FIXED_ADDRESS,
-            cmac=cmac,
+            structure=cmac,
         )
     elif cmac.is_broadcast:
         return MacIdentityResult(
             identity=MacIdentity.BROADCAST,
             resolution=MacResolution.IEEE_8023_DEFINED,
             form=MacForm.SPECIAL_FIXED_ADDRESS,
-            cmac=cmac,
+            structure=cmac,
         )
 
     special_lookup = fixed_address_lookup(cmac=cmac)
     if special_lookup is not None:
         return special_lookup
 
-    match cmac.administration, cmac.delivery, cmac.is_complete():
+    match cmac.administration, cmac.delivery, cmac.is_complete:
         case (Administration.UNIVERSAL, DeliveryType.INDIVIDUAL, True):
             return inspect_uaa_unicast_complete(cmac, ctx)
 
@@ -1094,7 +1082,5 @@ def _analyze(cmac: MACClassification, ctx: EtherlyzerContext) -> MacIdentityResu
             raise ValueError("Unsupported MAC classification")
 
 
-def analyze_mac_identity(
-    classified_mac: MACClassification, context: EtherlyzerContext
-) -> MacIdentityResult:
+def inspect(classified_mac: MacStructure, context: EtherlyzerContext) -> MacIdentityResult:
     return _analyze(classified_mac, context)

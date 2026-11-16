@@ -1,22 +1,5 @@
-from etherlyzer.bootstrap import EtherlyzerContext
 from etherlyzer.infrastructure.registry.provider import RegistryProvider
 from etherlyzer.presentation.reporting.model import Item, Section
-
-
-def get_mac_assignment(eth_ctx: EtherlyzerContext, macaddr: str):
-    entry = eth_ctx.indexes.mac.lookup(macaddr)
-    if entry is None:
-        return Section(title="IEEE Assignment", items=[Item(key="Result", value="No match found.")])
-
-    return Section(
-        title="IEEE Assignment",
-        items=[
-            Item(key="Registry", value=entry.registry),
-            Item(key="Assignment", value=entry.assignment),
-            Item(key="Name", value=entry.organization_name),
-            Item(key="Address", value=entry.organization_address),
-        ],
-    )
 
 
 def get_registry_entries():

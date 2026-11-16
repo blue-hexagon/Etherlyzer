@@ -3,9 +3,9 @@ from __future__ import annotations
 import argparse
 
 from etherlyzer.application.cli.multiline_stdin import read_multiline
-from etherlyzer.core.interpretation.mac.normalization import normalize
 from etherlyzer.core.interpretation.mac.validation import MACValidator
-from etherlyzer.presentation.reporting.model import Report, Table, Section
+from etherlyzer.presentation.reporting.model import Report, Section, Table
+from etherlyzer.presentation.reporting.renders import get_renderer
 
 
 def run(args: argparse.Namespace) -> int:
@@ -18,61 +18,80 @@ def run(args: argparse.Namespace) -> int:
         columns=(
             "Line",
             "Input",
-            "Registry",
-            "Assignment",
-            "Organization",
-            "Form",
-            "Identity",
-            "Resolution",
+            "Validity",
+            "Mask",
+            "Normalized",
+        )
+    )
+    summary = Table(
+        columns=(
+            "Empty Lines",
+            "Valid Lines",
+            "Invalid Lines",
+            "Total Lines",
         )
     )
     report = Report(
         [
             Section(
                 title="",
-                items=[table],
+                items=[table, summary],
             ),
         ],
     )
-    linenumber = 0
-    invalid_lines: list[int] = []
-    padding = len(str(len(macs))) + 2
-    normalized_count = 0
-    invalid_count = 0
-    for mac in macs:
-        validated_mac, validation_mask = MACValidator.validate(mac)
-        # TODO: Expand reporting
-        if args.linenumbers:
-            linenumber += 1
-            if MACValidator.mask_is_valid(validation_mask) or not args.strict:
-                print(f"{linenumber}.".ljust(padding, " "), end="")
-        if not MACValidator.mask_is_valid(validation_mask):
-            invalid_lines.append(linenumber)
-        if not args.strict and not MACValidator.mask_is_valid(validation_mask):
-            if args.show_info is True:
-                print("ERR".ljust(4, " "), end="")
-            if len(validated_mac) > 14:
-                print(f"{validated_mac.ljust(14, ' ')[:14]}. => {validation_mask}")
-            else:
-                print(f"{validated_mac.ljust(15, ' ')[:15]} => {validation_mask}")
-            invalid_count += 1
+    total_empty_lines: int = 0
+    total_lines: int = len(macs)
+    total_valid: int = 0
+    total_invalid: int = 0
+    for linenumber, mac in enumerate(macs, start=1):
+        normalized_mac, validation_mask = MACValidator.validate(mac)
+        is_valid = "Valid" if MACValidator.mask_is_valid(validation_mask) else "Invalid"
+        if args.skip_empty_lines and validation_mask == "MMMMMMMMMMMM":
+            total_empty_lines += 1
+            continue
+        if args.only_valid:
+            if MACValidator.mask_is_valid(validation_mask):
+                total_valid += 1
+                table.append(
+                    linenumber,
+                    mac,
+                    is_valid,
+                    validation_mask,
+                    "",
+                )
+                continue
+            total_invalid += 1
             continue
 
-        if MACValidator.mask_is_valid(validation_mask):
-            normalized_mac = normalize(mac)
-            if args.show_info is True:
-                print("OK".ljust(4, " "), end="")
-            if args.show_originals:
-                print(f"{normalized_mac.ljust(15, ' ')} <~ {mac}")
-            else:
-                print(f"{normalized_mac}")
-            normalized_count += 1
+        elif args.only_invalid:
+            if not MACValidator.mask_is_valid(validation_mask):
+                total_invalid += 1
+                table.append(
+                    linenumber,
+                    mac,
+                    is_valid,
+                    validation_mask,
+                    normalized_mac,
+                )
+                continue
+            total_valid += 1
+            continue
 
-    print()
-    print(f"Normalized {normalized_count}/{len(macs)} MAC addresses.")
-    print(
-        f"{len(invalid_lines)} invalid lines{':' if len(invalid_lines) > 0 else '!'} {', '.join([str(linum) for linum in invalid_lines])}"
+        table.append(
+            linenumber,
+            mac,
+            is_valid,
+            validation_mask,
+            normalized_mac,
+        )
+
+    summary.append(
+        total_empty_lines,
+        total_valid,
+        total_invalid,
+        total_lines,
     )
+    print(report.render(get_renderer("text")))
     return 0
 
 
@@ -97,7 +116,6 @@ Examples:
     )
 
     source = parser.add_mutually_exclusive_group(required=True)
-
     source.add_argument(
         "mac",
         nargs="?",
@@ -113,30 +131,23 @@ Examples:
 
     parser.add_argument(
         "-l",
-        "--linenumbers",
+        "--skip-empty-lines",
         action="store_true",
-        help="Prefix output lines with their corresponding input line number.",
+        help="Skips reporting of invalid empty lines.",
     )
-
-    parser.add_argument(
-        "-s",
-        "--strict",
-        action="store_true",
-        help="Suppress invalid entries and output only successfully normalized MAC addresses.",
-    )
-
-    parser.add_argument(
-        "-o",
-        "--show-originals",
-        action="store_true",
-        help="Show the original input alongside each normalized MAC address.",
-    )
-
-    parser.add_argument(
+    validity_display = parser.add_mutually_exclusive_group(required=False)
+    validity_display.add_argument(
         "-i",
-        "--show-info",
+        "--only-invalid",
         action="store_true",
-        help="Prefix each result with OK or ERR to indicate validation status.",
+        help="Only report invalid MAC addresses.",
+    )
+
+    validity_display.add_argument(
+        "-v",
+        "--only-valid",
+        action="store_true",
+        help="Only report valid MAC addresses.",
     )
 
     parser.set_defaults(

@@ -23,18 +23,18 @@ def initialize_etherlyzer(
 ) -> EtherlyzerContext:
     provider = RegistryProvider(cache_dir=cache_dir)
 
-    registries: list[Registry] = select_registries(
+    registries: list[Registry] = _select_registries(
         provider,
         inclusions=registry_inclusions,
         exemptions=registry_exemptions,
     )
 
-    initialize_registry_caches(registries=registries)
-    indexes = initialize_indexes(registries=registries)
+    _initialize_registry_caches(registries=registries)
+    indexes = _initialize_indexes(registries=registries)
     return EtherlyzerContext(provider=provider, indexes=indexes)
 
 
-def select_registries(
+def _select_registries(
     provider: RegistryProvider,
     inclusions: list[str] | None = None,
     exemptions: list[str] | None = None,
@@ -50,7 +50,7 @@ def select_registries(
     ]
 
 
-def initialize_registry_caches(registries: list[Registry]) -> None:
+def _initialize_registry_caches(registries: list[Registry]) -> None:
 
     for registry in registries:
         if registry.registry_cache.filepath.exists():
@@ -60,5 +60,5 @@ def initialize_registry_caches(registries: list[Registry]) -> None:
             raise RuntimeError(f"Failed to synchronize registry cache: {registry.name}")
 
 
-def initialize_indexes(registries: Iterable[Registry]) -> IndexStore:
+def _initialize_indexes(registries: Iterable[Registry]) -> IndexStore:
     return IndexBuilder.build(registries)

@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from etherlyzer.application.cli.commands.inspect.common import (
     MacInspectionParams,
 )
 from etherlyzer.bootstrap import EtherlyzerContext
-from etherlyzer.core.interpretation.mac.allocation_analysis import summarize_vendor_allocations
-from etherlyzer.core.interpretation.mac.formatting import MACFormatter
-from etherlyzer.core.interpretation.mac.identifier import MacAssessment
-from etherlyzer.core.interpretation.mac.translation import MacTranslation
+from etherlyzer.core.interpretation.mac import formatting, translation
+from etherlyzer.core.interpretation.mac.allocation_analysis import get_vendor_allocations
+from etherlyzer.core.interpretation.mac.inspection import MacAssessment
 from etherlyzer.domain.entry.mac import MACAllocationEntry
 from etherlyzer.infrastructure.registry.registry_source import RegistrySource
 from etherlyzer.presentation.reporting.model import Item, Section
@@ -22,7 +23,7 @@ def build_associated_block_summary_section(
         raise RuntimeError(
             "Logic error occured - related_entries should resolve because MacAllocationEntry is already resolved."
         )
-    total_alloc, iab_alloc, mal_alloc, mam_alloc, mas_alloc = summarize_vendor_allocations(
+    total_alloc, iab_alloc, mal_alloc, mam_alloc, mas_alloc = get_vendor_allocations(
         related_entries
     )
     mal, mam, mas, iab = None, None, None, None
@@ -81,7 +82,11 @@ def build_associated_block_summary_section(
     )
 
 
-def build_vendor_blocks_section(entry: MACAllocationEntry, eth_ctx: EtherlyzerContext) -> Section:
+def build_vendor_blocks_section(
+    entry: MACAllocationEntry,
+    eth_ctx: EtherlyzerContext,
+    layout: Literal["grid", "default"] = "grid",
+) -> Section:
     """Takes a list of MacAllocationEntry's *from the same vendor*"""
     org_name: str = entry.organization_name
     related_entries: list[MACAllocationEntry] | None = eth_ctx.indexes.vendor.lookup_many(org_name)
@@ -92,11 +97,11 @@ def build_vendor_blocks_section(entry: MACAllocationEntry, eth_ctx: EtherlyzerCo
 
     return Section(
         title="Registered Blocks",
-        layout="grid",
+        layout=layout,
         items=[
             Item(
                 key=entry.registry_id(),
-                value=MACFormatter.format_default(entry.assignment),
+                value=formatting.to_default_format(entry.assignment),
             )
             for entry in related_entries
         ],
@@ -108,8 +113,8 @@ def build_ieee_registration_section(
     entry: MACAllocationEntry,
     reg: RegistrySource[MACAllocationEntry],
 ) -> Section:
-    range_start = MACFormatter.format_default(entry.assignment, "0")
-    range_end = MACFormatter.format_default(entry.assignment, "f")
+    range_start = formatting.to_default_format(entry.assignment, "0")
+    range_end = formatting.to_default_format(entry.assignment, "f")
     address = entry.format_vendor_address()
 
     allocation_items: list[Item | Section] = [
@@ -119,7 +124,7 @@ def build_ieee_registration_section(
         ),
         Item(
             key="Assignment",
-            value=MACFormatter.format_default(entry.assignment),
+            value=formatting.to_default_format(entry.assignment),
         ),
         Item(
             key="Range",
@@ -165,7 +170,7 @@ def build_ieee_registration_section(
     )
 
 
-def build_mac_autopsy_section(
+def build_mac_autopsy(
     params: MacInspectionParams,
     identity: str,
     registration: str,
@@ -185,9 +190,6 @@ def build_mac_autopsy_section(
 
     ig_bit = first_octet & 1
     ig_bit_addon = "Group / Multicast" if ig_bit else "Individual / Unicast"
-
-    pt = MacTranslation
-    pt.strict = False  # len != 12
 
     return Section(
         title="MAC Address Autopsy",
@@ -222,13 +224,13 @@ def build_mac_autopsy_section(
             Section(
                 title="Representations",
                 items=[
-                    Item(key="Canonical", value=str(pt.to_canonical(normalized))),
-                    Item(key="Bit-Reversed", value=str(pt.to_bit_reversed(normalized))),
-                    Item(key="To Hex", value=str(pt.to_hex(normalized))),
-                    Item(key="To Integer", value=str(pt.to_decimal(normalized))),
-                    Item(key="To Decimals", value=str(pt.to_decimal_bytes(normalized))),
-                    Item(key="To Binary", value=str(pt.to_binary(normalized))),
-                    Item(key="To Bytes", value=str(pt.to_bytes(normalized))),
+                    Item(key="Canonical", value=translation.to_canonical(normalized)),
+                    Item(key="Bit-Reversed", value=translation.to_bit_reversed(normalized)),
+                    Item(key="To Hex", value=translation.to_hex(normalized)),
+                    Item(key="To Integer", value=translation.to_decimal(normalized)),
+                    Item(key="To Decimals", value=translation.to_decimal_bytes(normalized)),
+                    Item(key="To Binary", value=translation.to_binary(normalized)),
+                    Item(key="To Bytes", value=translation.to_bytes(normalized)),
                 ],
             ),
             Section(
@@ -249,9 +251,7 @@ def build_mac_autopsy_section(
     )
 
 
-def build_cid_registration_section(
-    params: MacInspectionParams, clear_ig_bit: bool = False
-) -> Section:
+def build_cid_registration(params: MacInspectionParams, clear_ig_bit: bool = False) -> Section:
     context = params.context
     classified_mac = params.classified_mac
     CID_LENGTH = 6
@@ -296,3 +296,19 @@ def build_cid_registration_section(
         )
 
     return section
+
+
+def build_mac_registration(eth_ctx: EtherlyzerContext, macaddr: str) -> Section:
+    entry = eth_ctx.indexes.mac.lookup(macaddr)
+    if entry is None:
+        return Section(title="IEEE Assignment", items=[Item(key="Result", value="No match found.")])
+
+    return Section(
+        title="IEEE Assignment",
+        items=[
+            Item(key="Registry", value=entry.registry),
+            Item(key="Assignment", value=entry.assignment),
+            Item(key="Name", value=entry.organization_name),
+            Item(key="Address", value=entry.organization_address),
+        ],
+    )

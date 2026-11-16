@@ -28,7 +28,16 @@ class TextRenderer:
                 raise ValueError("Table row has an invalid column count")
 
         def lines(val: ReportValue) -> list[str]:
-            return ("" if val is None else str(val)).split("\n")
+            text = "" if val is None else str(val)
+
+            text = text.expandtabs(4)
+
+            text = "".join(
+                char if char.isprintable() or char == "\n" else f"\\x{ord(char):02X}"
+                for char in text
+            )
+
+            return text.split("\n")
 
         def width(text: str) -> int:
             result = wcswidth(text)

@@ -6,18 +6,18 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from etherlyzer.application.cli.multiline_stdin import read_multiline
-from etherlyzer.application.services.get import get_mac_assignment
+from etherlyzer.application.services.mac import build_mac_registration
 from etherlyzer.bootstrap import EtherlyzerContext, initialize_etherlyzer
-from etherlyzer.core.interpretation.mac.classifier import classify_mac
-from etherlyzer.core.interpretation.mac.identifier import (
+from etherlyzer.core.interpretation.mac.classifier import get_mac_structure
+from etherlyzer.core.interpretation.mac.inspection import (
     MacForm,
     MacIdentity,
     MacResolution,
-    analyze_mac_identity,
+    inspect,
 )
 from etherlyzer.domain.entry.mac import MACAllocationEntry
 from etherlyzer.presentation.reporting.model import Item, Report, Section, Table
-from etherlyzer.presentation.reporting.renders import get_render, get_render_choices
+from etherlyzer.presentation.reporting.renders import get_render_choices, get_renderer
 
 
 @dataclass(frozen=True, slots=True)
@@ -39,7 +39,7 @@ def get_bulk(
 
     for line_number, mac in enumerate(values, start=1):
         mac = mac.strip()
-        reason = analyze_mac_identity(classify_mac(mac), context)
+        reason = inspect(get_mac_structure(mac), context)
 
         entry = context.indexes.mac.lookup_group_allocation(mac)
         result = MACTerminalLookupResult(
@@ -58,7 +58,7 @@ def get_bulk(
 
 def handle_single(context: EtherlyzerContext, report: Report, args: argparse.Namespace) -> int:
     entry = context.indexes.mac.lookup(args.mac)
-    entry_section = get_mac_assignment(context, args.mac)
+    entry_section = build_mac_registration(context, args.mac)
     if entry is None:
         report.sections.append(entry_section)
         return 1
@@ -136,7 +136,7 @@ def run(args: argparse.Namespace) -> int:
 
     if args.mac:
         status = handle_single(context, report, args)
-        print(report.render(get_render(args.format)))
+        print(report.render(get_renderer(args.format)))
         return status
     if args.bulk:
         raw_input = read_multiline(skip_empty_lines=False)
@@ -146,7 +146,7 @@ def run(args: argparse.Namespace) -> int:
         return 2
 
     status = handle_bulk(context, report, args, raw_input)
-    print(report.render(get_render(args.format)))
+    print(report.render(get_renderer(args.format)))
     return status
 
 

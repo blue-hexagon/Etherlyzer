@@ -3,19 +3,19 @@ from __future__ import annotations
 from etherlyzer.application.cli.commands.inspect.common import (
     MacInspectionParams,
 )
-from etherlyzer.application.services.mac import (
-    build_cid_registration_section,
-    build_mac_autopsy_section,
-)
 from etherlyzer.application.cli.commands.inspect.macaddr_uaa_ig import (
     inspect_universal,
+)
+from etherlyzer.application.services.mac import (
+    build_cid_registration,
+    build_mac_autopsy,
 )
 from etherlyzer.core.interpretation.mac.classifier import (
     Administration,
     DeliveryType,
     SLAPQuadrant,
 )
-from etherlyzer.core.interpretation.mac.identifier import analyze_mac_identity
+from etherlyzer.core.interpretation.mac.inspection import inspect
 from etherlyzer.presentation.reporting.renderers.text import TextRenderer
 
 
@@ -53,12 +53,12 @@ def mac_inspection_router(
     if classified_mac is None:
         raise ValueError("Unexpected MAC classification")
 
-    mac_identity = analyze_mac_identity(
+    mac_identity = inspect(
         classified_mac,
         context,
     )
     report.sections.append(
-        build_mac_autopsy_section(
+        build_mac_autopsy(
             params,
             mac_identity.identity,
             mac_identity.resolution,
@@ -79,7 +79,7 @@ def mac_inspection_router(
 
             case (Administration.LOCAL, _) if classified_mac.slap_quadrant == SLAPQuadrant.ELI:
                 report.previous_section.append(
-                    build_cid_registration_section(params, clear_ig_bit=True),
+                    build_cid_registration(params, clear_ig_bit=True),
                 )
             case (Administration.LOCAL, DeliveryType.INDIVIDUAL):
                 match classified_mac.slap_quadrant:

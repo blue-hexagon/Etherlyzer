@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from etherlyzer.presentation.reporting.model import ReportRenderer
@@ -19,7 +19,7 @@ def get_render_choices() -> list[str]:
     return list(RENDERERS)
 
 
-def get_render(kind: str = "text") -> ReportRenderer:
+def get_renderer(kind: Literal["text", "json", "csv"] = "text") -> ReportRenderer:
     try:
         return RENDERERS[kind]()
     except KeyError:

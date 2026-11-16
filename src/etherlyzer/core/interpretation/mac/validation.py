@@ -1,11 +1,13 @@
 from enum import StrEnum
 from string import punctuation
 
+from etherlyzer.config.knobs import etherlyzer_knobs
 from etherlyzer.core.interpretation.mac.constants import (
     HEX_DIGITS,
     LENIENT_TYPOS,
     RELAXED_TYPOS,
     VALID_SEPARATORS,
+    TypoTolerance,
 )
 
 
@@ -20,6 +22,21 @@ class MacMaskLetter(StrEnum):
     LENIENT_TYPO = "l"
     PUNCTUATION = "p"
     SEPERATOR = "-"
+
+
+def fix_typos_and_mark_invalid(
+    mac: str, typo_tolerance: TypoTolerance = etherlyzer_knobs.typo_tolerance
+) -> str:
+    """
+    Correct typos according to global config settings
+    and otherwise marks a typo invalid with the char '#'
+    """
+    for ch in mac:
+        if ch in typo_tolerance.value:
+            mac = mac.replace(ch, typo_tolerance.value[ch])
+        elif ch not in HEX_DIGITS:
+            mac = mac.replace(ch, "#")
+    return mac
 
 
 class MACValidator:

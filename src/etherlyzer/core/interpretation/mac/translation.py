@@ -1,71 +1,67 @@
 import string
-from dataclasses import dataclass
-from typing import Any, ClassVar
+from typing import Any
 
 
 def get_arrlen_chwidth(arr: list[Any]) -> int:
     return len(str(len(arr)))  # 0-9 = 1; 10-99 = 2; 100-999 = 3 etc..
 
 
-@dataclass(slots=True)
-class MacTranslation:
-    strict: ClassVar[bool] = True  # Strict validation means len == 12
+def _raw(normalized: str, *, strict: bool = True) -> bytes:
+    if strict and len(normalized) != 12:
+        raise ValueError("Expected a complete 48-bit MAC address")
 
-    @classmethod
-    def validate(cls, normalized: str) -> None:
-        if (
-            len(normalized) != 12 or not all(c in string.hexdigits for c in normalized)
-        ) and cls.strict:
-            raise ValueError(f"{normalized} is not a valid 6-12-ch hex string")
+    if len(normalized) % 2:
+        raise ValueError("Hexadecimal input must have an even number of digits")
 
-    @classmethod
-    def _raw(cls, normalized: str) -> bytes:
-        if not len(normalized) % 2 == 0:
-            raise ValueError(f"Invalid hexadecimal input '{normalized}': odd number of digits")
-        cls.validate(normalized)
-        return bytes.fromhex(normalized)
+    if not all(c in string.hexdigits for c in normalized):
+        raise ValueError(f"Invalid hexadecimal input: {normalized!r}")
 
-    @classmethod
-    def to_canonical(cls, normalized: str) -> str:
-        return cls._raw(normalized).hex("-").upper()
+    return bytes.fromhex(normalized)
 
-    @classmethod
-    def to_bit_reversed(cls, normalized: str) -> str:
-        reversed_bytes = bytes(int(f"{byte:08b}"[::-1], 2) for byte in cls._raw(normalized))
-        return reversed_bytes.hex(":").upper()
 
-    @classmethod
-    def to_decimal_bytes(cls, normalized: str, padding: bool = False) -> str:
-        return (
-            " ".join(f"{str(byte).ljust(3, ' ')}" for byte in cls._raw(normalized))
-            if padding
-            else " ".join(str(byte) for byte in cls._raw(normalized))
-        )
+def to_canonical(normalized: str, *, strict: bool = True) -> str:
+    return _raw(normalized, strict=strict).hex("-").upper()
 
-    @classmethod
-    def to_decimal(cls, normalized: str) -> str:
-        val = int.from_bytes(cls._raw(normalized), byteorder="big")
-        return f"{val:,}"
 
-    @classmethod
-    def to_binary(cls, normalized: str) -> str:
-        return ".".join(f"{byte:08b}" for byte in cls._raw(normalized))
+def to_bit_reversed(normalized: str, *, strict: bool = True) -> str:
+    raw = _raw(normalized, strict=strict)
+    reversed_bytes = bytes(int(f"{byte:08b}"[::-1], 2) for byte in raw)
+    return reversed_bytes.hex(":").upper()
 
-    @classmethod
-    def to_binary_raw(cls, normalized: str) -> str:
-        return f"{int.from_bytes(cls._raw(normalized), byteorder='big'):048b}"
 
-    @classmethod
-    def to_hex(cls, normalized: str) -> str:
-        val = int.from_bytes(cls._raw(normalized), byteorder="big")
-        ln = len(normalized)
+def to_decimal_bytes(
+    normalized: str,
+    *,
+    padding: bool = False,
+    strict: bool = True,
+) -> str:
+    raw = _raw(normalized, strict=strict)
 
-        return f"0x{val:0{ln}X}"
+    return " ".join(f"{byte:<3}" if padding else str(byte) for byte in raw)
 
-    @classmethod
-    def to_hex_bytes(cls, normalized: str) -> str:
-        return " ".join(f"0x{byte:02X}" for byte in cls._raw(normalized))
 
-    @classmethod
-    def to_bytes(cls, normalized: str) -> str:
-        return cls._raw(normalized).hex(" ").upper()
+def to_decimal(normalized: str, *, strict: bool = True) -> str:
+    raw = _raw(normalized, strict=strict)
+    return f"{int.from_bytes(raw, 'big'):,}"
+
+
+def to_binary(normalized: str, *, strict: bool = True) -> str:
+    return ".".join(f"{byte:08b}" for byte in _raw(normalized, strict=strict))
+
+
+def to_binary_raw(normalized: str, *, strict: bool = True) -> str:
+    raw = _raw(normalized, strict=strict)
+    return "".join(f"{byte:08b}" for byte in raw)
+
+
+def to_hex(normalized: str, *, strict: bool = True) -> str:
+    raw = _raw(normalized, strict=strict)
+    return f"0x{raw.hex().upper()}"
+
+
+def to_hex_bytes(normalized: str, *, strict: bool = True) -> str:
+    return " ".join(f"0x{byte:02X}" for byte in _raw(normalized, strict=strict))
+
+
+def to_bytes(normalized: str, *, strict: bool = True) -> str:
+    return _raw(normalized, strict=strict).hex(" ").upper()

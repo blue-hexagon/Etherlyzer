@@ -14,7 +14,7 @@ class VendorAllocationStats:
         self.total_blocks += 1
 
 
-def summarize_vendor_allocations(
+def get_vendor_allocations(
     vendors_other_blocks: list[MACAllocationEntry],
 ) -> tuple[
     VendorAllocationStats,

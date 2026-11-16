@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import argparse
 
-from etherlyzer.application.services.get import get_registry_entries
+from etherlyzer.application.services.registry import get_registry_entries
 from etherlyzer.presentation.reporting.model import Report
-from etherlyzer.presentation.reporting.renders import get_render
+from etherlyzer.presentation.reporting.renders import get_renderer
 
 
 def run(args: argparse.Namespace) -> int:  # noqa; keep standard params.
     report = Report(sections=[get_registry_entries()])
-    print(report.render(get_render("text")))
+    print(report.render(get_renderer("text")))
     return 0
 
 

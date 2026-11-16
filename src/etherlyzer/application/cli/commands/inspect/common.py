@@ -4,7 +4,7 @@ import argparse
 from dataclasses import dataclass
 
 from etherlyzer.bootstrap import EtherlyzerContext
-from etherlyzer.core.interpretation.mac.classifier import MACClassification
+from etherlyzer.core.interpretation.mac.classifier import MacStructure
 from etherlyzer.presentation.reporting.model import Report
 
 
@@ -25,4 +25,4 @@ class CommonInspectionParams:
 
 @dataclass(frozen=True)
 class MacInspectionParams(CommonInspectionParams):
-    classified_mac: MACClassification
+    classified_mac: MacStructure

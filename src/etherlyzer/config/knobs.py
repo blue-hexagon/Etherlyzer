@@ -71,17 +71,17 @@ def _load_environment() -> None:
     load_dotenv(destination_env)
 
 
-def _validate_knobs(kbobs: EtherlyzerKnobs) -> None:
-    if kbobs.db_update_interval_hours <= 0:
+def _validate_knobs(knobs: EtherlyzerKnobs) -> None:
+    if knobs.db_update_interval_hours <= 0:
         raise ValueError("DB_UPDATE_INTERVAL_HOURS must be greater than zero.")
 
-    if len(kbobs.field_separator) != 1:
+    if len(knobs.field_separator) != 1:
         raise ValueError("FIELD_SEPARATOR must contain exactly one character.")
 
-    if kbobs.mac_separator not in {"", ":", "-", "."}:
+    if knobs.mac_separator not in {"", ":", "-", "."}:
         raise ValueError("MAC_SEPARATOR must be one of '', ':', '-', or '.'.")
 
-    if kbobs.mac_block_size not in {2, 4, 12}:
+    if knobs.mac_block_size not in {2, 4, 12}:
         raise ValueError("MAC_BLOCK_SIZE must be 2, 4, or 12.")
 
 

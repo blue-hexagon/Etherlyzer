@@ -3,282 +3,248 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/logo_dark.png">
   <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/logo_light.png">
-  <img alt="Etherlyzer" src="docs/source/_static/logo_light.png" width="460">
+  <img alt="EtherLyzer" src="docs/source/_static/logo_light.png" width="460">
 </picture>
 
+<p><strong>Offline-first Ethernet identifier intelligence for Python and the command line.</strong></p>
+
 <p>
-  <strong>Lightweight Ethernet Address Intelligence Engine</strong>
+  <a href="https://pypi.org/project/etherlyzer/"><img src="https://img.shields.io/pypi/pyversions/etherlyzer" alt="Supported Python versions"></a>
+  <a href="https://pypi.org/project/etherlyzer/"><img src="https://img.shields.io/pypi/v/etherlyzer?label=PyPI" alt="PyPI version"></a>
+  <a href="https://github.com/blue-hexagon/Etherlyzer/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/blue-hexagon/Etherlyzer/tests.yml?branch=master&label=tests" alt="Tests"></a>
+  <a href="https://etherlyzer.docs.manjana.dev/"><img src="https://img.shields.io/badge/docs-online-6f42c1" alt="Documentation"></a>
+  <a href="https://github.com/blue-hexagon/Etherlyzer/blob/master/LICENSE"><img src="https://img.shields.io/github/license/blue-hexagon/Etherlyzer" alt="License"></a>
 </p>
 
-<p align="center">
-
-  <!-- Compatibility -->
-  <a href="https://pypi.org/project/etherlyzer/">
-    <img src="https://img.shields.io/pypi/pyversions/etherlyzer" alt="Python Versions">
-  </a>
-
-  <!-- Distribution -->
-  <a href="https://pypi.org/project/etherlyzer/">
-    <img src="https://img.shields.io/pypi/v/etherlyzer?label=PyPI" alt="PyPI Version">
-  </a>
-
-  <!-- Quality -->
-  <a href="https://github.com/blue-hexagon/Etherlyzer/actions/workflows/tests.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/blue-hexagon/Etherlyzer/tests.yml?branch=master&label=tests" alt="Tests">
-  </a>
-
-  <!-- Project -->
-  <a href="https://etherlyzer.docs.manjana.dev/">
-    <img src="https://img.shields.io/badge/docs-online-6f42c1" alt="Documentation">
-  </a>
-  <a href="https://github.com/blue-hexagon/Etherlyzer/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/blue-hexagon/Etherlyzer" alt="License">
-  </a>
-</p>
 <p>
-  <a href="https://etherlyzer.docs.manjana.dev/"><strong>Documentation</strong></a>
-  ·
-  <a href="https://pypi.org/project/etherlyzer/"><strong>PyPI</strong></a>
-  ·
-  <a href="https://github.com/blue-hexagon/etherlyzer"><strong>Source</strong></a>
+  <a href="https://etherlyzer.docs.manjana.dev/"><strong>Documentation</strong></a> ·
+  <a href="https://pypi.org/project/etherlyzer/"><strong>PyPI</strong></a> ·
+  <a href="https://github.com/blue-hexagon/Etherlyzer"><strong>Source</strong></a>
 </p>
 
 </div>
 
 ---
 
-A lightweight, offline-first Python toolkit for analyzing Ethernet identifiers and IEEE EUI-48 address allocations.
+**EtherLyzer** is a Python library and CLI toolkit for analyzing MAC addresses, IEEE assignments, and Ethernet-related identifiers. It combines **local IEEE registry lookups**, **structural classification**, **standards-aware identity resolution**, **formatting and translation**, and **packet-capture extraction** in a composable interface.
 
-Etherlyzer goes beyond conventional MAC vendor lookups by combining IEEE registry data, address classification,
-allocation analysis, and organizational correlation into a unified command-line interface and Python API.
+It goes beyond conventional OUI lookups: an address can identify an IEEE-registered organization, follow a protocol-defined addressing rule, or have a special purpose without belonging to an ordinary vendor allocation.
 
-Identify the organization behind a MAC address, determine its IEEE-registered allocation, inspect address ranges and
-allocation capacities, correlate related vendor blocks, resolve EtherTypes, and validate or normalize MAC addresses —
-all locally, without relying on third-party lookup APIs.
+Designed for network engineering, automation, asset discovery, NOC/SOC investigations, and network forensics.
 
-Built for network engineers, security researchers, and developers who need fast, reliable, standards-aware insight into
-Ethernet addressing.
+## Why EtherLyzer?
 
-## Why Etherlyzer?
+A conventional lookup might tell you that a MAC prefix belongs to a particular organization. EtherLyzer helps answer different questions:
 
-Most MAC lookup tools stop at:
+- **Who holds the allocation?** Resolve MA-L, MA-M, MA-S, and legacy IAB assignments, including the registered organization and assignment prefix.
+- **What kind of address is this?** Examine individual/group delivery, universal/local administration, broadcast and zero-address properties, and the applicable SLAP quadrant.
+- **Does it have a standards-defined purpose?** Recognize addresses and address patterns used by protocols such as IPv6 multicast, rather than treating every unmatched address as unknown.
+- **What can legitimately be inferred?** Distinguish a registered *address block* from a verified assignment of a specific 48-bit address.
+- **How can I process it?** Normalize, validate, reformat, translate, extract, inspect, and incorporate results into structured reports.
 
-> `00:00:0c → Cisco`
+For example, `33:33:00:00:00:01` need not match an IEEE vendor allocation to be meaningful: EtherLyzer can identify it as an **IPv6 multicast address** under the mapping defined by RFC 2464.
 
-Etherlyzer goes further.
+An inspection can distinguish the address's structure from its standards-defined identity:
 
-It understands the IEEE allocation behind the address:
+```text
+MAC: 33:33:00:00:00:01
+  Delivery       : Group Address
+  Administration : Locally Administered Address (LAA)
+  Identity       : IPv6 Multicast Address
+  Resolution     : IETF IPv6 Multicast Mapping (RFC 2464)
+  IEEE Assignment: No match found
+```
 
-- **MA-L / OUI-24**
-- **MA-M / OUI-28**
-- **MA-S / OUI-36**
-- **Legacy IAB allocations**
-- **Company Identifiers (CID)**
-- **EtherType protocol identifiers**
+A missing vendor match is not the same as an unknown address.
 
-And exposes details such as:
+## Features
 
-- organization and vendor identity,
-- assignment prefix,
-- registry type,
-- address range,
-- prefix and host bit lengths,
-- allocation capacity,
-- legacy status,
-- related IEEE allocations belonging to the same organization.
+| Capability                   | Description                                                                             |
+|------------------------------|-----------------------------------------------------------------------------------------|
+| IEEE lookup                  | Local lookups for MA-L, MA-M, MA-S, IAB, and company identifiers (CID)                  |
+| MAC inspection               | Structural classification, address identity, registry resolution, and assessments       |
+| Special addresses            | Recognition of supported standards-defined fixed addresses and group address ranges     |
+| EtherType intelligence       | Lookup and inspection of Ethernet protocol identifiers                                  |
+| Allocation analysis          | Prefixes, address ranges, capacities, and related organizational allocations            |
+| Normalization and formatting | Strict or lenient normalization; common and customizable MAC representations            |
+| Translation                  | Binary, hexadecimal, decimal, byte-oriented, and per-octet bit-reversed representations |
+| Extraction                   | Source and destination MAC extraction from supported files and packet captures          |
+| Reporting                    | Composable `Report`, `Section`, and `Item` objects with text, JSON, and CSV renderers   |
+| Local operation              | Synchronizable IEEE datasets; ordinary lookups do not require third-party lookup APIs   |
 
-All registry data is synchronized locally, so normal lookups stay local too.
+## Installation
 
-### Built for real workflows
-
-Etherlyzer is useful anywhere Ethernet identifiers become data rather than something you inspect manually:
-
-- network automation,
-- asset discovery,
-- NAC and inventory systems,
-- NOC/SOC workflows,
-- packet-analysis tooling,
-- security investigations,
-- bulk dataset enrichment,
-- Python applications and scripts.
-
-## Install
-
-Requires Python 3.12+.
+The currently published PyPI distribution requires **Python 3.14+**. Check your development branch's `pyproject.toml` if you are using an unreleased version.
 
 ```console
-pip install etherlyzer
+python -m pip install etherlyzer
 etherlyzer --version
 ```
 
-## Extract unique MAC addresses from binaries, text-files or packet-captures
-```text
-etherlyzer extract -f c04-wap-r1.pcap -ul
-Packet 1  00:20:af:1b:07:fa
-Packet 1  00:e0:29:68:8b:fb
-```
-## See what they belong to
-```text
-etherlyzer whois -blcp
-Paste text. Type ;;; and press <Enter> when done:
-00:20:af:1b:07:fa
-00:e0:29:68:8b:fb
-;;;
-Line  Result  Registry  Assignment  Organization
-1.    MATCH   MA-L      0020AF      3COM
-2.    MATCH   MA-L      00E029      STANDARD MICROSYSTEMS CORP.
+## Quick start: Python API
+
+The Python API exposes domain operations directly and groups related transformations into modules.
+
+### Inspect a MAC address
+
+```python
+from etherlyzer import inspect_mac, lookup_mac
+
+mac = "B8:1E:A4:33:70:3F"
+
+inspection = inspect_mac(mac)
+registration = lookup_mac(mac)
+
+print(inspection.structure.delivery.value)
+print(inspection.structure.administration.value)
+print(inspection.identity.value)
+print(inspection.resolution.value)
+print(registration.organization_name if registration else "No IEEE assignment found")
 ```
 
-## See what a MAC address really belongs to
+**Inspection and registration are deliberately separate.** `lookup_mac()` resolves organizational allocations; `inspect_mac()` interprets structure and identity, including standards-defined addresses without an ordinary vendor registration.
+
+An allocation match identifies the holder of an IEEE-registered block. It does **not** prove the observed device's manufacturer, the current owner, or that a specific 48-bit address was legitimately assigned.
+
+### Normalize, format, and translate
+
+```python
+from etherlyzer import formatting, normalize_strict, translation
+
+mac = normalize_strict("b81e.a433.703f")
+
+print(formatting.to_canonical_format(mac))
+print(formatting.to_customized_format(mac, block_size=4, separator=".", case="lower"))
+print(translation.to_binary(mac))
+print(translation.to_decimal(mac))
+print(translation.to_bit_reversed(mac))
+```
+
+`normalize_strict()` requires a complete 48-bit address and rejects unsupported characters. The more permissive `normalize()` is also available when lenient input cleanup is intentional.
+
+### Extract unique MAC addresses from a packet capture
+
+```python
+from pathlib import Path
+from etherlyzer import extraction, inspect_mac, normalize_strict
+
+unique_macs = {
+    normalize_strict(address)
+    for packet in extraction.extract_file(Path("capture.pcapng"))
+    for address in (packet.src, packet.dst)
+    if address is not None
+}
+
+for mac in sorted(unique_macs):
+    result = inspect_mac(mac)
+    print(mac, result.identity.value)
+```
+
+This extracts both source and destination MAC addresses, normalizes them, and performs one inspection per unique address. For captures with unusual or malformed records, handle normalization errors per record.
+
+### Build structured reports
+
+EtherLyzer's presentation API is independent of its inspection and lookup logic. Applications can assemble their own report hierarchy and choose an output renderer.
+
+```python
+from etherlyzer import inspect_mac, lookup_mac
+from etherlyzer.presentation import Item, Report, Section, get_renderer
+
+mac = "33:33:00:00:00:01"
+inspection = inspect_mac(mac)
+registration = lookup_mac(mac)
+
+report = Report(
+    sections=[
+        Section(
+            title="MAC Analysis",
+            items=[
+                Item("Address", mac),
+                Item("Identity", inspection.identity.value),
+                Item("Resolution", inspection.resolution.value),
+                Item("IEEE Assignment", registration.assignment if registration else None),
+            ],
+        )
+    ]
+)
+
+print(report.render(get_renderer("text")))
+print(report.render(get_renderer("json")))
+```
+
+The same report model can support text, JSON, and CSV workflows. More elaborate reports can compose nested sections for formatting, translation, IEEE registration, and structural inspection.
+
+## Command-line interface
+
+The CLI provides lookup, inspection, validation, formatting, extraction, and local registry management. Examples below use the newer, type-first `inspect` syntax from the current development interface; run `--help` against your installed version to confirm its supported commands and options.
 
 ```console
-etherlyzer inspect -xsb 00000f
-```
+# Identify an IEEE allocation holder
+etherlyzer whois B8:1E:A4:33:70:3F
 
-```text
-MAC Address Autopsy
-  Input
-    Value             : 00000f
-    Length            : 24 bits
-  Representations
-    Canonical         : 00-00-0F
-    Bit-Reversed      : 00:00:F0
-    To Hex            : 00000F
-    To Integer        : 15
-    To Decimals       : 0 0 15
-    To Octal          : 00000017
-    To Binary         : 0000.0000.0000.0000.0000.1111
-    To Bytes          : 00 00 0F
-  Address Properties
-    Null Address      : False
-    Broadcast         : False
-    Special Bits
-      U/L             : 0 Universal / Universally Administered
-      I/G             : 0 Individual / Unicast
+# Inspect a MAC address and its classification
+etherlyzer inspect mac 333300000001
 
-IEEE Identifier
-  Type                : Universal Individual Prefix (Registered Block)
-  SLAP Quadrant       : None
+# Inspect an EtherType identifier
+etherlyzer inspect ethertype 0800
 
-IEEE Registry
-  IEEE Type           : MA-L [MAC Address Block Large]
-  Assignment          : 00-00-0f
-  Range               : 00-00-0f-00-00-00 - 00-00-0f-ff-ff-ff
-  Prefix Bits         : 24 bits
-  Address Bits        : 24 bits
-  Legacy              : False
-  Legacy Name         : OUI
-  Address Capacity    : 16,777,216
-
-Associated Allocations
-  Total
-    Blocks           : 1
-    Capacity         : 16,777,216
-  MA-L
-    Blocks           : 1
-    Capacity         : 16,777,216
-  MA-M
-    Blocks           : 0
-    Capacity         : 0
-  MA-S
-    Blocks           : 0
-    Capacity         : 0
-  IAB
-    Blocks           : 0
-    Capacity         : 0
-  Registered Blocks (B=IAB, S=MA-S, M=MA-M, L=MA-L)
-      [L] 00-00-0f
-
-Organization
-  Name              : NEXT
-  Full Name         : NEXT, INC.
-  Address
-    3475 DEER CREEK ROAD PALO ALTO CA US 94304
-```
-
-Etherlyzer can also correlate the organization against its other known IEEE MAC allocations.
-
-## One toolkit, multiple jobs
-
-```console
-# Identify a vendor
-etherlyzer whois 00:11:22:33:44:55
-
-# Inspect the exact IEEE allocation
-etherlyzer inspect 00:00:0c:12:34:56
-
-# Inspect an Ethernet protocol identifier
-etherlyzer inspect -t protocol 0800
-
-# Validate and diagnose malformed input
+# Validate or format MAC input
 etherlyzer validate 00-11-22-33-44-55
-
-# Normalize MAC representation
 etherlyzer format 001122334455
 
-# Cisco-style formatting
-etherlyzer format 001122334455 -p . -s 4
-
-# Process multiple values
-etherlyzer whois -f macs.txt
-etherlyzer validate -b
-
-# Inspect local registry state
+# Inspect and update local IEEE registry data
 etherlyzer registries
-
-# Refresh IEEE registry data
 etherlyzer sync
+
+# Discover available extraction options
+etherlyzer extract --help
 ```
 
-## Local by design
-
-Etherlyzer maintains synchronized copies of the supported IEEE datasets on the local system.
-
-That means routine lookups do **not** require sending MAC addresses or internal asset data to an external lookup
-service.
-
-This makes Etherlyzer particularly useful for:
-
-- internal infrastructure inventories,
-- restricted environments,
-- sensitive network datasets,
-- high-volume lookups,
-- offline analysis,
-- automated enrichment pipelines.
-
-Internet access is only required when the IEEE registry datasets need to be refreshed.
-
-## CLI and Python API
-
-The command-line interface is built on the same underlying Python library.
-
-Use Etherlyzer interactively from a terminal, compose it into shell workflows, or integrate its registry, lookup,
-validation, and formatting capabilities directly into Python applications.
-
-## Documentation
-
-Full documentation is available at:
-
-### **https://etherlyzer.docs.manjana.dev/**
-
-It includes:
-
-- CLI reference
-- Python API
-- IEEE registry concepts
-- MAC address concepts
-- validation masks
-- configuration
-- registry synchronization
-- examples and guides
-
-For quick CLI help:
+For command-specific options:
 
 ```console
 etherlyzer --help
-etherlyzer <command> --help
+etherlyzer inspect --help
+etherlyzer whois --help
 ```
+
+> **Version note:** The public PyPI release may not yet include all APIs or command-line syntax shown in this development-oriented README. Check the installed package version and the changelog before relying on an example.
+
+## Supported IEEE data
+
+| Dataset   | Scope                                                               |
+|-----------|---------------------------------------------------------------------|
+| MA-L      | Large MAC address allocations; 24-bit assignment prefixes (OUI-24)  |
+| MA-M      | Medium MAC address allocations; 28-bit assignment prefixes          |
+| MA-S      | Small MAC address allocations; 36-bit assignment prefixes           |
+| IAB       | Legacy Individual Address Blocks                                    |
+| CID       | IEEE Company Identifiers; not equivalent to MAC address allocations |
+| EtherType | Ethernet protocol identifier assignments                            |
+
+EtherLyzer uses applicable assignment boundaries for resolution, including more specific allocations where relevant. Results may include allocation capacities, ranges, registry metadata, and related blocks associated with an organization.
+
+## Offline-first by design
+
+EtherLyzer maintains local copies of supported IEEE datasets and builds indexes for repeated lookups. Once the necessary data is available, routine lookups can be completed locally without sending queried MAC addresses or internal inventory data to third-party lookup services.
+
+This is especially useful for restricted environments, private inventories, offline analysis, packet-capture investigations, and bulk enrichment pipelines. Network access may be required for initial dataset acquisition or synchronization, including any configured automatic refresh.
+
+## Documentation
+
+Full documentation: **[etherlyzer.docs.manjana.dev](https://etherlyzer.docs.manjana.dev/)**
+
+Explore the CLI reference, Python API, IEEE registry concepts, MAC address classification, validation, configuration, and registry synchronization guides.
+
+## Development
+
+```console
+git clone https://github.com/blue-hexagon/Etherlyzer.git
+cd Etherlyzer
+poetry install
+```
+
+The repository uses Poetry for dependency management, with pytest, mypy, and Ruff for testing and code quality. Refer to `pyproject.toml` for the authoritative Python version and development configuration.
 
 ## License
 
-Etherlyzer is released under the [MIT License](LICENSE).
+EtherLyzer is released under the [MIT License](LICENSE).

@@ -16,7 +16,7 @@ from etherlyzer.application.cli.commands.inspect.macaddr_router import (
 from etherlyzer.bootstrap import (
     initialize_etherlyzer,
 )
-from etherlyzer.core.interpretation.mac.classifier import classify_mac
+from etherlyzer.core.interpretation.mac.classifier import get_mac_structure
 from etherlyzer.infrastructure.registry.family import RegistryFamily
 from etherlyzer.presentation.reporting.model import Report
 
@@ -62,7 +62,7 @@ def dispatch(args: argparse.Namespace) -> int:
                     args=args,
                     context=context,
                     inspect_flags=inspect_flags,
-                    classified_mac=classify_mac(args.value),
+                    classified_mac=get_mac_structure(args.value),
                     report=Report(),
                 )
             )

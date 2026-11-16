@@ -2,12 +2,13 @@ import csv
 from dataclasses import dataclass
 from io import StringIO
 
+from etherlyzer.config.knobs import etherlyzer_knobs
 from etherlyzer.presentation.reporting.model import Report, Section
 
 
 @dataclass(slots=True)
 class CSVRenderer:
-    delimiter: str = ","
+    delimiter: str = etherlyzer_knobs.field_separator
 
     def render(self, report: Report) -> str:
         output = StringIO(newline="")

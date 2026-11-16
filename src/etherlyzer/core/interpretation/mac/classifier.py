@@ -22,7 +22,7 @@ class SLAPQuadrant(StrEnum):
 
 
 @dataclass(frozen=True, slots=True)
-class MACClassification:
+class MacStructure:
     normalized: str
     administration: Administration
     delivery: DeliveryType
@@ -30,6 +30,7 @@ class MACClassification:
     is_zero: bool
     slap_quadrant: SLAPQuadrant | None
 
+    @property
     def is_complete(self) -> bool:
         return len(self.normalized) == 12
 
@@ -46,7 +47,7 @@ class MACClassification:
         return is_all_ones
 
 
-def classify_mac(mac: str) -> MACClassification:
+def get_mac_structure(mac: str) -> MacStructure:
     normalized = normalize(mac)
 
     if not normalized or len(normalized) > 12 or len(normalized) < 6:
@@ -73,7 +74,7 @@ def classify_mac(mac: str) -> MACClassification:
             0x0C: SLAPQuadrant.SAI,
         }[first & 0x0C]
 
-    return MACClassification(
+    return MacStructure(
         normalized=normalized,
         administration=(Administration.LOCAL if is_local else Administration.UNIVERSAL),
         delivery=(DeliveryType.GROUP if is_group else DeliveryType.INDIVIDUAL),

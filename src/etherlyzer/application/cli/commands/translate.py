@@ -6,8 +6,9 @@ from enum import StrEnum
 from pathlib import Path
 
 from etherlyzer.application.cli.multiline_stdin import read_multiline
-from etherlyzer.core.interpretation.mac.normalization import normalize_semi_strict
-from etherlyzer.core.interpretation.mac.translation import MacTranslation, get_arrlen_chwidth
+from etherlyzer.core.interpretation.mac import translation
+from etherlyzer.core.interpretation.mac.normalization import normalize_strict
+from etherlyzer.core.interpretation.mac.translation import get_arrlen_chwidth
 
 
 class Status(StrEnum):
@@ -31,22 +32,21 @@ REPRESENTATIONS = (
 
 def translate_to_all_representations(mac: str) -> tuple[dict[str, str], Status]:
     try:
-        normalized = normalize_semi_strict(mac).upper()
+        normalized = normalize_strict(mac).upper()
     except ValueError:
         return {}, Status.INVALID
 
-    pt = MacTranslation()
     return (
         {
-            "canonical": pt.to_canonical(normalized),
-            "bit_reversed": pt.to_bit_reversed(normalized),
-            "decimal": pt.to_decimal(normalized),
-            "decimal_bytes": pt.to_decimal_bytes(normalized, padding=True),
-            "binary": pt.to_binary(normalized),
-            "binary_raw": pt.to_binary_raw(normalized),
-            "hex": pt.to_hex(normalized),
-            "hex_bytes": pt.to_hex_bytes(normalized),
-            "bytes": pt.to_bytes(normalized),
+            "canonical": translation.to_canonical(normalized),
+            "bit_reversed": translation.to_bit_reversed(normalized),
+            "decimal": translation.to_decimal(normalized),
+            "decimal_bytes": translation.to_decimal_bytes(normalized, padding=True),
+            "binary": translation.to_binary(normalized),
+            "binary_raw": translation.to_binary_raw(normalized),
+            "hex": translation.to_hex(normalized),
+            "hex_bytes": translation.to_hex_bytes(normalized),
+            "bytes": translation.to_bytes(normalized),
         },
         Status.OK,
     )

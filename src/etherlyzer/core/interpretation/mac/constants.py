@@ -22,7 +22,6 @@ LENIENT_TYPOS: dict[str, str] = {
 }
 
 
-#
 class TypoTolerance(Enum):
     STRICT = STRICT_TYPOS
     RELAXED = RELAXED_TYPOS

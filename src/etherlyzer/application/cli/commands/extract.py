@@ -4,8 +4,8 @@ import argparse
 from pathlib import Path
 
 from etherlyzer.application.cli.multiline_stdin import read_multiline
-from etherlyzer.core.interpretation.mac.extraction import MACExtractor
-from etherlyzer.core.interpretation.mac.formatting import MACFormatter
+from etherlyzer.core.interpretation.mac import formatting
+from etherlyzer.core.interpretation.mac.extraction import extract_file, extract_from_bytestream
 from etherlyzer.core.interpretation.mac.normalization import normalize
 
 
@@ -18,10 +18,10 @@ def run(args: argparse.Namespace) -> int:
             skip_empty_lines=False,
         )
         data = "\n".join(lines).encode("utf-8")
-        matches = MACExtractor.extract_macs(data)
+        matches = extract_from_bytestream(data)
 
     else:
-        matches = MACExtractor.extract_file(args.file)
+        matches = extract_file(args.file)
 
     seen: set[str] = set()
     count = 0
@@ -34,12 +34,11 @@ def run(args: argparse.Namespace) -> int:
                 continue
             seen.add(normalized)
 
-        formatted = MACFormatter.format(
+        formatted = formatting.to_customized_format(
             mac=normalized,
             separator=args.separator,
             block_size=args.block_size,
             case=args.casing,
-            fix_typos=False,
         )
 
         if args.offsets:
