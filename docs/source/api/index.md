@@ -18,3 +18,10 @@ The public Python API is currently being documented.
 
 Detailed module, class, and function references will be added as the public API is formalized.
 :::
+
+```{toctree}
+:maxdepth: 2
+
+inspection_mac
+inspection_ethertype
+```

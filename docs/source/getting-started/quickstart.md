@@ -4,14 +4,14 @@ EtherLyzer provides commands for identifying, inspecting, validating, and format
 
 ## Main commands
 
-| Command       | Purpose                                                                                       |
-|---------------|-----------------------------------------------------------------------------------------------|
-| `whois`       | Identify IEEE vendors and organizations for MAC addresses.                                    |
-| `inspect`     | Inspect an IEEE assignment and display registry, organization, range, and allocation details. |
-| `validate`    | Validate and normalize MAC addresses with optional diagnostics and filtering.                 |
-| `format`      | Normalize MAC address formatting with optional typo correction.                               |
-| `registries`  | Show local IEEE registry metadata and synchronization status.                                 |
-| `synchronize` | Synchronize the local IEEE registry database with upstream sources.                           |
+| Command      | Purpose                                                                                       |
+|--------------|-----------------------------------------------------------------------------------------------|
+| `whois`      | Identify IEEE vendors and organizations for MAC addresses.                                    |
+| `inspect`    | Inspect an IEEE assignment and display registry, organization, range, and allocation details. |
+| `validate`   | Validate and normalize MAC addresses with optional diagnostics and filtering.                 |
+| `format`     | Normalize MAC address formatting with optional typo correction.                               |
+| `registries` | Show local IEEE registry metadata and synchronization status.                                 |
+| `sync`       | Synchronize the local IEEE registry database with upstream sources.                           |
 
 ## Identify a MAC address
 
@@ -22,7 +22,9 @@ etherlyzer whois 00:11:22:33:44:55
 ## Inspect an IEEE assignment
 
 ```text
-etherlyzer inspect 00:11:22:33:44:55
+etherlyzer inspect mac 00:11:22:33:44:55
+etherlyzer inspect identifier 0A6791
+etherlyzer inspect ethertype 0800
 ```
 
 ## Validate a MAC address
@@ -35,6 +37,7 @@ etherlyzer validate 00-11-22-33-44-55
 
 ```text
 etherlyzer format 001122334455
+etherlyzer format 001122334455 --block-size 6 --separator - --casing lower
 ```
 
 ## Inspect local registries
@@ -63,7 +66,7 @@ For example:
 etherlyzer whois -h
 ```
 ```text
-usage: etherlyzer whois [-h] [-d DELIMITER] [-p] [-l] [-c] (-f FILE | -b | mac)
+usage: etherlyzer whois [-h] [-o {text,json,csv}] [-p] [-f FILE] [-b] [mac]
 
 Identify IEEE vendors and organizations for one or more MAC addresses.
 
@@ -72,22 +75,16 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -d, --delimiter DELIMITER
-                        Select a delimiter, if none is chosen tabs is default
+  -o {text,json,csv}, --format {text,json,csv}
+                        Select a format for the output
   -p, --preserve-bad-entries
-                        Enables preservation of bad entries such as self-assigned or multicast addresses
-  -l, --linenumbers     Prefix output lines with their corresponding input line number
-  -c, --column-names    Write a header row on the first line of the output
-  -f, --file FILE       Read MAC addresses from a file
+                        .
+  -f FILE, --file FILE  Read multiple MAC addresses from a file
   -b, --bulk            Read multiple MAC addresses interactively
 
 Examples:
   etherlyzer whois 00:11:22:33:44:55   Look up a single MAC address
   etherlyzer whois -b                  Enter MAC addresses interactively
   etherlyzer whois -f .\macs.txt       Look up MAC addresses from a file
-  etherlyzer whois -bl                 Show original input line numbers
   etherlyzer whois -bp                 Include unsuccessful lookups
-  etherlyzer whois -blcp               Show all results in an aligned table
-  etherlyzer whois -blcp -d ";"        Output semicolon-delimited results
-
 ```

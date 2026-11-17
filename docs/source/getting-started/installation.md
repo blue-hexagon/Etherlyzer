@@ -2,7 +2,7 @@
 
 ## Requirements
 
-EtherLyzer requires Python 3.14 or newer.
+EtherLyzer requires Python 3.12+
 
 ## Install from PyPI
 
@@ -43,5 +43,5 @@ poetry install
 Run EtherLyzer inside the Poetry environment:
 
 ```shell
-poetry run etherlyzer --version
+etherlyzer --version
 ```

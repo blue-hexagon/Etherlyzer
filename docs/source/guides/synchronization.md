@@ -10,11 +10,11 @@ EtherLyzer uses locally stored IEEE registry data for address identification and
 
 The synchronization process checks whether datasets require updating and refreshes them from their upstream IEEE sources when necessary.
 
-| Mode | Behavior | Command |
-|---|---|---|
-| Standard | Check and refresh expired registries | `etherlyzer sync` |
-| Status | Display registry expiration information | `etherlyzer sync --status` |
-| Force | Synchronize regardless of expiration status | `etherlyzer sync --force` |
+| Mode     | Behavior                                    | Command                    |
+|----------|---------------------------------------------|----------------------------|
+| Standard | Check and refresh expired registries        | `etherlyzer sync`          |
+| Status   | Display registry expiration information     | `etherlyzer sync --status` |
+| Force    | Synchronize regardless of expiration status | `etherlyzer sync --force`  |
 
 Synchronization can operate on all supported registries or selected datasets.
 
@@ -104,12 +104,12 @@ Once IEEE registry datasets have been synchronized, EtherLyzer performs lookups 
 
 Commands such as `whois` and `inspect` can therefore resolve available registry information without querying an external lookup service for each address.
 
-| Operation | Internet access |
-|---|---|
-| Local IEEE registry lookup | Not required |
-| MAC address inspection using local data | Not required |
-| Checking locally recorded expiration information | Not required |
-| Downloading updated IEEE registry data | Required |
+| Operation                                        | Internet access |
+|--------------------------------------------------|-----------------|
+| Local IEEE registry lookup                       | Not required    |
+| MAC address inspection using local data          | Not required    |
+| Checking locally recorded expiration information | Not required    |
+| Downloading updated IEEE registry data           | Required        |
 
 The local database reflects the most recently synchronized datasets. If upstream registrations have changed since the last successful synchronization, those changes will not be reflected until the local data is refreshed.
 
@@ -121,22 +121,22 @@ For details about the supported datasets, see {doc}`registries`.
 usage: etherlyzer sync [-h] [-s [REGISTRY ...] | -f [REGISTRY ...]]
 ```
 
-| Argument / Option | Description |
-|---|---|
+| Argument / Option             | Description                                                    |
+|-------------------------------|----------------------------------------------------------------|
 | `-s, --status [REGISTRY ...]` | Display expiration status for all or selected IEEE registries. |
-| `-f, --force [REGISTRY ...]` | Force synchronization of all or selected IEEE registries. |
-| `-h, --help` | Display command help. |
+| `-f, --force [REGISTRY ...]`  | Force synchronization of all or selected IEEE registries.      |
+| `-h, --help`                  | Display command help.                                          |
 
 ### Examples
 
-| Purpose | Command |
-|---|---|
-| Synchronize expired registries | `etherlyzer sync` |
-| Check all registry statuses | `etherlyzer sync -s` |
-| Check MA-L expiration status | `etherlyzer sync -s MA-L` |
-| Check multiple registries | `etherlyzer sync -s MA-L MA-M` |
-| Force synchronization of all registries | `etherlyzer sync -f` |
-| Force synchronization of MA-L | `etherlyzer sync -f MA-L` |
+| Purpose                                      | Command                        |
+|----------------------------------------------|--------------------------------|
+| Synchronize expired registries               | `etherlyzer sync`              |
+| Check all registry statuses                  | `etherlyzer sync -s`           |
+| Check MA-L expiration status                 | `etherlyzer sync -s MA-L`      |
+| Check multiple registries                    | `etherlyzer sync -s MA-L MA-M` |
+| Force synchronization of all registries      | `etherlyzer sync -f`           |
+| Force synchronization of MA-L                | `etherlyzer sync -f MA-L`      |
 | Force synchronization of selected registries | `etherlyzer sync -f MA-L MA-M` |
 
 ## Related documentation

@@ -78,8 +78,8 @@ myst_substitutions = {
 }
 # pygments_style = "friendly"
 # pygments_dark_style = "dracula"
-pygments_style = "sphinx"
-pygments_dark_style = "monokai"
+pygments_style = "friendly"
+pygments_dark_style = "native"
 highlight_options = {
     "python": {
         "stripnl": False,
@@ -97,7 +97,7 @@ intersphinx_mapping = {
 html_theme_options = {
     # GitHub integration
     "source_repository": "https://github.com/blue-hexagon/EtherLyzer/",
-    "source_branch": "main",
+    "source_branch": "master",
     "source_directory": "docs/source/",
     # Navigation
     "navigation_with_keys": True,
@@ -127,7 +127,9 @@ autodoc_default_options = {
     "member-order": "bysource",
     "show-inheritance": True,
 }
-autodoc_typehints = "none"
+autodoc_typehints = "description"
+autodoc_member_order = "bysource"
+
 always_document_param_types = True
 typehints_use_rtype = False
 napoleon_use_rtype = False
