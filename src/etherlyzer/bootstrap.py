@@ -39,6 +39,7 @@ def _select_registries(
     inclusions: list[str] | None = None,
     exemptions: list[str] | None = None,
 ) -> list[Registry]:
+    """Provide Name for in- or exclusions, e.g.: MA-L, MA-S, CID, IAB"""
     included = {name.casefold() for name in (inclusions or [])}
     excluded = {name.casefold() for name in (exemptions or [])}
 
