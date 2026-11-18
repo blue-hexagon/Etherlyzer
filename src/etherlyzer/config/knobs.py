@@ -41,6 +41,7 @@ class EtherlyzerKnobs:
     typo_tolerance: TypoTolerance = TypoTolerance.STRICT
 
     show_sync_messages: bool = False
+    debug_etherlyzer:bool=False
 
 
 def try_find_project_env() -> Path | None:

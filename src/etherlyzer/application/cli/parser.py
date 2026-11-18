@@ -13,6 +13,7 @@ from etherlyzer.application.cli.commands import (
     whois,
 )
 from etherlyzer.application.cli.commands.inspect import registration
+from etherlyzer.config.knobs import EtherlyzerKnobs, etherlyzer_knobs
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -76,6 +77,8 @@ def main(argv: list[str] | None = None) -> int:
 
     except Exception as exc:
         print(f"Error: {exc}")
+        if etherlyzer_knobs.debug_etherlyzer:
+            raise
         return 1
 
 
