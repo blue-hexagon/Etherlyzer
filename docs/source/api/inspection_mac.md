@@ -1,12 +1,15 @@
 # MAC Inspection
 
-## MAC Address Inspection
+## Queries
+
+:::{note}
+Both query-types support IEEE **Company Identifier** (CID) lookups for ELI-48 addresses. Although CIDs are organizational identifiers rather than MAC address allocations, they can be used to resolve the registered organization associated with an ELI-48 address.
+:::
 
 ```{eval-rst}
 .. autofunction:: etherlyzer.inspect_mac
 ```
 
-## IEEE Registration Lookup
 
 ```{eval-rst}
 .. autofunction:: etherlyzer.lookup_mac

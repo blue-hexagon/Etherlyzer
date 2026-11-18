@@ -1,9 +1,31 @@
+/* Light mode */
+.sd-badge.sd-bg-light {
+    --sd-color-light: #e7f3f6;
+    --sd-color-light-text: #155e75;
+}
+
+/* Dark mode — manually selected */
+body[data-theme="dark"] .sd-badge.sd-bg-light {
+    --sd-color-light: #244149;
+    --sd-color-light-text: #dbf6f9;
+}
+
+/* Dark mode — automatic/system preference */
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) .sd-badge.sd-bg-light {
+        --sd-color-light: #244149;
+        --sd-color-light-text: #dbf6f9;
+    }
+}
+
+/*---------------------------------------*/
+/**/
 table.docutils {
     width: 100%;
 }
 
 table.docutils {
-    border-collapse: collapse!important;
+    border-collapse: collapse !important;
     width: 100%;
     border-radius: 0;
     overflow: hidden;
@@ -97,9 +119,11 @@ Pygment Settings
 div.highlight-python.notranslate div.highlight pre {
     padding-block-end: 0.5lh;
 }
+
 div.highlight-bash.notranslate div.highlight pre {
     padding-block-end: 0.5lh;
 }
+
 div.highlight-text.notranslate div.highlight pre {
     padding-block-end: 0.5lh;
 }
@@ -120,7 +144,6 @@ body:not([data-theme="light"]) .highlight span.linenos {
     background: transparent;
 
 }
-
 
 
 /* ========================================

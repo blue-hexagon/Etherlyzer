@@ -79,7 +79,7 @@ myst_substitutions = {
 # pygments_style = "friendly"
 # pygments_dark_style = "dracula"
 pygments_style = "friendly"
-pygments_dark_style = "native"
+pygments_dark_style = "lightbulb"
 highlight_options = {
     "python": {
         "stripnl": False,

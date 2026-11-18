@@ -28,6 +28,78 @@ Output:
 
 By default, `translate` displays all supported representations.
 
+
+## Case study: Investigating malformed Ethernet frames
+
+MAC inspection can be particularly useful when unexpected addresses contain patterns suggesting that the observed values originated from other packet fields.
+
+During a network investigation, more than **20,000 unique MAC addresses** were observed on a single switch interface over several hours.
+
+The initial suspicion involved possible MAC Authentication Bypass (MAB) abuse or device impersonation.
+
+However, only approximately 10% of the observed addresses corresponded to registered IEEE allocations. Many of the remaining addresses exhibited recurring byte patterns.
+
+### Examining the address bytes
+
+One representative address was:
+
+```text
+40:06:AF:F1:08:08
+```
+
+Its decimal octets can be obtained using [`translate`](translate.md):
+
+```text
+etherlyzer translate 40:06:AF:F1:08:08 -t decimal_bytes
+```
+
+Output:
+
+```text
+64 6 175 241 8 8
+```
+
+The corresponding hexadecimal bytes are:
+
+```text
+40 06 AF F1 08 08
+```
+
+These values resemble fields that would occur in an IPv4 header:
+
+| Bytes   | Decimal | Possible interpretation     |
+|---------|---------|-----------------------------|
+| `40`    | 64      | IPv4 Time to Live (TTL)     |
+| `06`    | 6       | TCP protocol identifier     |
+| `AF F1` | 45041   | IPv4 header checksum        |
+| `08 08` | 8, 8    | Fragment of an IPv4 address |
+
+This raised the possibility that bytes from the network-layer header were being interpreted as an Ethernet source address.
+
+### Investigative significance
+
+The recurring patterns suggested a packet-assembly or parsing problem rather than a conventional collection of independently assigned MAC addresses.
+
+The investigation pointed toward an inexpensive unmanaged switch connected to the affected interface as a possible source of the malformed frames.
+
+However, the byte patterns alone did not establish the exact failure mechanism or conclusively identify the responsible device.
+
+The important finding was that **structural analysis of the addresses revealed relationships that ordinary IEEE vendor lookups could not explain**.
+
+This illustrates why MAC translation can be valuable when investigating:
+
+- Unexpectedly large numbers of learned MAC addresses.
+- Addresses containing recurring byte sequences.
+- Possible packet-header misalignment or corruption.
+- Unregistered addresses with recognizable protocol-field patterns.
+- Unusual address distributions on a single switch interface.
+
+:::{note}
+A pattern resembling protocol-header fields is an investigative clue, not proof of header corruption.
+
+Confirming the underlying cause requires supporting packet captures, device diagnostics, or other network evidence.
+:::
+
 ## Available representations
 
 The following representations are available for `40:06:AF:F1:08:08`:

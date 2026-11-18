@@ -1,16 +1,7 @@
-# MAC Formatting
-
-## IEEE Registration Lookup
+# MAC Extraction
 
 ```{eval-rst}
-.. autofunction:: etherlyzer.lookup_mac
-```
-
-## Result Models
-
-```{eval-rst}
-.. autoclass:: etherlyzer.MacIdentityResult
-   :undoc-members:
-   :class-doc-from: both
+.. automodule:: etherlyzer.core.interpretation.mac.extraction
    :members:
+   :member-order: bysource
 ```

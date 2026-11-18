@@ -1,7 +1,5 @@
 # EtherType Inspection
 
-## EtherType Inspection
-
 ```{eval-rst}
 .. autofunction:: etherlyzer.inspect_ethertype
 ```

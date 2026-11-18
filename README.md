@@ -203,8 +203,8 @@ from etherlyzer import formatting, normalize_strict, translation
 
 mac = normalize_strict("b81e.a433.703f")
 
-print(formatting.to_canonical_format(mac))
-print(formatting.to_customized_format(mac, block_size=4, separator=".", case="lower"))
+print(formatting.canonical_format(mac))
+print(formatting.custom_format(mac, block_size=4, separator=".", case="lower"))
 print(translation.to_binary(mac))
 print(translation.to_decimal(mac))
 print(translation.to_hex_bytes(mac))
