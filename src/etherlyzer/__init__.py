@@ -3,6 +3,7 @@ from importlib.metadata import PackageNotFoundError, version
 
 from etherlyzer.bootstrap import EtherlyzerContext, initialize_etherlyzer
 from etherlyzer.core.interpretation.ethertype.classifier import (
+    EtherTypeFieldType,
     EtherTypeStruct,
     get_ethertype_struct,
 )
@@ -277,7 +278,7 @@ def inspect_ethertype(ethertype: str) -> EtherTypeStruct:
     )
 
 
-__all__ = [
+__all__ = [  # noqa: RUF022
     "HEX_DIGITS",
     "LENIENT_TYPOS",
     "RELAXED_TYPOS",
@@ -291,6 +292,7 @@ __all__ = [
     "extraction",
     "formatting",
     "inspect_ethertype",
+    "EtherTypeFieldType",
     "inspect_mac",
     "lookup_mac",
     "normalize",
