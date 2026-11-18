@@ -20,6 +20,36 @@ def get_render_choices() -> list[str]:
 
 
 def get_renderer(kind: Literal["text", "json", "csv"] = "text") -> ReportRenderer:
+    """Create a renderer for the specified report output format.
+
+    Args:
+        kind: Defaults to ``text`` if no argument is given.
+
+    Returns:
+        A new renderer instance implementing the ReportRenderer interface.
+        Unknown formats fall back to TextRenderer.
+
+    Examples:
+        Create a report::
+
+            >>> from etherlyzer.presentation import Item, Report, Section
+            >>> report = Report(
+            ...     sections=[
+            ...         Section(
+            ...             title="MAC Analysis",
+            ...             items=[Item("Address", "00:11:22:33:44:55")],
+            ...         )
+            ...     ]
+            ... )
+
+        Render directly using a renderer::
+
+            >>> output = get_renderer("text").render(report)
+
+        Alternatively, render through the report interface::
+
+            >>> output = report.render(get_renderer("json"))
+    """
     try:
         return RENDERERS[kind]()
     except KeyError:
