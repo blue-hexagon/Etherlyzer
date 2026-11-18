@@ -34,7 +34,7 @@ def run(args: argparse.Namespace) -> int:
                 continue
             seen.add(normalized)
 
-        formatted = formatting.to_customized_format(
+        formatted = formatting.custom_format(
             mac=normalized,
             separator=args.separator,
             block_size=args.block_size,

@@ -8,6 +8,7 @@ from etherlyzer.application.cli.commands.inspect.common import (
 from etherlyzer.bootstrap import EtherlyzerContext
 from etherlyzer.core.interpretation.mac import formatting, translation
 from etherlyzer.core.interpretation.mac.allocation_analysis import get_vendor_allocations
+from etherlyzer.core.interpretation.mac.format_attribution import inspect_format
 from etherlyzer.core.interpretation.mac.inspection import MacAssessment
 from etherlyzer.domain.entry.mac import MACAllocationEntry
 from etherlyzer.infrastructure.registry.registry_source import RegistrySource
@@ -101,7 +102,7 @@ def build_vendor_blocks_section(
         items=[
             Item(
                 key=entry.registry_id(),
-                value=formatting.to_default_format(entry.assignment),
+                value=formatting.default_format(entry.assignment),
             )
             for entry in related_entries
         ],
@@ -113,8 +114,8 @@ def build_ieee_registration_section(
     entry: MACAllocationEntry,
     reg: RegistrySource[MACAllocationEntry],
 ) -> Section:
-    range_start = formatting.to_default_format(entry.assignment, "0")
-    range_end = formatting.to_default_format(entry.assignment, "f")
+    range_start = formatting.default_format(entry.assignment, "0")
+    range_end = formatting.default_format(entry.assignment, "f")
     address = entry.organization_address
 
     allocation_items: list[Item | Section] = [
@@ -124,7 +125,7 @@ def build_ieee_registration_section(
         ),
         Item(
             key="Assignment",
-            value=formatting.to_default_format(entry.assignment),
+            value=formatting.default_format(entry.assignment),
         ),
         Item(
             key="Range",
@@ -158,7 +159,7 @@ def build_ieee_registration_section(
                 items=[
                     Item(key="Name", value=entry.short_name()),
                     Item(key="Full Name", value=entry.organization_name),
-                    Item(key="Address", value="".join(address)),
+                    Item(key="Address", value=address),
                 ],
             ),
             Section(
@@ -191,6 +192,21 @@ def build_mac_autopsy(
     ig_bit = first_octet & 1
     ig_bit_addon = "Group / Multicast" if ig_bit else "Individual / Unicast"
 
+
+    inspection = inspect_format(params.args.value)
+
+    formats = [fmt.name for fmt in (inspection.recognized_formats or ())]
+    sources = [source for attr in (inspection.attributions or ()) for source in attr.sources]
+    strengths = [attr.strength.value for attr in (inspection.attributions or ())]
+
+    section = Section(
+        title="Source Attribution",
+        items=[
+            Item("Recognized Format", ", ".join(formats) or "Unknown"),
+            Item("Possible Sources", ", ".join(sources) or "Unknown"),
+            Item("Attribution Strength", ", ".join(strengths) or "None"),
+        ],
+    )
     return Section(
         title="MAC Address Autopsy",
         items=[
@@ -199,6 +215,7 @@ def build_mac_autopsy(
                 items=[
                     Item(key="Value", value=params.args.value),
                     Item(key="Length", value=f"{len(normalized) * 4} bits"),
+                    section,
                 ],
             ),
             Section(
@@ -228,7 +245,7 @@ def build_mac_autopsy(
                     Item(key="Bit-Reversed", value=translation.to_bit_reversed(normalized)),
                     Item(key="To Hex", value=translation.to_hex(normalized)),
                     Item(key="To Integer", value=translation.to_decimal(normalized)),
-                    Item(key="To Decimals", value=translation.to_decimal_bytes(normalized)),
+                    Item(key="To Decimals", value=translation.to_decimal_octets(normalized)),
                     Item(key="To Binary", value=translation.to_binary(normalized)),
                     Item(key="To Bytes", value=translation.to_bytes(normalized)),
                 ],

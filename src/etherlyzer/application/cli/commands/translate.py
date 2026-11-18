@@ -21,7 +21,7 @@ REPRESENTATIONS = (
     "bit_reversed",
     "hex",
     "decimal",
-    "decimal_bytes",
+    "decimal_octets",
     "binary",
     "binary_raw",
     "hex_bytes",
@@ -41,7 +41,7 @@ def translate_to_all_representations(mac: str) -> tuple[dict[str, str], Status]:
             "canonical": translation.to_canonical(normalized),
             "bit_reversed": translation.to_bit_reversed(normalized),
             "decimal": translation.to_decimal(normalized),
-            "decimal_bytes": translation.to_decimal_bytes(normalized, padding=True),
+            "decimal_octets": translation.to_decimal_octets(normalized, padding=True),
             "binary": translation.to_binary(normalized),
             "binary_raw": translation.to_binary_raw(normalized),
             "hex": translation.to_hex(normalized),
@@ -110,7 +110,7 @@ def register(
         epilog=r"""
 Examples:
   etherlyzer translate 40:06:AF:F1:08:08
-  etherlyzer translate 40:06:AF:F1:08:08 -t decimal_bytes
+  etherlyzer translate 40:06:AF:F1:08:08 -t decimal_octets
   etherlyzer translate 40:06:AF:F1:08:08 -t binary
   etherlyzer translate 40:06:AF:F1:08:08 -t bit_reversed
   etherlyzer translate 40:06:AF:F1:08:08 -t hex_bytes

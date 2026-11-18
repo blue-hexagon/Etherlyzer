@@ -17,6 +17,6 @@ from etherlyzer.core.interpretation.mac import formatting
 )
 def test_normalizes_mac_formats(value: str, expected: str) -> None:
     assert (
-        formatting.to_customized_format(mac=value, block_size=2, separator=":", case="lower")
+        formatting.custom_format(mac=value, block_size=2, separator=":", case="lower")
         == expected
     )

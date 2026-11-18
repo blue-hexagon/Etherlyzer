@@ -31,7 +31,7 @@ def run(args: argparse.Namespace) -> int:
         if args.fix_typos:
             fix_typos_and_mark_invalid(mac)
         print(
-            formatting.to_customized_format(
+            formatting.custom_format(
                 mac=mac,
                 separator=args.separator,
                 block_size=args.block_size,

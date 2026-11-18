@@ -45,11 +45,11 @@ def build_mac_formats(mac: str) -> Section:
     return Section(
         title="Formats",
         items=[
-            Item(key="Etherlyzer", value=formatting.to_default_format(normalized)),
-            Item(key="Canonical", value=formatting.to_canonical_format(normalized)),
+            Item(key="Etherlyzer", value=formatting.default_format(normalized)),
+            Item(key="Canonical", value=formatting.canonical_format(normalized)),
             Item(
                 key="Cisco",
-                value=formatting.to_customized_format(
+                value=formatting.custom_format(
                     normalized,
                     block_size=4,
                     separator=".",
@@ -149,16 +149,16 @@ def translate_bulk(file_path: Path) -> None:
             reversed_hex = translation.to_bit_reversed(mac)
             reversed_mac = normalize(reversed_hex)
 
-            print(f"MAC Address       : {formatting.to_canonical_format(mac)}")
+            print(f"MAC Address       : {formatting.canonical_format(mac)}")
             print(
-                f"Cisco Format      : {formatting.to_customized_format(mac, block_size=4, separator='.', case='lower')}"
+                f"Cisco Format      : {formatting.custom_format(mac, block_size=4, separator='.', case='lower')}"
             )
             print(f"Normalized        : {mac}")
             print()
             print(f"Hexadecimal       : {translation.to_hex(mac)}")
             print(f"Hexadecimal Bytes : {translation.to_hex_bytes(mac)}")
             print(f"Decimal           : {translation.to_decimal(mac)}")
-            print(f"Decimal Bytes     : {translation.to_decimal_bytes(mac)}")
+            print(f"Decimal Bytes     : {translation.to_decimal_octets(mac)}")
             print()
             print(f"Binary            : {translation.to_binary(mac)}")
             print(f"Binary Raw        : {translation.to_binary_raw(mac)}")
@@ -189,7 +189,7 @@ def format_bulk(file_path: Path) -> None:
             print(f"Input: {mac}")
 
             for block_size, separator in formats:
-                formatted = formatting.to_customized_format(
+                formatted = formatting.custom_format(
                     mac,
                     block_size=block_size,
                     separator=separator,
